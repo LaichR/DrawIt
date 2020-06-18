@@ -1,0 +1,243 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3DD1DF94-717C-49C4-B6D6-6278A514EC8A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Sketch</RootNamespace>
+    <AssemblyName>Sketch</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>$(SERVICE_LOCATOR_PATH)\Microsoft.Practices.ServiceLocation.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>$(UNITY_PATH)\Microsoft.Practices.Unity.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Configuration, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>$(UNITY_PATH)\Microsoft.Practices.Unity.Configuration.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.RegistrationByConvention, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>$(UNITY_PATH)\Microsoft.Practices.Unity.RegistrationByConvention.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="Prism, Version=7.2.0.1422, Culture=neutral, PublicKeyToken=40ee6c3a2184dc59, processorArchitecture=MSIL">
+      <HintPath>..\DrawIt\packages\Prism.Core.7.2.0.1422\lib\net45\Prism.dll</HintPath>
+    </Reference>
+    <Reference Include="Prism.Unity.Wpf, Version=6.2.0.0, Culture=neutral, PublicKeyToken=91a96d2a154366d8, processorArchitecture=MSIL">
+      <HintPath>$(PRISM_UNITY_PATH)\Prism.Unity.Wpf.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Prism.Wpf, Version=6.2.0.0, Culture=neutral, PublicKeyToken=91a96d2a154366d8, processorArchitecture=MSIL">
+      <HintPath>$(PRISM_WPF_PATH)\Prism.Wpf.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\DrawIt\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>$(PRISM_WPF_PATH)\System.Windows.Interactivity.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Windows.Presentation" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controls\ColorPicker\ColorPalette.xaml.cs">
+      <DependentUpon>ColorPalette.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ColorPicker\ColorPaletteModel.cs" />
+    <Compile Include="Controls\ColorPicker\ColorPicker.cs" />
+    <Compile Include="Controls\ColorPicker\ColorPickerDialog.xaml.cs" />
+    <Compile Include="Controls\ColorPicker\IColorSelectionTarget.cs" />
+    <Compile Include="Controls\ColorPicker\SupportingClasses.cs" />
+    <Compile Include="Controls\ConnectorMoveVisualizer.cs" />
+    <Compile Include="Controls\ConnectorAdorner.cs" />
+    <Compile Include="Controls\ConnectorUI.cs" />
+    <Compile Include="Controls\ConnectablePairSelector.cs" />
+    <Compile Include="Controls\IntersectionFinder.cs" />
+    <Compile Include="Controls\LineSegmentDecorator.cs" />
+    <Compile Include="Controls\Operations\OutlineUI.MoveOperation.cs" />
+    <Compile Include="Controls\Operations\SketchPad.RewireConnectorOperation.cs" />
+    <Compile Include="Controls\Operations\SketchPad.SelectUisOperation.cs" />
+    <Compile Include="Controls\OutlineHelper.cs" />
+    <Compile Include="Controls\ScanLine.cs" />
+    <Compile Include="Controls\SketchPad.cs" />
+    <Compile Include="Controls\OutlineAdorner.cs" />
+    <Compile Include="Controls\OutlineUI.cs" />
+    <Compile Include="Controls\Operations\ConnectorUI.MoveConnectorOperation.cs" />
+    <Compile Include="Controls\Operations\SketchPad.AddConnectorOperation.cs" />
+    <Compile Include="Controls\Operations\SketchPad.AddGadgetOperation.cs" />
+    <Compile Include="Controls\Operations\OutlineUI.ChangeSizeOperation.cs" />
+    <Compile Include="Controls\Operations\OutlineUI.EditLabelOperation.cs" />
+    <Compile Include="Controls\Operations\Nop.cs" />
+    <Compile Include="Interface\AllowableConnectorTarget.cs" />
+    <Compile Include="Interface\AllowableConnectorAttribute.cs" />
+    <Compile Include="Interface\IBoundedItemFactory.cs" />
+    <Compile Include="Interface\IConnectorItemModel.cs" />
+    <Compile Include="Interface\IBoundedItemModel.cs" />
+    <Compile Include="Interface\ISketchItemModel.cs" />
+    <Compile Include="Interface\ISketchItemFactory.cs" />
+    <Compile Include="Interface\SketchItemInfoAttribute.cs" />
+    <Compile Include="ModelFactoryRegistry.cs" />
+    <Compile Include="Models\ConnectableBaseFactory.cs" />
+    <Compile Include="Models\CursorPositionHelper.cs" />
+    <Compile Include="Models\ConnectorLabelModel.cs" />
+    <Compile Include="Models\Geometries\Triangle.cs" />
+    <Compile Include="Models\Geometries\Diamond.cs" />
+    <Compile Include="Models\Geometries\Arrow.cs" />
+    <Compile Include="Models\GeometryHelper.cs" />
+    <Compile Include="Models\IConnectorEnding.cs" />
+    <Compile Include="Models\ModelBase.cs" />
+    <Compile Include="Models\AutoRoutingConnectorStrategy.cs" />
+    <Compile Include="Models\ConnectableBase.cs" />
+    <Compile Include="Models\ConnectorModel.cs" />
+    <Compile Include="Models\ConnectorUtilities.cs" />
+    <Compile Include="Models\ContainerModel.cs" />
+    <Compile Include="Models\IConnectorMoveHelper.cs" />
+    <Compile Include="Models\IConnectorStrategy.cs" />
+    <Compile Include="Interface\ISketchContainer.cs" />
+    <Compile Include="Interface\OutlineChangedEventArgs.cs" />
+    <Compile Include="Models\SelfConnectorLineStrategy.cs" />
+    <Compile Include="SketchItemFactory.cs" />
+    <Compile Include="Utilities\SketchPadHelper.cs" />
+    <Compile Include="Models\StraightLineConnectorStrategy.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Types\AllowedDockings.cs" />
+    <Compile Include="Types\AllowedRelativePositions.cs" />
+    <Compile Include="Types\ComputeConnectorLine.cs" />
+    <Compile Include="Interface\ConnectionType.cs" />
+    <Compile Include="Types\ConnectorDocking.cs" />
+    <Compile Include="Types\ConnectorLineStyle.cs" />
+    <Compile Include="Types\EditMode.cs" />
+    <Compile Include="Types\IEditOperation.cs" />
+    <Compile Include="Types\IOutlineUI.cs" />
+    <Compile Include="Types\LineTypes.cs" />
+    <Compile Include="Types\LinkedAvlTree.cs" />
+    <Compile Include="Types\LinkedAvlTreeNode.cs" />
+    <Compile Include="Types\MoveType.cs" />
+    <Compile Include="Types\OutlineToolFactory.cs" />
+    <Compile Include="Types\RelativePosition.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\source\repos\RuntimeCheck\RuntimeCheck.csproj">
+      <Project>{7188d9d1-c458-4c0f-acb8-36c4279afa41}</Project>
+      <Name>RuntimeCheck</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UI.Utilities\UI.Utilities.csproj">
+      <Project>{6871c89d-fd52-4627-a44d-0949659dcaa6}</Project>
+      <Name>UI.Utilities</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="Resources\DefaultConnector.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\left_align.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\top_align.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\align_center.png" />
+    <Content Include="Resources\paint_roller.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Controls\ColorPicker\ColorPalette.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ColorPicker\ColorPickerDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

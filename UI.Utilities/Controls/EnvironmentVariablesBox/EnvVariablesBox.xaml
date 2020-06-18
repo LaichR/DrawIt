@@ -1,0 +1,19 @@
+﻿<Window x:Class="Bluebottle.Base.Controls.EnvironmentVariablesBox.EnvVariablesBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             Title="Environment Variable Viewer for HimsDebugger"
+             d:DesignHeight="200" d:DesignWidth="300"
+             SizeToContent="Height"
+                >
+    <Grid>
+        <DataGrid Name="VariablesTable" ItemsSource="{Binding EnvVariables}" AutoGenerateColumns="False" CanUserAddRows="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn  Header="Name" Width="1*" MinWidth="100" Binding="{Binding Key}"  />
+                <DataGridTextColumn  Header="Path" Width="3*" MinWidth="100" Binding="{Binding Value}" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>

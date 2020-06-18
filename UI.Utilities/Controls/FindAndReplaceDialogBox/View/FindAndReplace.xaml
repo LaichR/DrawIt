@@ -1,0 +1,227 @@
+﻿<Window x:Class="Bluebottle.Base.Controls.FindAndReplaceDialogBox.View.FindAndReplace"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:viewmodels ="clr-namespace:Bluebottle.Base.Controls.FindAndReplaceDialogBox.ViewModel" 
+             xmlns:baseControls ="clr-namespace:Bluebottle.Base.Controls"
+             Width="450" Height="300"
+             Icon="{Binding FindAndReplaceIcon}"
+             Top="{Binding FindReplaceWindowTop, Mode=TwoWay}"
+             Left="{Binding FindReplaceWindowLeft, Mode=TwoWay}"
+             Title="{Binding WindowTitle}"
+             ResizeMode="NoResize"
+             Topmost="True"
+             KeyUp="OnKeyUp"
+        >
+
+    <Window.Resources>
+         <!--no expand/collapse indicator for a tree view item -->
+        <Style x:Key="{x:Type TreeViewItem}" TargetType="{x:Type TreeViewItem}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TreeViewItem}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="5"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Border Name="Bd" Grid.Column="1">                            
+                                <ContentPresenter x:Name="PART_Header"
+                                                  ContentSource="Header"
+                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                            </Border>
+                            <ItemsPresenter x:Name="ItemsHost"
+                                            Grid.Row="1"
+                                            Grid.Column="1"
+                                            Grid.ColumnSpan="2"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
+    
+    <Grid>
+        <!--###############################################################-->
+        <!--             Find and Replace Tab Controls and Buttons         -->
+        <!--###############################################################-->
+        <Grid.RowDefinitions>
+            <RowDefinition Name="FindReplaceTabs" Height="10*"/>
+            <RowDefinition Name="Splitter" Height="4"/>
+            <RowDefinition Name="FindReplaceSettings" Height="10*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <TabControl Name="FRtabs" ItemsSource="{Binding}" SelectedIndex="{Binding Path=SelectedTabIndex, UpdateSourceTrigger=PropertyChanged}">               
+                <TabItem Header="Find">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Name="FFindLabel" Height="1*"/>
+                            <RowDefinition Name="FReplaceLabel" Height="1*"/>
+                            <RowDefinition Name="FReplaceAllButton" Height="1*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Name="FTab" Width="2*"/>
+                            <ColumnDefinition Name="FButtons" Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Row="0" Grid.Column="0">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5,5">
+                                <TextBlock Margin="2,0">Find what: </TextBlock>
+                                <baseControls:AuotSelectTextbox CatchFocusOnVisible="true" x:Name="FindTabFindTextbox" Text="{Binding Path=FindText,  UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch" TextAlignment="Left" Width="180" />
+                            </StackPanel>
+                        </Grid>
+                        <Grid Grid.Row="0" Grid.Column="1">
+                            <Button Content="Find Next" Command="{Binding Path=CmdFindNext}" IsDefault="True" Margin="5,5"/>
+                        </Grid>
+                    </Grid>
+                </TabItem>
+
+                <TabItem Header="Replace">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Name="RFindRLabel" Height="1*"/>
+                            <RowDefinition Name="RReplaceLabel" Height="1*"/>
+                            <RowDefinition Name="RReplaceAllButton" Height="1*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Name="RTab" Width="2*" />
+                            <ColumnDefinition Name="RButtons" Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Row="0" Grid.Column="0">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5,5">
+                                <TextBlock Margin="2,0">Find what:</TextBlock>
+                                <baseControls:AuotSelectTextbox CatchFocusOnVisible="true" x:Name="ReplaceTabFindTextbox" Text="{Binding Path=FindText, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch"  TextAlignment="Left" Width="180"></baseControls:AuotSelectTextbox>
+                            </StackPanel>
+                        </Grid>
+                        <Grid Grid.Row="0" Grid.Column="1">
+                            <Button Content="Find Next" Command="{Binding Path=CmdFindNext}" IsDefault="True" Margin="5,5"/>
+                        </Grid>
+                        <Grid Grid.Row="1" Grid.Column="0">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5,5">
+                                <TextBlock Margin="2,0">Replace with:</TextBlock>
+                                <baseControls:AuotSelectTextbox Text="{Binding Path=ReplaceText, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch"  TextAlignment="Left" Width="180"/>
+                            </StackPanel>
+                        </Grid>
+                        <Grid Grid.Row="1" Grid.Column="1">
+                            <Button Content="Replace" Command="{Binding Path=CmdReplace}" Margin="5,5"/>
+                        </Grid>
+                        <Grid Grid.Row="2" Grid.Column="1">
+                            <Button Content="Replace All" Command="{Binding Path=CmdReplaceAll}" Margin="5,5"/>
+                        </Grid>
+                    </Grid>
+                </TabItem>
+
+            </TabControl>
+        </Grid>
+
+        <!--###############################################################-->
+        <!--                    Search Settings                            -->
+        <!--###############################################################-->
+        <Grid Grid.Row="2">               
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Name="SeachModeSettings" Width="1*"/>
+                <ColumnDefinition Name="SearchDirectionSettings" Width="1*"/>
+                <ColumnDefinition Name="SearchScopeSettings" Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column ="0" Margin="5,5">
+                <Border BorderBrush="LightSlateGray" BorderThickness="1" Background="#FFF9F9F9">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Name="SettingsName1" Height="Auto"/>
+                            <RowDefinition Name="Settings1" Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="{Binding Path=SfSettings.Name}" Margin="5,0,0,0" FontWeight="Bold"/>
+                        <ListBox Grid.Row="1" ItemsSource="{Binding Path=SfSettings.Children}" 
+                                          BorderBrush="Transparent"
+                                          Background="#FFF9F9F9"
+                                          HorizontalContentAlignment="Stretch">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate DataType="{x:Type viewmodels:Setting}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <CheckBox Focusable="False" IsChecked="{Binding IsChecked}" VerticalAlignment="Center"  />
+                                        <ContentPresenter Content="{Binding Name, Mode=OneTime}" Margin="2,0" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <Grid Grid.Column ="1" Margin="5,5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Name="SearchDirection" Height="1*"/>
+                    <RowDefinition Name="WrapAroundCheckBox" Height="1*"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Border BorderBrush="LightSlateGray" BorderThickness="1" Background="#FFF9F9F9">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Name="SettingsName2" Height="Auto"/>
+                                <RowDefinition Name="Settings2" Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="{Binding Path=SdSettings.Name}" Margin="5,0,0,0" FontWeight="Bold"/>
+                            <ListBox Grid.Row="1" ItemsSource="{Binding Path=SdSettings.Children}" 
+                                          BorderBrush="Transparent"
+                                          Background="#FFF9F9F9"
+                                          HorizontalContentAlignment="Stretch">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type viewmodels:Setting}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <RadioButton GroupName="direction" Focusable="False" IsChecked="{Binding IsChecked}"
+                                             Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}},Path=DataContext.CmdSearchDirectionChanged}"
+                                             VerticalAlignment="Center"  />
+                                            <ContentPresenter Content="{Binding Name}" Margin="2,0"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                    </Border>
+                </Grid>
+                <Grid Grid.Row ="1">
+                    <StackPanel Orientation="Horizontal" Margin="5,5">
+                        <CheckBox Focusable="False" IsChecked="{Binding WrapAroundCheck}" IsEnabled="{Binding WrapAroundEnable}" Margin="7,0,0,0" />
+                        <ContentPresenter Content="Wrap Around" Margin="2,-2"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+
+            <Grid Grid.Column ="2" Margin="5,5">
+                <Border BorderBrush="LightSlateGray" BorderThickness="1" Background="#FFF9F9F9">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Name="SettingsName3" Height="Auto"/>
+                            <RowDefinition Name="Settings3" Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="{Binding Path=SSSettings.Name}" Margin="5,0,0,0" FontWeight="Bold"/>
+                        <ListBox Grid.Row="1" ItemsSource="{Binding Path=SSSettings.Children}" 
+                                          BorderBrush="Transparent"
+                                          Background="#FFF9F9F9"
+                                          HorizontalContentAlignment="Stretch">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate DataType="{x:Type viewmodels:Setting}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <RadioButton GroupName="scope" Focusable="False" IsChecked="{Binding IsChecked}" 
+                                             Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}},Path=DataContext.CmdSearchScopeChanged}" VerticalAlignment="Center"  />
+                                        <ContentPresenter Content="{Binding Name, Mode=OneTime}" Margin="2,0"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                </Border>
+
+            </Grid>
+    </Grid>
+
+    </Grid>
+</Window>
