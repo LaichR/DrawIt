@@ -23,17 +23,21 @@ namespace DrawIt.Uml
 
 
 
-        protected UmlTransitionModel(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        protected UmlTransitionModel(SerializationInfo info, StreamingContext context) 
+            : base(info, context) { }
 
-        protected override void ComputeGeometry()
+        public override void UpdateGeometry()
         {
-            base.ComputeGeometry();
+            base.UpdateGeometry();
             var g = Geometry as GeometryGroup;
-            g.Children.Add(new Arrow
+            if (g != null)
             {
-                Translation = new Vector(ConnectorStrategy.ConnectionEnd.X, ConnectorStrategy.ConnectionEnd.Y),
-                Rotation = ConnectorStrategy.EndAngle
-            }.Ending);
+                g.Children.Add(new Arrow
+                {
+                    Translation = new Vector(ConnectorStrategy.ConnectionEnd.X, ConnectorStrategy.ConnectionEnd.Y),
+                    Rotation = ConnectorStrategy.EndAngle
+                }.Ending);
+            }
         }
 
     }

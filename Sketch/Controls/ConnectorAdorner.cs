@@ -9,6 +9,7 @@ using System.Windows.Media;
 using System.Windows.Documents;
 using Sketch.Models;
 using System.Windows.Input;
+using Sketch.Interface;
 
 namespace Sketch.Controls
 {
@@ -17,14 +18,14 @@ namespace Sketch.Controls
         ConnectorModel _model;
         System.Windows.Media.Geometry _shadowGeometry;
 
-        SketchPad _parent;
+        ISketchItemDisplay _parent;
         double _lineWidht = 3;
         Brush _myLineBrush;
         Brush _myFillBrush;
         Pen _myPen;
         
         
-        public ConnectorAdorner(SketchPad parent, ConnectorUI ui)
+        public ConnectorAdorner(ISketchItemDisplay parent, ConnectorUI ui)
             :base(ui)
         {
             _parent = parent;
@@ -97,7 +98,7 @@ namespace Sketch.Controls
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
-            var p = MousePositionArea( e.GetPosition(_parent) );
+            var p = MousePositionArea( e.GetPosition(_parent.Canvas) );
 
             var toggleSelection = Keyboard.Modifiers != ModifierKeys.Control;
             

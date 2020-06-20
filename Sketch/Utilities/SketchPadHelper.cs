@@ -69,7 +69,8 @@ namespace Sketch.Utilities
         public static void TakeSnapshot( Stream stream, IEnumerable<ISketchItemModel> outlines)
         {
             IFormatter formatter = new BinaryFormatter();
-            List<ISketchItemModel> list = new List<ISketchItemModel>(outlines);
+            List<ISketchItemModel> list = new List<ISketchItemModel>(outlines.Where(
+                (x)=>x.IsSerializable));
             formatter.Serialize(stream, list);
         }
 

@@ -25,10 +25,10 @@ namespace Sketch.Controls
             {
                 _owner = owner;
                 _panel = _owner._parent;
-                var bindingName = _owner.Model.EditableLabelName;
+                var bindingName = _owner.Model.LabelPropertyName;
                 var binding = new Binding(bindingName);
                 binding.Mode = BindingMode.TwoWay;
-                binding.UpdateSourceTrigger = UpdateSourceTrigger.LostFocus;
+                binding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
                 _myLabelEditor.IsInactiveSelectionHighlightEnabled = true;
                 _myLabelEditor.SetBinding(TextBox.TextProperty, binding);
                 _myLabelEditor.Visibility = Visibility.Hidden;
@@ -72,8 +72,6 @@ namespace Sketch.Controls
                     e.Handled = false;
                 }
                 
-
-                
             }
 
             void HandleMouseDown(object sender, MouseButtonEventArgs e)
@@ -87,8 +85,11 @@ namespace Sketch.Controls
             public void StopOperation(bool commit)
             {
                 _owner.MouseDown -= HandleMouseDown;
-                _owner.InvalidateVisual();
                 _owner.RegisterHandler(null);
+                if( commit )
+                {
+                    _owner.Model.UpdateGeometry();
+                }
                 HideEditor();
             }
 

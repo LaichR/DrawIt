@@ -11,6 +11,25 @@ namespace Sketch.Interface
     public interface ISketchItemModel: ISerializable
     {
 
+        string Name
+        {
+            get;
+            set;
+        }
+
+        string LabelPropertyName
+        {
+            get;
+        }
+
+        bool AllowEdit
+        {
+            get;
+            set;
+        }
+
+        void UpdateGeometry();
+
         Geometry Geometry
         {
             get;
@@ -30,5 +49,13 @@ namespace Sketch.Interface
         {
             get;
         }
+
+        bool IsSerializable
+        {
+            get;
+        }
+
+        void Move(Transform translation);
+
     }
 }

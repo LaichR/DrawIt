@@ -15,7 +15,7 @@ using Sketch.Interface;
 
 namespace Sketch.Controls
 {
-    public partial class ConnectorUI: Shape, IGadgetUI
+    public partial class ConnectorUI: Shape, ISketchItemUI
     {
         public static readonly DependencyProperty GeometryProperty =
             DependencyProperty.Register("Geometry", typeof(Geometry), typeof(ConnectorUI),
@@ -56,7 +56,7 @@ namespace Sketch.Controls
 
 
         ConnectorModel _model;
-        SketchPad _parent;
+        ISketchItemDisplay _parent;
         Geometry _myGeometry = null;
         IEditOperation _currentOperationHandler;
         int _lineWidth;
@@ -68,7 +68,7 @@ namespace Sketch.Controls
         bool _addornerAdded = false;
 
 
-        public ConnectorUI(SketchPad parent, ConnectorModel model)
+        public ConnectorUI(ISketchItemDisplay parent, ConnectorModel model)
         {
             _model = model;
             _parent = parent;
@@ -218,7 +218,7 @@ namespace Sketch.Controls
         public event EventHandler<bool> SelectionChanged;
         public event EventHandler<bool> IsMarkedChanged;
 
-        public ModelBase Model
+        public ISketchItemModel Model
         {
             get { return _model; }
         }
@@ -230,7 +230,7 @@ namespace Sketch.Controls
         protected override void OnMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
         {
         
-            _parent.Focus();
+            _parent.Canvas.Focus();
             
             if( _currentOperationHandler != null )
             {
@@ -241,7 +241,7 @@ namespace Sketch.Controls
             
             e.Handled = true;
             
-            var p = e.GetPosition(_parent);
+            var p = e.GetPosition(_parent.Canvas);
             _currentOperationHandler = new MoveConnectorOperation(this, p );
 
             if( IsSelected)
@@ -276,16 +276,13 @@ namespace Sketch.Controls
 
         private void  UpdateGeometry()
         {
-            _model.TriggerGeometryUpdate();
+            _model.UpdateGeometry();
+            
+            //InvalidateVisual();
+            _parent.ShowIntersections();
 
-            InvalidateVisual();
-            var intersections = _parent.Intersections;
-            if (intersections != null)
-            {
-                intersections.InvalidateVisual();
-            }
-            
-            
+
+
             if (!_addornerAdded)
             {
                 AddAdorner();
@@ -351,13 +348,13 @@ namespace Sketch.Controls
                 var oldLabel = oldValue as ConnectorLabelModel;
                 if (oldLabel != null)
                 {
-                    _parent.RemoveVisualChild(oldLabel);
+                    _parent.SketchItems.Remove(oldLabel);
                     
                 }
                 var newLabel = newValue as ConnectorLabelModel;
                 if( newValue != null)
                 {
-                    _parent.AddVisualChild(newLabel);
+                    _parent.SketchItems.Add(newLabel);
                 }
             }
         }
@@ -384,12 +381,8 @@ namespace Sketch.Controls
             {
                 SelectionChanged(this, IsSelected);
             }
-
-            var intersections = _parent.Intersections;
-            if (intersections != null)
-            {
-                intersections.InvalidateVisual();
-            }
+            InvalidateVisual();
+            _parent.ShowIntersections();
 
         }
 
@@ -397,7 +390,7 @@ namespace Sketch.Controls
         {
             if (IsMarkedChanged != null)
             {
-                IsMarkedChanged(this, IsSelected);
+                IsMarkedChanged(this, IsMarked);
             }
         }
 
@@ -500,7 +493,7 @@ namespace Sketch.Controls
                 }
                 else
                 {
-                    me._parent.RegisterHandler(new SketchPad.RewireConnectorOperation(me._parent, me._model, me._model.ConnectorStart));
+                    me._parent.BeginEdit(new RewireConnectorOperation(me._parent, me._model, me._model.ConnectorStart));
                 }
 
             }
@@ -526,7 +519,7 @@ namespace Sketch.Controls
                 }
                 else
                 {
-                    me._parent.RegisterHandler(new SketchPad.RewireConnectorOperation(me._parent, me._model, me._model.ConnectorEnd));
+                    me._parent.BeginEdit(new RewireConnectorOperation(me._parent, me._model, me._model.ConnectorEnd));
                 }
 
                 
@@ -542,6 +535,11 @@ namespace Sketch.Controls
             {
                 me._myGeometry = e.NewValue as Geometry;
             }
+            if (me._myAdorner != null)
+            {
+                me._myAdorner.InvalidateVisual();
+            }
+
         }
     }
 }

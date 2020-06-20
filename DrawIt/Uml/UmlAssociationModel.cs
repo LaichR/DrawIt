@@ -25,9 +25,9 @@ namespace DrawIt.Uml
 
         protected UmlAssociationModel(SerializationInfo info, StreamingContext context) : base(info, context) { }
 
-        protected override void ComputeGeometry()
+        public override void UpdateGeometry()
         {
-            base.ComputeGeometry();
+            base.UpdateGeometry();
             var g = Geometry as GeometryGroup;
             g.Children.Add(new Arrow
             {

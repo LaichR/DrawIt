@@ -9,19 +9,14 @@ using Sketch.Types;
 
 namespace Sketch.Interface
 {
-    public interface ISketchContainer
+    public interface ISketchItemContainer
     {
-        Rect ChildArea
-        {
-            get;
-        }
 
         EditMode EditMode
         {
             get;
             set;
         }
-
 
         ObservableCollection<ISketchItemModel> SketchItems
         {

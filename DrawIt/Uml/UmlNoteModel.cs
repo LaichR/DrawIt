@@ -36,7 +36,7 @@ namespace DrawIt.Uml
             Note = "a note";
             RotationAngle = 0.0;
             FillColor = Colors.White;
-            //_toolFactory = toolFactory;
+            UpdateGeometry();
 
         }
 
@@ -44,9 +44,10 @@ namespace DrawIt.Uml
             :base(info, context) 
         {
             Note = info.GetString("Note");
+            UpdateGeometry();
         }
 
-        public override string EditableLabelName
+        public override string LabelPropertyName
         {
             get
             {
@@ -61,7 +62,9 @@ namespace DrawIt.Uml
             {
                 _note = value;
                 _formattedNote = new FormattedText(Note, System.Globalization.CultureInfo.CurrentCulture,
-                    System.Windows.FlowDirection.LeftToRight, new Typeface("Arial"), 12, Brushes.Blue);
+                    System.Windows.FlowDirection.LeftToRight, new Typeface("Arial"), 12, Brushes.Blue,
+                    VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip);
+
                 _formattedNote.MaxTextWidth = Math.Max(50, Bounds.Width - 5);
                 Rect newBounds = Bounds;
                 newBounds.Height = _formattedNote.Extent + BottomMargin * 2 + TopMargin;
@@ -69,7 +72,6 @@ namespace DrawIt.Uml
                 newBounds.Location = new Point(Bounds.Left, Bounds.Top + TopMargin);
                 newBounds.Height = _formattedNote.Extent + BottomMargin * 2;
                 LabelArea = newBounds;
-
             }
         }
 
@@ -85,35 +87,36 @@ namespace DrawIt.Uml
         //    get { return new List<UI.Utilities.Interfaces.ICommandDescriptor>(); }
         //}
 
-        public override Geometry Geometry
+        public override void UpdateGeometry()
         {
-            get {
-                var myGeometry = new GeometryGroup();
 
-                _formattedNote.MaxTextWidth = Math.Max(50, LabelArea.Width - 5);
+            var myGeometry = Geometry as GeometryGroup;
+            myGeometry.Children.Clear();
 
-                
-                
-                //myGeometry.Children.Add(textGeometry);
-                _notePath[0] = GetPathFigureFromPoints(new Point[]
-                    {
+            _formattedNote.MaxTextWidth = Math.Max(50, LabelArea.Width - 5);
+
+
+
+            //myGeometry.Children.Add(textGeometry);
+            _notePath[0] = GetPathFigureFromPoints(new Point[]
+                {
                         Bounds.TopLeft,
                         new Point( Bounds.Right - TopMargin, Bounds.Top),
                         new Point( Bounds.Right - TopMargin, Bounds.Top + TopMargin),
                         new Point( Bounds.Right, Bounds.Top + TopMargin),
                         Bounds.BottomRight,
                         Bounds.BottomLeft,
-                    }
-                    );
+                }
+                );
 
-                _notePath[0].IsClosed = true;
-                myGeometry.Children.Add(new PathGeometry(_notePath));
-                myGeometry.Children.Add(new LineGeometry(new Point(Bounds.Right - TopMargin, Bounds.Top), 
-                    new Point( Bounds.Right, Bounds.Top + TopMargin)));
+            _notePath[0].IsClosed = true;
+            myGeometry.Children.Add(new PathGeometry(_notePath));
+            myGeometry.Children.Add(new LineGeometry(new Point(Bounds.Right - TopMargin, Bounds.Top),
+                new Point(Bounds.Right, Bounds.Top + TopMargin)));
 
-                myGeometry.Transform = Rotation;
-                return myGeometry;
-            }
+            myGeometry.Transform = Rotation;
+            
+
         }
 
         public override void RenderAdornments(DrawingContext drawingContext)

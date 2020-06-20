@@ -18,7 +18,7 @@ namespace Sketch.Models
         
         FontFamily _labelFont;
 
-        string _label;
+        string _label = "";
 
         bool _isSelected;
 
@@ -43,12 +43,19 @@ namespace Sketch.Models
 
         public ModelBase() { }
 
+        public virtual bool IsSerializable
+        {
+            get => true;
+        }
+
         protected ModelBase(SerializationInfo info, StreamingContext context)
         {
             LabelArea = (System.Windows.Rect)info.GetValue("LabelArea", typeof(System.Windows.Rect));
             Name = info.GetString("Label");
             IsSelected = info.GetBoolean("IsSelected");
         }
+
+        public abstract void UpdateGeometry();
 
         public virtual ISketchItemModel RefModel
         {
@@ -72,17 +79,16 @@ namespace Sketch.Models
             protected set { _commands = value; }
         }
 
-        public virtual string EditableLabelName
+        public virtual string LabelPropertyName
         {
             get { return "Name"; }
         }
 
         public virtual string Name
         {
-            get{ return _label;}
+            get{ return _label; }
             set{ 
                 SetProperty<string>(ref _label, value);
-                RaisePropertyChanged("Geometry");
             }
         }
 

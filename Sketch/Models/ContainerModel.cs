@@ -30,6 +30,7 @@ namespace Sketch.Models
         protected ContainerModel(SerializationInfo info, StreamingContext context)
             :base(info, context) 
         {
+            UpdateGeometry();
         }
 
         public ObservableCollection<ModelBase> Children
@@ -44,36 +45,21 @@ namespace Sketch.Models
         {
             get
             {
-                var boundingRect = new RectangleGeometry(
-                    new System.Windows.Rect(Bounds.TopLeft, Bounds.BottomRight), Bounds.Height / 4, Bounds.Height / 4);
+                //var boundingRect = new RectangleGeometry(
+                //    new System.Windows.Rect(Bounds.TopLeft, Bounds.BottomRight), Bounds.Height / 4, Bounds.Height / 4);
+                var boundingRect = new RectangleGeometry(Bounds);
                 //boundingRect.Transform = new RotateTransform(90);
                 return boundingRect;
             }
         }
 
-        public override System.Windows.Media.Geometry Geometry
+        public override void UpdateGeometry()
         {
-            get
-            {
-                var myGeometry = new GeometryGroup();
-
-                //var screenLocation = this.PointToScreen(location);
-
-
-                myGeometry.Children.Add(Outline);
-
-                var leftTop = Bounds.TopLeft;
-
-                myGeometry.Children.Add(new LineGeometry(new System.Windows.Point(leftTop.X, leftTop.Y + 15),
-                    new System.Windows.Point(leftTop.X + Bounds.Width, leftTop.Y + 15)));
-
-
-                FormattedText t = new FormattedText(Name, System.Globalization.CultureInfo.CurrentCulture,
-                    System.Windows.FlowDirection.LeftToRight, new Typeface("Arial"), 12, Brushes.Blue);
-                myGeometry.Children.Add(t.BuildGeometry(new System.Windows.Point(leftTop.X + 5, leftTop.Y)));
-                //myGeometry.Transform = new RotateTransform(90);
-                return myGeometry;
-            }
+            base.UpdateGeometry();
+            var g = Geometry as GeometryGroup;
+            var leftTop = LabelArea.TopLeft;
+            g.Children.Add(new LineGeometry(new System.Windows.Point(leftTop.X, leftTop.Y + LabelArea.Height),
+                    new System.Windows.Point(leftTop.X + LabelArea.Width, leftTop.Y + LabelArea.Height)));
         }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)

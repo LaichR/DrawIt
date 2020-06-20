@@ -223,7 +223,7 @@ namespace Sketch.Controls
         {
 
             if (_sketchPad.CurrentOperationHandler != null &&
-                !(_sketchPad.CurrentOperationHandler is SketchPad.SelectUisOperation )) return;
+                !(_sketchPad.CurrentOperationHandler is SelectUisOperation )) return;
 
             foreach (var @i in _intersections)
             {

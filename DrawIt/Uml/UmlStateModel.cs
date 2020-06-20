@@ -30,36 +30,26 @@ namespace DrawIt.Uml
             AllowSizeChange = true;
             Name = "new state";
             RotationAngle = 0.0;
+            UpdateGeometry();
         }
 
-        protected UmlStateModel(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        protected UmlStateModel(SerializationInfo info, StreamingContext context) : base(info, context) 
+        { }
 
-        public override System.Windows.Media.Geometry Geometry
+        public override void UpdateGeometry()
         {
-            get
-            {
-                var myGeometry = new GeometryGroup();
 
-                //FontStyle norma = FontStyles.Normal;
-                //FontFamily ff = new FontFamilyConverter().ConvertFromString("Arial") as FontFamily;
+            var myGeometry = Geometry as GeometryGroup;
+            myGeometry.Children.Clear();
 
 
-                
-                //FormattedText t = new FormattedText(Name, System.Globalization.CultureInfo.CurrentCulture,
-                //    System.Windows.FlowDirection.LeftToRight, new Typeface(ff, FontStyles.Normal, FontWeights.ExtraLight, FontStretches.Medium), 14, Brushes.Black);
-                
-                //var textGeometry = t.BuildGeometry(new Point(LabelArea.Left + 5, LabelArea.Top + 4));
+            var body = new Rect(Bounds.Left, Bounds.Top, Bounds.Width, Bounds.Height);
+            myGeometry.Children.Add(new LineGeometry(new Point(Bounds.Left, LabelArea.Bottom),
+                                                      new Point(Bounds.Right, LabelArea.Bottom)));
+            myGeometry.Children.Add(new RectangleGeometry(body, Bounds.Height / 4, Bounds.Height / 4));
+            myGeometry.Transform = Rotation;
+            
 
-                //myGeometry.Children.Add(textGeometry);
-
-
-                var body = new Rect(Bounds.Left, Bounds.Top, Bounds.Width, Bounds.Height);
-                myGeometry.Children.Add(new LineGeometry( new Point(Bounds.Left,LabelArea.Bottom), 
-                                                          new Point( Bounds.Right, LabelArea.Bottom)) );
-                myGeometry.Children.Add(new RectangleGeometry(body, Bounds.Height / 4, Bounds.Height / 4));
-                myGeometry.Transform = Rotation;
-                return myGeometry;
-            }
         }
 
         public override System.Windows.Media.RectangleGeometry Outline

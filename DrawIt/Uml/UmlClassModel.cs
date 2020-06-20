@@ -34,23 +34,24 @@ namespace DrawIt.Uml
             AllowEdit = true;
             Name = "new class";
             RotationAngle = 0.0;
+            UpdateGeometry();
         }
 
         protected UmlClassModel(SerializationInfo info, StreamingContext context) : base(info, context) { }
 
-        public override System.Windows.Media.Geometry Geometry
-        {
-            get
-            {
-                var myGeometry = new GeometryGroup();
+        //public override System.Windows.Media.Geometry Geometry
+        //{
+        //    get
+        //    {
+        //        var myGeometry = new GeometryGroup();
  
-                var body = new Rect(Bounds.Left, Bounds.Top , Bounds.Width, Bounds.Height);
-                myGeometry.Children.Add(new LineGeometry(LabelArea.BottomLeft, LabelArea.BottomRight));
-                myGeometry.Children.Add(new RectangleGeometry(body, 2, 2));
-                myGeometry.Transform = Rotation;
-                return myGeometry;
-            }
-        }
+        //        var body = new Rect(Bounds.Left, Bounds.Top , Bounds.Width, Bounds.Height);
+        //        myGeometry.Children.Add(new LineGeometry(LabelArea.BottomLeft, LabelArea.BottomRight));
+        //        myGeometry.Children.Add(new RectangleGeometry(body, 2, 2));
+        //        myGeometry.Transform = Rotation;
+        //        return myGeometry;
+        //    }
+        //}
 
         public override System.Windows.Media.RectangleGeometry Outline
         {

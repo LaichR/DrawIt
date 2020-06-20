@@ -82,6 +82,7 @@ namespace Sketch.Models
         protected ConnectorModel(SerializationInfo info, StreamingContext context):base(info, context)
         {
             _connectionType = (ConnectionType)info.GetValue("ConnectionType", typeof(ConnectionType));
+            
             StartPointRelativePosition = info.GetDouble("StartPointRelativePosition");
             MiddlePointRelativePosition = info.GetDouble("MiddlePointRelativePosition");
             EndPointRelativePosition = info.GetDouble("EndPointRelativePosition");
@@ -89,7 +90,7 @@ namespace Sketch.Models
             StartPointDocking = (ConnectorDocking)info.GetValue("StartPointDocking", typeof(ConnectorDocking));
             var isLableVisible = info.GetBoolean("IsLabelShown");
             From = (ConnectableBase) info.GetValue("From", typeof(ConnectableBase));
-            To = (ConnectableBase)info.GetValue("To", typeof(ConnectableBase));            
+            To = (ConnectableBase)info.GetValue("To", typeof(ConnectableBase));
             _myConnectorStrategy = ConnectorUtilities.GetConnectionType(this, _connectionType);
             _cmdShowLabel = new DelegateCommand(ExecuteShowLabel, CanExecuteShowLabel);
             _cmdHideLabel = new DelegateCommand(ExecuteHideLabel, CanExecuteHideLabel);
@@ -98,6 +99,7 @@ namespace Sketch.Models
             {
                 ExecuteShowLabel();
             }
+            UpdateGeometry();
         }
 
         public override ISketchItemModel RefModel
@@ -260,10 +262,7 @@ namespace Sketch.Models
                 var helper = ConnectorStrategy.StartMove(ConnectorStart);
                 var p = translation.Transform(ConnectorStart);
                 p = ConnectorUtilities.RestrictRange(From.Bounds,p);
-                
                 helper.Commit(StartPointDocking, EndPointDocking, p, ConnectorEnd, helper.Distance);
-                
-                TriggerGeometryUpdate();
             }
             if( ConnectorEndSelected)
             {
@@ -272,7 +271,7 @@ namespace Sketch.Models
                 p = ConnectorUtilities.RestrictRange(To.Bounds, p);
                 helper.Commit(EndPointDocking, StartPointDocking, p, ConnectorStart, helper.Distance);
             }
-            RaisePropertyChanged("Geometry");
+            UpdateGeometry();
         }
 
         public IBoundedItemModel From
@@ -342,13 +341,6 @@ namespace Sketch.Models
             
         }
 
-        public virtual void TriggerGeometryUpdate()
-        {
-            ComputeGeometry();
-            
-            if (_connectorStartLabel != null) _connectorStartLabel.InvalidateGeometry();
-        }
-
         public void ShowLabelConnectorStart( Point p)
         {
             var labelModel = new ConnectorLabelModel(this, true, p);
@@ -362,11 +354,20 @@ namespace Sketch.Models
             _restoreAction();
         }
 
-        protected virtual void ComputeGeometry()
+        public override void UpdateGeometry()
         {
-            _geometry.Children.Clear();
-            _path.Figures = new PathFigureCollection(_myConnectorStrategy.ConnectorPath);
-            _geometry.Children.Add(_path);
+            // this might be triggered before the full object is available
+            // hence we need to prevent this from doing bad stuff!
+            if (_geometry != null && _myConnectorStrategy != null)
+            {
+                _geometry.Children.Clear();
+                _path.Figures = new PathFigureCollection(_myConnectorStrategy.ConnectorPath);
+                _geometry.Children.Add(_path);
+                if (_connectorStartLabel != null)
+                {
+                    _connectorStartLabel.UpdateGeometry();
+                }
+            }
         }
 
         Point GetLabelPosition()

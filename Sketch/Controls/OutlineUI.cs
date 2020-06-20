@@ -18,7 +18,7 @@ using Sketch.Interface;
 
 namespace Sketch.Controls
 {
-    public partial class OutlineUI: Shape, IGadgetUI
+    public partial class OutlineUI: Shape, ISketchItemUI
     {
         
         public static readonly DependencyProperty BoundsProperty =
@@ -104,7 +104,7 @@ namespace Sketch.Controls
             }
             else
             {
-                this.StrokeThickness = 1;
+                this.StrokeThickness = 0.1;
             }
 
             // allow to bind Stroke dash array property
@@ -112,10 +112,7 @@ namespace Sketch.Controls
             {
                 this.SetBinding(StrokeDashArrayProperty, "StrokeDashArray");
             }
-            else
-            {
-                this.StrokeThickness = 1;
-            }
+
 
             // some of the bindings must only occur after the shadow was created!
             _adorner = new OutlineAdorner(this, parent);
@@ -217,7 +214,7 @@ namespace Sketch.Controls
             _parent.DropSnapshot();
         }
 
-        public ModelBase Model
+        public ISketchItemModel Model
         {
             get { return _model; }
         }
@@ -262,6 +259,7 @@ namespace Sketch.Controls
         protected override void OnRender(DrawingContext drawingContext)
         {
             drawingContext.PushClip(_model.Outline);
+
             if (!_model.Render(drawingContext))
             {
                 base.OnRender(drawingContext);
@@ -269,7 +267,7 @@ namespace Sketch.Controls
             _model.RenderAdornments(drawingContext);
             drawingContext.Pop();
             _adorner.InvalidateVisual();
-            
+
         }
 
         protected override void OnMouseLeave(MouseEventArgs e)
@@ -509,6 +507,7 @@ namespace Sketch.Controls
                     gadgetUI._adorner.InvalidateVisual();
                 }
             }
+            gadgetUI.Shape.InvalidateVisual();
         }
 
         private static void OnAllowSizeChangeChanged(DependencyObject source,

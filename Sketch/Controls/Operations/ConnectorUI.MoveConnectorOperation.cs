@@ -90,7 +90,7 @@ namespace Sketch.Controls
                 _ui.MouseMove += HandleMouseMove;
                 _ui.MouseUp += HandleMouseUp;
                 _ui.CaptureMouse();
-                _ui._parent.Children.Add(_visualizer);
+                _ui._parent.Canvas.Children.Add(_visualizer);
             }
 
             public void StopOperation(bool commit)
@@ -98,7 +98,7 @@ namespace Sketch.Controls
                 if (!_done)
                 {
                     _done = true;
-                    _ui._parent.Children.Remove(_visualizer);
+                    _ui._parent.Canvas.Children.Remove(_visualizer);
                     _ui.MouseMove -= HandleMouseMove;
                     _ui.MouseUp -= HandleMouseUp;
                     _ui.ReleaseMouseCapture();
@@ -141,10 +141,10 @@ namespace Sketch.Controls
 
             public void OnMouseMove(System.Windows.Input.MouseEventArgs e)
             {
-                Point p = e.GetPosition(_ui._parent);
+                Point p = e.GetPosition(_ui._parent.Canvas);
 
-                p.X = Math.Round(p.X / _ui._parent.Grid) * _ui._parent.Grid;
-                p.Y = Math.Round(p.Y / _ui._parent.Grid) * _ui._parent.Grid;
+                p.X = Math.Round(p.X / SketchPad.GridSize) * SketchPad.GridSize;
+                p.Y = Math.Round(p.Y / SketchPad.GridSize) * SketchPad.GridSize;
 
                 var v = Point.Subtract(_p0, p);
                 _p0 = p;

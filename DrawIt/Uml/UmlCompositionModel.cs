@@ -29,9 +29,9 @@ namespace DrawIt.Uml
             FillEndings = true;
         }
 
-        protected override void ComputeGeometry()
+        public override void UpdateGeometry()
         {
-            base.ComputeGeometry();
+            base.UpdateGeometry();
             var geometry = Geometry as GeometryGroup;
             geometry.Children.Add(new Diamond
             {

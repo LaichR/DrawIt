@@ -32,38 +32,27 @@ namespace DrawIt.Uml
             AllowSizeChange = false;
             LabelArea = Rect.Empty;
             IsSelected = true;
-            AllowSizeChange = true;
             Name = "Initial-State";
             RotationAngle = 0.0;
-            FillColor = Colors.Black;
-            _geometry = new EllipseGeometry(Bounds);
-            
 
+            FillColor = Colors.Black;
+            UpdateGeometry();
         }
 
         protected UmlInitialStateModel(SerializationInfo info, StreamingContext context) : 
             base(info, context) 
         {
-            _geometry = new EllipseGeometry(Bounds);
+            UpdateGeometry();
         }
 
-        public void ComputeGeometry()
+        public override void UpdateGeometry()
         {
-            _geometry.Center = new Point(
-                (Bounds.Left + Bounds.Right) / 2,
-                (Bounds.Top + Bounds.Bottom) / 2);
-            _geometry.RadiusX = Bounds.Width / 2 -1;
-            _geometry.RadiusY = _geometry.RadiusX;
+            var g = Geometry as GeometryGroup;
+            g.Children.Clear();
+            g.Children.Add(new EllipseGeometry(Bounds));
         }
 
-        public override System.Windows.Media.Geometry Geometry
-        {
-            get
-            {
-                ComputeGeometry();
-                return _geometry.Clone();
-            }
-        }
+        
 
         public override RectangleGeometry Outline
         {

@@ -16,14 +16,12 @@ namespace DrawIt.Uml
     public class UmlFinalStateModel : ConnectableBase
     {
         const int DefaultWidth = 26;
-        const int DefaultHeight = 26;
+        const int DefaultHeight = 27;
         const int OuterRadius = 12;
         const int InnerRadius1 = 11;
         const int InnerRadius2 = 8;
 
-        
-        
-        GeometryGroup _geometry;
+       
         EllipseGeometry _inner;
         CombinedGeometry _outer;
         public UmlFinalStateModel(Point p)
@@ -35,23 +33,22 @@ namespace DrawIt.Uml
             AllowSizeChange = false;
             LabelArea = Rect.Empty;
             IsSelected = true;
-            AllowSizeChange = true;
+           
             Name = "Final-State";
             RotationAngle = 0.0;
             
-            _geometry = new GeometryGroup();
             FillColor = Colors.Black;
-            ComputeGeometry();
+            UpdateGeometry();
 
         }
 
         protected UmlFinalStateModel(SerializationInfo info, StreamingContext context) : 
             base(info, context) 
         {
-            _geometry = new GeometryGroup();
+            UpdateGeometry();
         }
 
-        public void ComputeGeometry()
+        public override void UpdateGeometry()
         {
             var center = new Point((Bounds.Left + Bounds.Right)/2, 
                 (Bounds.Top + Bounds.Bottom)/2);
@@ -69,19 +66,12 @@ namespace DrawIt.Uml
                 InnerRadius1, InnerRadius1);
             _outer.GeometryCombineMode = GeometryCombineMode.Xor;
 
-            _geometry.Children.Clear();
-            _geometry.Children.Add( _outer );
-            _geometry.Children.Add(_inner);
-            
-        }
+            var g = Geometry as GeometryGroup;
 
-        public override System.Windows.Media.Geometry Geometry
-        {
-            get
-            {
-                ComputeGeometry();
-                return _geometry.Clone();
-            }
+            g.Children.Clear();
+            g.Children.Add( _outer );
+            g.Children.Add(_inner);
+            
         }
 
         public override RectangleGeometry Outline
@@ -100,7 +90,7 @@ namespace DrawIt.Uml
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
-            _geometry = new GeometryGroup();
+            UpdateGeometry();
         }
 
     }

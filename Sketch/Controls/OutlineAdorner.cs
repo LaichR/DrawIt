@@ -20,7 +20,7 @@ namespace Sketch.Controls
         static readonly DashStyle _activeDashStile = new DashStyle(new double[] { 2.0, 2.5 }, 0.0);
         static readonly double _activeStroke = 1.0;
         static readonly double _defaultStroke = 3.0;
-        static readonly Pen _hitTestPen = new Pen(Brushes.White, 20.0);
+        static readonly Pen _hitTestPen = new Pen(Brushes.White, 10.0);
 
         ConnectableBase _realBody;
         RectangleGeometry _shadowGeometry;
@@ -43,9 +43,10 @@ namespace Sketch.Controls
             :base(adorned)
         {
             _adorned = adorned;
+            
             _parent = parent;
             _realBody = _adorned.Model as ConnectableBase;
-            _shadowGeometry = _realBody.Outline;
+            _shadowGeometry = _realBody.Outline.Clone();
             _myBrush = _selectedOutlineBrush;
             ComputeSensitiveBorder();
             _myPen = new Pen(_myBrush, _defaultStroke);
@@ -73,7 +74,8 @@ namespace Sketch.Controls
 
         protected override void OnRender(DrawingContext drawingContext)
         {
-            drawingContext.DrawGeometry(null, _myPen, _shadowGeometry);
+            drawingContext.DrawGeometry(null, 
+                _myPen, _shadowGeometry);
         }
 
         public void Transform( Transform transform)
@@ -113,8 +115,8 @@ namespace Sketch.Controls
         protected override void OnMouseMove(System.Windows.Input.MouseEventArgs e)
         {
             Point p = e.GetPosition(this._parent);
-            p.X = Math.Round(p.X / _parent.Grid) * _parent.Grid;
-            p.Y = Math.Round(p.Y / _parent.Grid) * _parent.Grid;
+            p.X = Math.Round(p.X / SketchPad.GridSize) * SketchPad.GridSize;
+            p.Y = Math.Round(p.Y / SketchPad.GridSize) * SketchPad.GridSize;
 
             if( _adorned.LabelArea.Contains(p) && _adorned.Model.AllowEdit )
             {

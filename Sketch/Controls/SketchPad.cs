@@ -20,12 +20,12 @@ using System.IO;
 namespace Sketch.Controls
 {
     
-    public partial class SketchPad: Canvas
+    public partial class SketchPad: Canvas, ISketchItemDisplay
     {
         public static readonly DependencyProperty SketchItemsPropery =
             DependencyProperty.Register("SketchItems", 
             typeof(ObservableCollection<Sketch.Interface.ISketchItemModel>), 
-            typeof(SketchPad), new PropertyMetadata(OnOutlinesChanged));
+            typeof(SketchPad), new PropertyMetadata(OnSketchItemsChanged));
 
         public static readonly DependencyProperty DeleteEntriesProperty =
             DependencyProperty.Register("DeleteEntries", typeof(ICommand), 
@@ -52,19 +52,20 @@ namespace Sketch.Controls
 
         internal const int GridSize = 6;
 
-        //Button _addConnectorButton = new Button();
+        
         LinkedList<byte[]> _snapshots = new LinkedList<byte[]>();
         
-        IGadgetUI _selectedGadget = null;
-        List<IGadgetUI> _activeUis = new List<IGadgetUI>();
-        ConnectableBase _from = null;
-        //ConnectableBase _to = null;
-        IEditOperation _currentInputHandler;
-        IList<IGadgetUI> _selectedUis = new List<IGadgetUI>();
-        ICommand _deleteCmd = null;
-        bool _outlineEnable = true;
+        ISketchItemUI _selectedUI = null;                    // currently selected item or null if no item is selected
+        
+        ConnectableBase _from = null;                        // item that is the starting object for a new connector to be inserted
+        
+        IEditOperation _currentInputHandler;                 // handles the user input
 
-        object _synchRoot = new object();
+        IList<ISketchItemUI> _markedUis = new List<ISketchItemUI>(); // list of items that are highlighted; this includes the selected item as well
+        ICommand _deleteCmd = null;                          // command to be invoked when an item shall be removed
+        bool _outlineEnable = true;                          // flag to indicate if new items shall react on user gestures
+
+        object _synchRoot = new object();                    // i think this is not really consistently used!
         IntersectionFinder _intersectionFinder;
 
         public SketchPad()
@@ -73,6 +74,24 @@ namespace Sketch.Controls
             EditMode = Types.EditMode.Insert;
             Background = Brushes.White;   
             
+        }
+
+        public ISketchItemUI SelectedItem
+        {
+            get => _selectedUI;
+        }
+
+        public void ClearSelection()
+        {
+            if ( _selectedUI != null )
+            {
+                _selectedUI.IsSelected = false;
+            }
+        }
+
+        public IList<ISketchItemUI> MarkedItems
+        {
+            get => _markedUis;
         }
         
         public double LogicalWidth
@@ -84,14 +103,6 @@ namespace Sketch.Controls
             set
             {
                 base.SetValue(LogicalWidthProperty, value);
-            }
-        }
-
-        public int Grid
-        {
-            get
-            {
-                return GridSize;
             }
         }
 
@@ -126,6 +137,14 @@ namespace Sketch.Controls
         {
             get { return (ICommand)GetValue(DeleteEntriesProperty); }
             set { SetValue(DeleteEntriesProperty, value); }
+        }
+
+        public void ShowIntersections()
+        {
+            if (_intersectionFinder != null)
+            {
+                _intersectionFinder.InvalidateVisual();
+            }
         }
 
         public void TakeSnapshot()
@@ -170,11 +189,11 @@ namespace Sketch.Controls
         {
             lock (_synchRoot)
             {
-                _from = _selectedGadget.Model as ConnectableBase;
+                _from = _selectedUI.Model as ConnectableBase;
                 if (_from != null)
                 {
                     var p = ConnectorUtilities.ComputeCenter(_from.Bounds);
-                    RegisterHandler(new AddConnectorOperation(this, _from, p));
+                    BeginEdit(new AddConnectorOperation(this, _from, p));
                 }
             }
         }
@@ -189,16 +208,30 @@ namespace Sketch.Controls
 
 
             RenderTargetBitmap bmp = new RenderTargetBitmap((int)ActualWidth, (int)ActualHeight, 96, 96, PixelFormats.Pbgra32);
-            foreach( var ui in _activeUis.OfType<ConnectorUI>() )
+
+           
+            
+            foreach( var ui in Children.OfType<ConnectorUI>() )
             {
-                bmp.Render(ui.Shape);
+                ui.IsSelected = false;
+                //bmp.Render(ui.Shape);
+
                 AdjustBoundaries(ui.Model.Geometry.Bounds, ref minX, ref maxX, ref minY, ref maxY);
                 
             }
-            foreach( var ui in _activeUis.OfType<OutlineUI>())
+
+
+
+            foreach( var ui in Children.OfType<OutlineUI>())
             {
-                bmp.Render(ui.Shape);
+                ui.IsSelected = false;
+                //bmp.Render(ui.Shape);
                 AdjustBoundaries(ui.Model.Geometry.Bounds, ref minX, ref maxX, ref minY, ref maxY);
+            }
+            bmp.Render(this);
+            if (_intersectionFinder != null)
+            {
+                bmp.Render(_intersectionFinder);
             }
 
             // x and y must not be smaller than 0
@@ -219,21 +252,11 @@ namespace Sketch.Controls
             {
                 encoder.Save(stm);
             }
-
-        }
-
-        public void MoveSelected( double dx, double dy )
-        {
-            var transform = new TranslateTransform(dx, dy);
-            foreach( var ui in _selectedUis)
-            {
-                ui.Model.Move(transform);
-            }
         }
 
         public void AddVisualChild(ISketchItemModel model)
         {
-            IGadgetUI newActiveOutline = null;
+            ISketchItemUI newActiveOutline = null;
 
             if (model is ConnectableBase)
             {
@@ -256,22 +279,22 @@ namespace Sketch.Controls
             }
             
 
-            if( _selectedGadget != null)
+            if( _selectedUI != null)
             {
-                _selectedGadget.IsSelected = false;
+                _selectedUI.IsSelected = false;
             }
             newActiveOutline.IsSelected = false;
-            newActiveOutline.SelectionChanged += gadgetSelectionChanged;
+            newActiveOutline.SelectionChanged += itemSelectionChanged;
             newActiveOutline.IsMarkedChanged += gadgetIsMarkedChanged;
             
             newActiveOutline.IsSelected = true;
-            this._activeUis.Add(newActiveOutline);
+            //this._activeUis.Add(newActiveOutline);
         }
 
         public void RemoveVisualChild( ISketchItemModel model )
         {
-            List<IGadgetUI> toRemove = new List<IGadgetUI>();
-            toRemove.AddRange(_activeUis.Where((x) => x.Model == model));
+            List<ISketchItemUI> toRemove = new List<ISketchItemUI>();
+            toRemove.AddRange(Children.OfType<ISketchItemUI>().Where((x) => x.Model == model));
             RemoveActiveUis(toRemove);
             
         }
@@ -284,24 +307,14 @@ namespace Sketch.Controls
             }
         }
 
-
-        internal IntersectionFinder Intersections
-        {
-            get
-            {
-                //AdornerLayer.GetAdornerLayer(this).Add(_intersectionFinder);
-                return _intersectionFinder;
-                
-            }
-        }
-
+        public Canvas Canvas => this;
 
         internal void HandleKeyDown( KeyEventArgs args)
         {
             this.OnKeyDown(args);
         }
 
-        internal void RegisterHandler( IEditOperation handler )
+        public void BeginEdit( IEditOperation handler )
         {
             if( _currentInputHandler != null)
             {
@@ -311,13 +324,11 @@ namespace Sketch.Controls
         }
 
 
-
-
-        internal void SetOutlineEnable(bool enable)
+        public void SetSketchItemEnable(bool enable)
         {
-            foreach (var child in Children.OfType<IGadgetUI>())
+            _outlineEnable = enable;
+            foreach (var child in Children.OfType<ISketchItemUI>())
             {
-                _outlineEnable = enable;
                 if (enable)
                 {
                     child.Enable();
@@ -329,7 +340,7 @@ namespace Sketch.Controls
             }
         }
 
-        void EndOperation()
+        public void EndEdit()
         {
             var factory = ModelFactoryRegistry.Instance.GetSketchItemFactory();
             if ( factory.SelectedForCreation == null||
@@ -340,11 +351,11 @@ namespace Sketch.Controls
 
             if (EditMode == Types.EditMode.Insert)
             {
-                RegisterHandler(new AddGadgetOperation(this));
+                BeginEdit(new AddConnectableItemOperation(this));
             }
             else
             {
-                RegisterHandler(new SelectUisOperation(this));
+                BeginEdit(new SelectUisOperation(this));
             }
             InvalidateVisual();
         }
@@ -371,17 +382,17 @@ namespace Sketch.Controls
             }
             else if( e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
             {
-                List<IGadgetUI> toRemove = new List<IGadgetUI>();
+                List<ISketchItemUI> toRemove = new List<ISketchItemUI>();
                 foreach (var m in e.OldItems)
                 {
                     var model = m as ISketchItemModel;
-                    toRemove.AddRange( _activeUis.Where((x) => x.Model == model || model.RefModel == x.Model) );
+                    toRemove.AddRange( Children.OfType<ISketchItemUI>().Where((x) => x.Model == model || model.RefModel == x.Model) );
                 }
                 RemoveActiveUis(toRemove);
             }
             else if(e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
             {
-                List<IGadgetUI> toRemove = new List<IGadgetUI>(_activeUis);
+                List<ISketchItemUI> toRemove = new List<ISketchItemUI>(Children.OfType<ISketchItemUI>());
                 RemoveActiveUis(toRemove);
                 Children.Clear();
             }
@@ -391,38 +402,38 @@ namespace Sketch.Controls
         {
             lock( this._synchRoot)
             {
-                var ui = obj as IGadgetUI;
+                var ui = obj as ISketchItemUI;
                 if (ui != null)
                 {
-                    if (_selectedUis.Contains(ui) && !args)
+                    if (_markedUis.Contains(ui) && !args)
                     {
-                        _selectedUis.Remove(ui);
+                        _markedUis.Remove(ui);
                     }
-                    else if (args && !_selectedUis.Contains(ui))
+                    else if (args && !_markedUis.Contains(ui))
                     {
-                        _selectedUis.Add(ui);
+                        _markedUis.Add(ui);
                     }
                 }
             }
         }
 
-        void gadgetSelectionChanged(object obj, bool args)
+        void itemSelectionChanged(object obj, bool args)
         {
             lock (this._synchRoot)
             {
                 if (args )
                 {
-                    if( _selectedGadget != obj && _selectedGadget != null)
+                    if( _selectedUI != obj && _selectedUI != null)
                     {
-                        _selectedGadget.IsSelected = false;
+                        _selectedUI.IsSelected = false;
                     }
-                    _selectedGadget = obj as IGadgetUI;
+                    _selectedUI = obj as ISketchItemUI;
                 }
                 else 
                 {
-                    if (_selectedGadget == obj)
+                    if (_selectedUI == obj)
                     {
-                        _selectedGadget = null;
+                        _selectedUI = null;
                     }
                 }
             }
@@ -441,10 +452,10 @@ namespace Sketch.Controls
                     }
                     break;
                 case Key.F2:
-                    if (_selectedGadget != null)
+                    if (_selectedUI != null)
                     {
                         {
-                            var ui = _selectedGadget.Shape as OutlineUI;
+                            var ui = _selectedUI.Shape as OutlineUI;
                             if (ui != null)
                             {
                                 ui.StartEdit();
@@ -454,15 +465,15 @@ namespace Sketch.Controls
                     break;
                 case Key.Escape:
                     // we iterate over the _activeUi collection, since we are removing items from the _selectedUi collection 
-                    foreach( var ui in _activeUis)
+                    foreach( var ui in Children.OfType<ISketchItemUI>())
                     {
                         ui.IsMarked = false;
                     }
-                    //_selectedUis.Clear();
-                    if( _selectedGadget != null)
+                    
+                    if( _selectedUI != null)
                     {
-                        _selectedGadget.IsSelected = false;
-                        //_selectedGadget = null;
+                        _selectedUI.IsSelected = false;
+                        
                     }
                     break;
                 case Key.Z:
@@ -478,18 +489,18 @@ namespace Sketch.Controls
             }
         }
 
-        void RemoveActiveUis(List<IGadgetUI> toRemove)
+        void RemoveActiveUis(List<ISketchItemUI> toRemove)
         {
             foreach (var ui in toRemove)
             {
                 ui.IsSelected = false;
                 ui.IsMarked = false;
 
-                ui.SelectionChanged -= gadgetSelectionChanged;
+                ui.SelectionChanged -= itemSelectionChanged;
                 ui.IsMarkedChanged -= gadgetIsMarkedChanged;
 
                 
-                _activeUis.Remove(ui);
+                //_activeUis.Remove(ui);
                 Children.Remove(ui.Shape);
 
             }
@@ -517,7 +528,7 @@ namespace Sketch.Controls
             }
         }
 
-        private static void OnOutlinesChanged(DependencyObject source,
+        private static void OnSketchItemsChanged(DependencyObject source,
             DependencyPropertyChangedEventArgs e)
         {
             SketchPad pad = source as SketchPad;
@@ -570,12 +581,12 @@ namespace Sketch.Controls
             SketchPad pad = source as SketchPad;
             if( pad.EditMode == EditMode.Insert)
             {
-                pad.RegisterHandler(new AddGadgetOperation(pad));
+                pad.BeginEdit(new AddConnectableItemOperation(pad));
             }
             else
             {
 
-                pad.RegisterHandler(new SelectUisOperation(pad));
+                pad.BeginEdit(new SelectUisOperation(pad));
             }
         }
 

@@ -6,10 +6,26 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 
+
 namespace Sketch.Models
 {
     public static class GeometryHelper
     {
+
+        public static Geometry MakeLeftToRightTextGeometry(string text, Point pos, Typeface typeFace, 
+            double fontSize, Brush brush )
+        {
+
+            var pixelsPerDpi = VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip;
+            var formattedLable = new FormattedText(text,
+               System.Globalization.CultureInfo.CurrentCulture,
+               System.Windows.FlowDirection.LeftToRight, typeFace, fontSize, brush, pixelsPerDpi);
+            
+            var geometry =  formattedLable.BuildGeometry(pos);
+            
+            return geometry;
+        }
+
         public static Geometry GetGeometryFromPath( params PathFigure[] paths)
         {
             return new PathGeometry(paths);

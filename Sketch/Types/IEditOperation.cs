@@ -8,11 +8,11 @@ using System.Windows.Input;
 
 namespace Sketch.Controls
 {
-    internal interface IEditOperation
+    public interface IEditOperation
     {
         //void Start();
         
-        void StopOperation(bool ok);
+        void StopOperation(bool commit );
 
        
     }

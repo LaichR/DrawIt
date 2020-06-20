@@ -28,18 +28,21 @@ namespace DrawIt.Uml
             IsSelected = true;
             AllowSizeChange = true;
             Name = "new package";
+            UpdateGeometry();
         }
 
         protected UmlPackageModel(SerializationInfo info, StreamingContext context) : base(info, context) { }
 
-        public override System.Windows.Media.Geometry Geometry
+        public override void UpdateGeometry()
         {
-            get
-            {
-                var myGeometry = new GeometryGroup();
+            
+                var myGeometry = Geometry as GeometryGroup;
+                myGeometry.Children.Clear();
 
                 FormattedText t = new FormattedText(Name, System.Globalization.CultureInfo.CurrentCulture,
-                    System.Windows.FlowDirection.LeftToRight, new Typeface("Arial"), 12, Brushes.Blue);
+                    System.Windows.FlowDirection.LeftToRight, new Typeface("Arial"), 12, Brushes.Blue,
+                    VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip);
+
                 var textGeometry = t.BuildGeometry(new Point(LabelArea.Left + 7, LabelArea.Top + 2));
 
                 //myGeometry.Children.Add(textGeometry);
@@ -64,9 +67,6 @@ namespace DrawIt.Uml
                 myGeometry.Children.Add(labelPath);
                 var body = new Rect(Bounds.Left, Bounds.Top + LabelArea.Height, Bounds.Width, Bounds.Height - LabelArea.Height);
                 myGeometry.Children.Add(new RectangleGeometry(body));
-                
-                return myGeometry;
-            }
         }
 
         public override System.Windows.Media.RectangleGeometry Outline

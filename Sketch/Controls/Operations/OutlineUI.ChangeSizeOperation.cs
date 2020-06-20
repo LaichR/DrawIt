@@ -114,8 +114,8 @@ namespace Sketch.Controls
 
             Transform ComputeResizeTransformation(Point p)
             {
-                p.X = Math.Round(p.X / this._ui._parent.Grid) * this._ui._parent.Grid;
-                p.Y = Math.Round(p.Y / this._ui._parent.Grid) * this._ui._parent.Grid;
+                p.X = Math.Round(p.X / SketchPad.GridSize) * SketchPad.GridSize;
+                p.Y = Math.Round(p.Y / SketchPad.GridSize) * SketchPad.GridSize;
 
                 var rect = _origialRect;
                 var rot = _ui._geometry.Transform as RotateTransform;

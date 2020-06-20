@@ -26,7 +26,7 @@ using DrawIt.Shapes;
 namespace DrawIt
 {
     public class ApplicationViewModel : BindableBase
-        , ISketchContainer, IColorSelectionTarget
+        , ISketchItemContainer, IColorSelectionTarget
     {
         DelegateCommand _cmdInsertMode;
         DelegateCommand _cmdEditMode;

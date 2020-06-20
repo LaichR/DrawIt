@@ -118,16 +118,16 @@
     <Compile Include="Controls\IntersectionFinder.cs" />
     <Compile Include="Controls\LineSegmentDecorator.cs" />
     <Compile Include="Controls\Operations\OutlineUI.MoveOperation.cs" />
-    <Compile Include="Controls\Operations\SketchPad.RewireConnectorOperation.cs" />
-    <Compile Include="Controls\Operations\SketchPad.SelectUisOperation.cs" />
+    <Compile Include="Controls\Operations\RewireConnectorOperation.cs" />
+    <Compile Include="Controls\Operations\SelectUisOperation.cs" />
     <Compile Include="Controls\OutlineHelper.cs" />
     <Compile Include="Controls\ScanLine.cs" />
     <Compile Include="Controls\SketchPad.cs" />
     <Compile Include="Controls\OutlineAdorner.cs" />
     <Compile Include="Controls\OutlineUI.cs" />
     <Compile Include="Controls\Operations\ConnectorUI.MoveConnectorOperation.cs" />
-    <Compile Include="Controls\Operations\SketchPad.AddConnectorOperation.cs" />
-    <Compile Include="Controls\Operations\SketchPad.AddGadgetOperation.cs" />
+    <Compile Include="Controls\Operations\AddConnectorOperation.cs" />
+    <Compile Include="Controls\Operations\AddBoundedtemOperation.cs" />
     <Compile Include="Controls\Operations\OutlineUI.ChangeSizeOperation.cs" />
     <Compile Include="Controls\Operations\OutlineUI.EditLabelOperation.cs" />
     <Compile Include="Controls\Operations\Nop.cs" />
@@ -136,6 +136,7 @@
     <Compile Include="Interface\IBoundedItemFactory.cs" />
     <Compile Include="Interface\IConnectorItemModel.cs" />
     <Compile Include="Interface\IBoundedItemModel.cs" />
+    <Compile Include="Interface\ISketchItemDisplay.cs" />
     <Compile Include="Interface\ISketchItemModel.cs" />
     <Compile Include="Interface\ISketchItemFactory.cs" />
     <Compile Include="Interface\SketchItemInfoAttribute.cs" />
@@ -156,7 +157,7 @@
     <Compile Include="Models\ContainerModel.cs" />
     <Compile Include="Models\IConnectorMoveHelper.cs" />
     <Compile Include="Models\IConnectorStrategy.cs" />
-    <Compile Include="Interface\ISketchContainer.cs" />
+    <Compile Include="Interface\ISketchItemContainer.cs" />
     <Compile Include="Interface\OutlineChangedEventArgs.cs" />
     <Compile Include="Models\SelfConnectorLineStrategy.cs" />
     <Compile Include="SketchItemFactory.cs" />
@@ -176,7 +177,7 @@
     <Compile Include="Types\ConnectorLineStyle.cs" />
     <Compile Include="Types\EditMode.cs" />
     <Compile Include="Types\IEditOperation.cs" />
-    <Compile Include="Types\IOutlineUI.cs" />
+    <Compile Include="Interface\ISketchItemUI.cs" />
     <Compile Include="Types\LineTypes.cs" />
     <Compile Include="Types\LinkedAvlTree.cs" />
     <Compile Include="Types\LinkedAvlTreeNode.cs" />

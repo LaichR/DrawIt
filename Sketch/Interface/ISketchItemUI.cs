@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Shapes;
 
-namespace Sketch.Controls
+namespace Sketch.Interface
 {
-    internal interface IGadgetUI
+    public interface ISketchItemUI
     {
         bool IsSelected
         {
@@ -36,7 +36,7 @@ namespace Sketch.Controls
             get;
         }
 
-        Models.ModelBase Model
+        ISketchItemModel Model
         {
             get;
         }

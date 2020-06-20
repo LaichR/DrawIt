@@ -30,11 +30,12 @@ namespace DrawIt.Uml
             RotationAngle = 0.0;
             LabelArea = new Rect(p, new Size(Bounds.Width, 20));
             FillColor = System.Windows.Media.Colors.Snow;
+            UpdateGeometry();
         }
 
         protected UmlChoiceModel(SerializationInfo info, StreamingContext context)
             :base(info, context) 
-        {}
+        { UpdateGeometry(); }
         
 
         public override System.Windows.Media.RectangleGeometry Outline
@@ -49,20 +50,23 @@ namespace DrawIt.Uml
 
         public override void RenderAdornments(DrawingContext drawingContext) { }
 
-        public override System.Windows.Media.Geometry Geometry
+        public override void UpdateGeometry()
         {
-            get {
-                List<Point> border = new List<Point>
+
+            var g = Geometry as GeometryGroup;
+            g.Children.Clear();
+
+            List<Point> border = new List<Point>
                 {
                     new Point( Bounds.Left, Bounds.Top + Bounds.Height/2),
                     new Point( Bounds.Left + Bounds.Width/2, Bounds.Top),
                     new Point( Bounds.Right, Bounds.Top + Bounds.Height/2),
                     new Point( Bounds.Left + Bounds.Width/2, Bounds.Bottom),
                 };
-                var pf = GeometryHelper.GetPathFigureFromPoint(border);
-                pf.IsClosed = true;
-                return GeometryHelper.GetGeometryFromPath(pf);
-            }
+            var pf = GeometryHelper.GetPathFigureFromPoint(border);
+            pf.IsClosed = true;
+            g.Children.Add(GeometryHelper.GetGeometryFromPath(pf));
+
         }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
