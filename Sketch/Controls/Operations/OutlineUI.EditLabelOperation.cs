@@ -9,6 +9,7 @@ using System.Windows.Data;
 using System.Windows.Controls;
 
 using Sketch.Models;
+using Sketch.Interface;
 
 namespace Sketch.Controls
 {
@@ -17,7 +18,7 @@ namespace Sketch.Controls
         internal class EditLabelOperation : IEditOperation
         {
             OutlineUI _owner;
-            SketchPad _panel;
+            ISketchItemDisplay _panel;
             
             TextBox _myLabelEditor = new TextBox();
 
@@ -95,9 +96,9 @@ namespace Sketch.Controls
 
             void ShowEditor()
             {
-                if (!_panel.Children.Contains(_myLabelEditor))
+                if (!_panel.Canvas.Children.Contains(_myLabelEditor))
                 {
-                    _panel.Children.Add(_myLabelEditor);
+                    _panel.Canvas.Children.Add(_myLabelEditor);
                 }
                 Canvas.SetZIndex(_myLabelEditor, 3000);
                 Canvas.SetLeft(_myLabelEditor, _owner.LabelArea.Left + 1);
@@ -115,9 +116,9 @@ namespace Sketch.Controls
 
             void HideEditor()
             {
-                if (_panel.Children.Contains(_myLabelEditor))
+                if (_panel.Canvas.Children.Contains(_myLabelEditor))
                 {
-                    _panel.Children.Remove(_myLabelEditor);
+                    _panel.Canvas.Children.Remove(_myLabelEditor);
                 }
                 _myLabelEditor.Visibility = Visibility.Hidden;
             }

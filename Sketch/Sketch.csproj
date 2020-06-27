@@ -122,6 +122,8 @@
     <Compile Include="Controls\Operations\SelectUisOperation.cs" />
     <Compile Include="Controls\OutlineHelper.cs" />
     <Compile Include="Controls\ScanLine.cs" />
+    <Compile Include="Controls\SketchItemDisplay.cs" />
+    <Compile Include="Controls\SketchItemDisplayLabel.cs" />
     <Compile Include="Controls\SketchPad.cs" />
     <Compile Include="Controls\OutlineAdorner.cs" />
     <Compile Include="Controls\OutlineUI.cs" />
@@ -136,6 +138,7 @@
     <Compile Include="Interface\IBoundedItemFactory.cs" />
     <Compile Include="Interface\IConnectorItemModel.cs" />
     <Compile Include="Interface\IBoundedItemModel.cs" />
+    <Compile Include="Interface\ISketchItemLabelProvider.cs" />
     <Compile Include="Interface\ISketchItemDisplay.cs" />
     <Compile Include="Interface\ISketchItemModel.cs" />
     <Compile Include="Interface\ISketchItemFactory.cs" />
@@ -161,7 +164,7 @@
     <Compile Include="Interface\OutlineChangedEventArgs.cs" />
     <Compile Include="Models\SelfConnectorLineStrategy.cs" />
     <Compile Include="SketchItemFactory.cs" />
-    <Compile Include="Utilities\SketchPadHelper.cs" />
+    <Compile Include="Utilities\SketchItemDisplayHelper.cs" />
     <Compile Include="Models\StraightLineConnectorStrategy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

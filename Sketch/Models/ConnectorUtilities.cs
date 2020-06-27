@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Shapes;
+using Sketch.Controls;
 using Sketch.Interface;
 using Sketch.Types;
 
@@ -222,9 +224,10 @@ namespace Sketch.Models
 
         public static ConnectorDocking ComputeDocking( Rect r, double relativePosition, ref Point p)
         {
+            
             if (p.Y == r.Top || p.Y == r.Bottom)
             {
-                p.X = Math.Round((r.Left + relativePosition * r.Width)/3)*3;
+                p.X = RoundToGrid(r.Left + relativePosition * r.Width);
                 if (p.Y == r.Bottom)
                     return ConnectorDocking.Bottom;
                 return ConnectorDocking.Top;
@@ -232,7 +235,7 @@ namespace Sketch.Models
 
             if (p.X == r.Left || p.X == r.Right)
             {
-                p.Y = Math.Round((r.Top + relativePosition * r.Height)/3)*3;
+                p.Y = RoundToGrid(r.Top + relativePosition * r.Height);
                 if (p.X == r.Right) return ConnectorDocking.Right;
                 return ConnectorDocking.Left;
             }
@@ -244,16 +247,16 @@ namespace Sketch.Models
             switch(docking)
             {
                 case ConnectorDocking.Top:
-                    return new Point(Math.Round(r.Left + relativePosition * r.Width), r.Top);
+                    return new Point(RoundToGrid(r.Left + relativePosition * r.Width), r.Top);
                 case ConnectorDocking.Right:
-                    return new Point(r.Right, Math.Round(r.Top + relativePosition*r.Height) );
+                    return new Point(r.Right, RoundToGrid(r.Top + relativePosition*r.Height) );
                 case ConnectorDocking.Bottom:
-                    return new Point(Math.Round(r.Left + relativePosition * r.Width), r.Bottom);
+                    return new Point(RoundToGrid(r.Left + relativePosition * r.Width), r.Bottom);
                 case ConnectorDocking.Left:
-                    return new Point(r.Left, Math.Round(r.Top + relativePosition*r.Height) );
+                    return new Point(r.Left, RoundToGrid(r.Top + relativePosition*r.Height) );
                     
                 default:
-                    return new Point(Math.Round(r.Left + relativePosition * r.Width), r.Top);
+                    return new Point(RoundToGrid(r.Left + relativePosition * r.Width), r.Top);
                     
             }
         }
@@ -295,6 +298,11 @@ namespace Sketch.Models
         static IConnectorStrategy CreateStrightLineConnector(ConnectorModel connectorModel)
         {
             return new StraightLineConnectorStrategy(connectorModel);
+        }
+
+        public static double RoundToGrid(double number)
+        {
+            return Math.Round(number /  SketchPad.GridSize) * SketchPad.GridSize;
         }
 
         #region internal helper

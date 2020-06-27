@@ -50,9 +50,8 @@ namespace Sketch.Models
 
         protected ModelBase(SerializationInfo info, StreamingContext context)
         {
-            LabelArea = (System.Windows.Rect)info.GetValue("LabelArea", typeof(System.Windows.Rect));
-            Name = info.GetString("Label");
-            IsSelected = info.GetBoolean("IsSelected");
+            RestoreData(info, context);
+            Initialize();
         }
 
         public abstract void UpdateGeometry();
@@ -81,10 +80,10 @@ namespace Sketch.Models
 
         public virtual string LabelPropertyName
         {
-            get { return "Name"; }
+            get { return "Label"; }
         }
 
-        public virtual string Name
+        public virtual string Label
         {
             get{ return _label; }
             set{ 
@@ -127,7 +126,7 @@ namespace Sketch.Models
 
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue("Label", Name);
+            info.AddValue("Label", Label);
             info.AddValue("LabelArea", LabelArea);
             info.AddValue("IsSelected", IsSelected);
         }
@@ -141,5 +140,14 @@ namespace Sketch.Models
         {
             AllowEdit = true;
         }
+
+        protected virtual void RestoreData(SerializationInfo info, StreamingContext context)
+        {
+            LabelArea = (System.Windows.Rect)info.GetValue("LabelArea", typeof(System.Windows.Rect));
+            Label = info.GetString("Label");
+            IsSelected = info.GetBoolean("IsSelected");
+        }
+
+        protected abstract void Initialize();
     }
 }

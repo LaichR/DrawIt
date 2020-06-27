@@ -66,17 +66,7 @@ namespace Sketch.Models
         }
 
         protected ConnectableBase(SerializationInfo info, StreamingContext context):base(info, context)
-        {   
-            _fillColor = new SerializableColor();
-            _bounds = (Rect)info.GetValue("Bounds", typeof(Rect));
-            _allowSizeChange = info.GetBoolean("AllowSizeChange");
-            try{
-               _fillColor.ScRgb =  (float[])info.GetValue("Fill", typeof(float[]));
-            }
-            catch { }
-
-            Initialize();
-        }
+        {}
 
         public override void UpdateGeometry()
         {
@@ -165,7 +155,7 @@ namespace Sketch.Models
         protected virtual void RenderLable(DrawingContext drawingContext)
         {
             // draw the lable
-            FormattedText t = new FormattedText(Name, System.Globalization.CultureInfo.CurrentCulture,
+            FormattedText t = new FormattedText(Label, System.Globalization.CultureInfo.CurrentCulture,
                 System.Windows.FlowDirection.LeftToRight, _lableFont, _fontSize,
                 System.Windows.Media.Brushes.Black,
                 VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip);
@@ -239,7 +229,30 @@ namespace Sketch.Models
             }
         }
 
-        void Initialize()
+        protected override void RestoreData(SerializationInfo info, StreamingContext context)
+        {
+            base.RestoreData(info, context);
+            _fillColor = new SerializableColor();
+            _bounds = (Rect)info.GetValue("Bounds", typeof(Rect));
+            _allowSizeChange = info.GetBoolean("AllowSizeChange");
+            try
+            {
+                _fillColor.ScRgb = (float[])info.GetValue("Fill", typeof(float[]));
+            }
+            catch { }
+            _fillColor = new SerializableColor();
+            _bounds = (Rect)info.GetValue("Bounds", typeof(Rect));
+            _allowSizeChange = info.GetBoolean("AllowSizeChange");
+            try
+            {
+                _fillColor.ScRgb = (float[])info.GetValue("Fill", typeof(float[]));
+            }
+            catch { }
+
+            Initialize();
+        }
+
+        protected override void Initialize()
         {
             
             _cmdSelectColor = new DelegateCommand(SelectColor);

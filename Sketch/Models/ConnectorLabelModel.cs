@@ -56,11 +56,11 @@ namespace Sketch.Models
         {
             get
             {
-                return _connector.Name;
+                return _connector.Label;
             }
             set
             {
-                _connector.Name = value;
+                _connector.Label = value;
                 UpdateGeometry();
             }
         }
@@ -129,7 +129,7 @@ namespace Sketch.Models
             if (!_geometryUpdating && _connector !=null)
             {
                 _geometryUpdating = true; // since 
-                _formattedText = new FormattedText(_connector.Name, System.Globalization.CultureInfo.CurrentCulture,
+                _formattedText = new FormattedText(_connector.Label, System.Globalization.CultureInfo.CurrentCulture,
                     System.Windows.FlowDirection.LeftToRight, new Typeface("Arial"), 12, Brushes.Blue,
                     VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip);
 

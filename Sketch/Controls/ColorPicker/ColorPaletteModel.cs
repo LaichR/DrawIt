@@ -15,17 +15,17 @@ namespace Sketch.Controls.ColorPicker
     {
         Color _customColor = Colors.Snow;
         Color _defaultColor = Colors.Wheat;
-        IColorSelectionTarget _selectionTarget = null;
+        readonly IColorSelectionTarget _selectionTarget = null;
 
-        DelegateCommand _selectRed;
-        DelegateCommand _selectYellow;
-        DelegateCommand _selectOrange;
-        DelegateCommand _selectBlue;
-        DelegateCommand _selectGreen;
-        DelegateCommand _selectCustomColor;
-        DelegateCommand _editCustomColor;
-        DelegateCommand _selectDefaultColor;
-        DelegateCommand _editDefaultColor;
+        readonly DelegateCommand _selectRed;
+        readonly DelegateCommand _selectYellow;
+        readonly DelegateCommand _selectOrange;
+        readonly DelegateCommand _selectBlue;
+        readonly DelegateCommand _selectGreen;
+        readonly DelegateCommand _selectCustomColor;
+        readonly DelegateCommand _editCustomColor;
+        readonly DelegateCommand _selectDefaultColor;
+        readonly DelegateCommand _editDefaultColor;
 
         public ColorPaletteModel( IColorSelectionTarget selectionTarget )
         {
@@ -129,7 +129,7 @@ namespace Sketch.Controls.ColorPicker
             set
             {
                 SetProperty<Color>(ref _customColor, value);
-                OnPropertyChanged("CustomBrush");
+                RaisePropertyChanged("CustomBrush");
             }
         }
 
@@ -150,7 +150,7 @@ namespace Sketch.Controls.ColorPicker
             set
             {
                 SetProperty<Color>(ref _defaultColor, value);
-                OnPropertyChanged("DefaultBrush");
+                RaisePropertyChanged("DefaultBrush");
             }
         }
 
@@ -165,8 +165,11 @@ namespace Sketch.Controls.ColorPicker
 
         void EditColor( ref Color brushToEdit )
         {
-            var colorPicker = new ColorPickerDialog();
-            colorPicker.StartingColor = brushToEdit;
+            var colorPicker = new ColorPickerDialog()
+            {
+                StartingColor = brushToEdit
+            };
+            
             bool? result = colorPicker.ShowDialog();
 
             if (result ?? true)

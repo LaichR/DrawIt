@@ -8,14 +8,8 @@ using System.Windows.Media;
 
 namespace Sketch.Interface
 {
-    public interface ISketchItemModel: ISerializable
+    public interface ISketchItemModel: ISerializable, ISketchItemLabelProvider
     {
-
-        string Name
-        {
-            get;
-            set;
-        }
 
         string LabelPropertyName
         {

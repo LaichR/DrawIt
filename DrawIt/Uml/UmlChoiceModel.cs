@@ -18,7 +18,6 @@ namespace DrawIt.Uml
     [AllowableConnector(typeof(UmlTransitionModel))]
     public class UmlChoiceModel : ConnectableBase
     {
-        IList<UI.Utilities.Interfaces.ICommandDescriptor> _tools;
         
 
         public UmlChoiceModel(Point p )
@@ -26,7 +25,7 @@ namespace DrawIt.Uml
             Bounds = new Rect(p, new Size(36, 34));
             IsSelected = true;
             AllowSizeChange = false;
-            Name = "Choice";
+            Label = "Choice";
             RotationAngle = 0.0;
             LabelArea = new Rect(p, new Size(Bounds.Width, 20));
             FillColor = System.Windows.Media.Colors.Snow;
@@ -35,7 +34,9 @@ namespace DrawIt.Uml
 
         protected UmlChoiceModel(SerializationInfo info, StreamingContext context)
             :base(info, context) 
-        { UpdateGeometry(); }
+        {
+            UpdateGeometry();
+        }
         
 
         public override System.Windows.Media.RectangleGeometry Outline

@@ -20,7 +20,7 @@ namespace Sketch.Controls
         ISketchItemDisplay _pad;
         Point _startPoint;
         Rectangle _selectionAreaVisualizer;
-        bool _selecting = false;
+        //bool _selecting = false;
 
         public SelectUisOperation(ISketchItemDisplay pad)
         {
@@ -78,15 +78,17 @@ namespace Sketch.Controls
         {
             var start = e.GetPosition(_pad.Canvas);
             _startPoint = start;
-            _selectionAreaVisualizer = new Rectangle();
-            _selectionAreaVisualizer.Width = 5;
-            _selectionAreaVisualizer.Height = 5;
-
-            _selectionAreaVisualizer.MinHeight = 5;
-            _selectionAreaVisualizer.MinWidth = 5;
-            _selectionAreaVisualizer.Stroke = Brushes.Black;
-            _selectionAreaVisualizer.StrokeThickness = 0.5;
-            _selectionAreaVisualizer.StrokeDashArray = new DoubleCollection(new double[] { 5, 5 });
+            _selectionAreaVisualizer = new Rectangle()
+            {
+                Width = 5,
+                Height = 5,
+                MinHeight = 5,
+                MinWidth = 5,
+                Stroke = Brushes.Black,
+                StrokeThickness = 0.5,
+                StrokeDashArray = new DoubleCollection( new double[] { 5, 5 })
+            };
+           
             Canvas.SetLeft(_selectionAreaVisualizer, _startPoint.X);
             Canvas.SetTop(_selectionAreaVisualizer, _startPoint.Y);
             _pad.Canvas.MouseLeftButtonUp += MouseLeftButtonUp;

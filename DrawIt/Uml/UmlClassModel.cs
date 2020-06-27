@@ -32,12 +32,15 @@ namespace DrawIt.Uml
             IsSelected = true;
             AllowSizeChange = true;
             AllowEdit = true;
-            Name = "new class";
+            Label = "new class";
             RotationAngle = 0.0;
             UpdateGeometry();
         }
 
-        protected UmlClassModel(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        protected UmlClassModel(SerializationInfo info, StreamingContext context) : base(info, context) 
+        {
+            UpdateGeometry();
+        }
 
         //public override System.Windows.Media.Geometry Geometry
         //{

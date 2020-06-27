@@ -112,7 +112,7 @@ namespace Sketch.Controls
             }
         }
 
-        bool _isRendering = false;
+        //bool _isRendering = false;
         object synchRoot = new object();
         Intersection[] _intersections = new Intersection[0];
 
@@ -122,13 +122,13 @@ namespace Sketch.Controls
         LinkedAvlTree<ScanLine> _verticalScan = null;// new LinkedAvlTree<ScanLine>();
 
         int lineSegments = 0;
-        SketchPad _sketchPad;
+        SketchItemDisplay _sketchDisplay;
 
 
         public IntersectionFinder(UIElement sketchPad) : base(sketchPad)
         {
-            _sketchPad = AdornedElement as SketchPad;
-            RuntimeCheck.Assert.True(_sketchPad != null, "Invalid sketchpad");
+            _sketchDisplay = AdornedElement as SketchItemDisplay;
+            RuntimeCheck.Assert.True(_sketchDisplay != null, "Invalid sketchpad");
             IsHitTestVisible = false;
             Visibility = Visibility.Visible;
 
@@ -222,8 +222,8 @@ namespace Sketch.Controls
         protected override void OnRender(DrawingContext drawingContext)
         {
 
-            if (_sketchPad.CurrentOperationHandler != null &&
-                !(_sketchPad.CurrentOperationHandler is SelectUisOperation )) return;
+            if (_sketchDisplay.CurrentOperationHandler != null &&
+                !(_sketchDisplay.CurrentOperationHandler is SelectUisOperation )) return;
 
             foreach (var @i in _intersections)
             {
@@ -248,7 +248,7 @@ namespace Sketch.Controls
             _verticalScan = new LinkedAvlTree<ScanLine>();
 
             //_isRendering = true; // only one IntersectionFinder needs to render
-            foreach (var connector in _sketchPad.Children.OfType<ConnectorUI>())
+            foreach (var connector in _sketchDisplay.Children.OfType<ConnectorUI>())
             {
                 AddLineSegments(connector);
             }

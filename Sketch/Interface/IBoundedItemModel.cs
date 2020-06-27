@@ -16,11 +16,6 @@ namespace Sketch.Interface
     public interface IBoundedItemModel: ISketchItemModel
     {
 
-        string Name
-        {
-            get;
-        }
-
         Rect Bounds
         {
             get;

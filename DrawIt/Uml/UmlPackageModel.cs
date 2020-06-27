@@ -27,11 +27,12 @@ namespace DrawIt.Uml
             LabelArea = new Rect(location, new Size(140, 20));
             IsSelected = true;
             AllowSizeChange = true;
-            Name = "new package";
+            Label = "new package";
             UpdateGeometry();
         }
 
-        protected UmlPackageModel(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        protected UmlPackageModel(SerializationInfo info, StreamingContext context) 
+            : base(info, context) { }
 
         public override void UpdateGeometry()
         {
@@ -39,7 +40,7 @@ namespace DrawIt.Uml
                 var myGeometry = Geometry as GeometryGroup;
                 myGeometry.Children.Clear();
 
-                FormattedText t = new FormattedText(Name, System.Globalization.CultureInfo.CurrentCulture,
+                FormattedText t = new FormattedText(Label, System.Globalization.CultureInfo.CurrentCulture,
                     System.Windows.FlowDirection.LeftToRight, new Typeface("Arial"), 12, Brushes.Blue,
                     VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip);
 

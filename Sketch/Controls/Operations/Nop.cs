@@ -6,25 +6,25 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows;
 using System.Windows.Controls;
-
+using Sketch.Interface;
 
 namespace Sketch.Controls
 {
     internal class NopHandler : IEditOperation
     {
-        SketchPad _pad;
+        ISketchItemDisplay _pad;
 
-        public NopHandler(SketchPad pad)
+        public NopHandler(ISketchItemDisplay pad)
         {
             _pad = pad;
-            _pad.MouseDown += _pad_MouseDown;
+            _pad.Canvas.MouseDown += _pad_MouseDown;
         }
 
         void _pad_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            _pad.Focus();
+            _pad.Canvas.Focus();
         }
-        public void StopOperation(bool ok) { _pad.MouseDown -= _pad_MouseDown; }
+        public void StopOperation(bool ok) { _pad.Canvas.MouseDown -= _pad_MouseDown; }
        
     }
 }

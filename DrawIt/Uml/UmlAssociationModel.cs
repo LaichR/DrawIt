@@ -19,7 +19,9 @@ namespace DrawIt.Uml
 
         public UmlAssociationModel( ConnectionType type, IBoundedItemModel from, IBoundedItemModel to)
             :base(type, from, to)
-        {}
+        {
+            UpdateGeometry();
+        }
 
 
 

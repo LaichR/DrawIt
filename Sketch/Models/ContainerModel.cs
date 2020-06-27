@@ -7,36 +7,35 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Media;
 using System.Runtime.Serialization;
+using Sketch.Interface;
+using Sketch.Utilities;
+using System.IO;
 
 namespace Sketch.Models
 {
     [Serializable]
-    public class ContainerModel: ConnectableBase
+    public class ContainerModel: ConnectableBase, ISketchItemContainer
     {
         
+        ObservableCollection<ISketchItemModel> _children = new ObservableCollection<ISketchItemModel>();
         
-        ObservableCollection<ModelBase> _children = new ObservableCollection<ModelBase>();
-        
-
         public ContainerModel(Point location, Size size )
             //:base(new Guid())
         {
             Bounds = new Rect(location, size);
             LabelArea = new Rect(location, new Size(size.Width, 20));
             IsSelected = true;
-            Name = "hello world";
+            Label = "hello world";
         }
 
         protected ContainerModel(SerializationInfo info, StreamingContext context)
             :base(info, context) 
-        {
-            UpdateGeometry();
-        }
+        {}
 
-        public ObservableCollection<ModelBase> Children
+        public ObservableCollection<ISketchItemModel> SketchItems
         {
             get { return _children; }
-            set { SetProperty<ObservableCollection<ModelBase>>(ref _children, value); }
+            set { SetProperty<ObservableCollection<ISketchItemModel>>(ref _children, value); }
         }
 
         
@@ -65,6 +64,31 @@ namespace Sketch.Models
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
+            List<ModelBase> children = new List<ModelBase>(SketchItems.OfType<ModelBase>());
+            using (var stream = new System.IO.MemoryStream())
+            {
+                SketchItemDisplayHelper.TakeSnapshot(stream, SketchItems);
+                var buffer = stream.ToArray();
+                info.AddValue("Children", buffer, typeof(byte[]));
+            }
         }
+
+        protected override void RestoreData(SerializationInfo info, StreamingContext context)
+        {
+            base.RestoreData(info, context);
+            try
+            {
+                var buffer = (byte[])info.GetValue("Children", typeof(byte[]));
+                using (var stream = new System.IO.MemoryStream(buffer))
+                {
+                    var children = new List<ISketchItemModel>();
+                    SketchItemDisplayHelper.RestoreSnapshot(stream, children);
+                    List<ISketchItemModel> sketchItemList = new List<ISketchItemModel>(children);
+                    SketchItemDisplayHelper.RestoreChildren(SketchItems, children);
+                }
+            }
+            catch { }
+        }
+
     }
 }

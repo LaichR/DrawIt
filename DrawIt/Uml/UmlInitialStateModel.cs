@@ -32,9 +32,8 @@ namespace DrawIt.Uml
             AllowSizeChange = false;
             LabelArea = Rect.Empty;
             IsSelected = true;
-            Name = "Initial-State";
+            Label = "Initial-State";
             RotationAngle = 0.0;
-
             FillColor = Colors.Black;
             UpdateGeometry();
         }
@@ -66,6 +65,11 @@ namespace DrawIt.Uml
         {
             base.GetObjectData(info, context);
             _geometry = new EllipseGeometry(Bounds);
+        }
+
+        protected override void Initialize()
+        {
+            base.Initialize();
         }
 
     }

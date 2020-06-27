@@ -32,7 +32,7 @@ namespace DrawIt.Uml
             Bounds = new Rect(p, new Size(100, 50));
             IsSelected = true;
             AllowSizeChange = true;
-            Name = "new note";
+            Label = "new note";
             Note = "a note";
             RotationAngle = 0.0;
             FillColor = Colors.White;
@@ -43,7 +43,6 @@ namespace DrawIt.Uml
         protected UmlNoteModel(SerializationInfo info, StreamingContext context)
             :base(info, context) 
         {
-            Note = info.GetString("Note");
             UpdateGeometry();
         }
 
@@ -115,8 +114,6 @@ namespace DrawIt.Uml
                 new Point(Bounds.Right, Bounds.Top + TopMargin)));
 
             myGeometry.Transform = Rotation;
-            
-
         }
 
         public override void RenderAdornments(DrawingContext drawingContext)
@@ -143,6 +140,12 @@ namespace DrawIt.Uml
             pf.StartPoint = start;
             pf.Segments = ls;
             return pf;
+        }
+
+        protected override void RestoreData(SerializationInfo info, StreamingContext context)
+        {
+            base.RestoreData(info, context);
+            Note = info.GetString("Note");
         }
     }
 }

@@ -3,20 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Collections.ObjectModel;
-
 
 namespace Sketch.Interface
 {
-    public interface ISketchItemContainer : ISketchItemLabelProvider
+    public interface ISketchItemLabelProvider
     {
-
-
-        ObservableCollection<ISketchItemModel> SketchItems
+        string Label
         {
             get;
+            set;
         }
-
     }
 }

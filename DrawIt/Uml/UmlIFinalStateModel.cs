@@ -34,7 +34,7 @@ namespace DrawIt.Uml
             LabelArea = Rect.Empty;
             IsSelected = true;
            
-            Name = "Final-State";
+            Label = "Final-State";
             RotationAngle = 0.0;
             
             FillColor = Colors.Black;
@@ -86,12 +86,5 @@ namespace DrawIt.Uml
         //{
         //    get { return new List<UI.Utilities.Interfaces.ICommandDescriptor>(); }
         //}
-
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-            UpdateGeometry();
-        }
-
     }
 }

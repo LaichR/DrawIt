@@ -97,6 +97,7 @@ namespace Sketch
 
         public IBoundedItemModel CreateConnectableSketchItem(Type cls, System.Windows.Point p)
         {
+
             if (_createBoundedItem.TryGetValue(cls, out CreateBoundedSketchItemDelegate factoryOp))
             {
                 return factoryOp(p);

@@ -91,7 +91,7 @@ namespace Sketch.Controls.ColorPicker
             set
             {
                 SetValue(SelectedColorProperty, _color);
-                setColor((Color)value);
+                SetColor((Color)value);
             }
         }
 
@@ -244,7 +244,7 @@ namespace Sketch.Controls.ColorPicker
             DependencyProperty.Register
             ("SelectedColor", typeof(System.Windows.Media.Color), typeof(ColorPicker),
             new PropertyMetadata(System.Windows.Media.Colors.Transparent,
-                new PropertyChangedCallback(selectedColor_changed)
+                new PropertyChangedCallback(SelectedColor_Changed)
 
             ));
 
@@ -497,10 +497,10 @@ namespace Sketch.Controls.ColorPicker
 
                 if (shouldFindPoint && !isAlphaChange && templateApplied)
                 {
-                    updateMarkerPosition(_color);
+                    UpdateMarkerPosition(_color);
                 }
             }
-            catch (FormatException fException)
+            catch (FormatException )
             {
 
                 SetValue(HexadecimalStringProperty, oldValue);
@@ -508,7 +508,7 @@ namespace Sketch.Controls.ColorPicker
 
         }
 
-        private static void selectedColor_changed(DependencyObject d,
+        private static void SelectedColor_Changed(DependencyObject d,
             DependencyPropertyChangedEventArgs e)
         {
             ColorPicker cPicker = (ColorPicker)d;
@@ -565,7 +565,7 @@ namespace Sketch.Controls.ColorPicker
         {
 
             Point p = e.GetPosition(_colorDetail);
-            updateMarkerPosition(p);
+            UpdateMarkerPosition(p);
         }
 
         private void OnMouseMove(object sender, MouseEventArgs e)
@@ -576,7 +576,7 @@ namespace Sketch.Controls.ColorPicker
             {
 
                 Point p = e.GetPosition(_colorDetail);
-                updateMarkerPosition(p);
+                UpdateMarkerPosition(p);
                 Mouse.Synchronize();
 
             }
@@ -590,8 +590,8 @@ namespace Sketch.Controls.ColorPicker
             {
                 double widthDifference = args.NewSize.Width / args.PreviousSize.Width;
                 double heightDifference = args.NewSize.Height / args.PreviousSize.Height;
-                markerTransform.X = markerTransform.X * widthDifference;
-                markerTransform.Y = markerTransform.Y * heightDifference;
+                markerTransform.X *= widthDifference;
+                markerTransform.Y *= heightDifference;
             }
             else if (m_ColorPosition != null)
             {
@@ -605,7 +605,7 @@ namespace Sketch.Controls.ColorPicker
 
         #region Color Resolution Helpers
 
-        private void setColor(Color theColor)
+        private void SetColor(Color theColor)
         {
             _color = theColor;
             
@@ -614,22 +614,22 @@ namespace Sketch.Controls.ColorPicker
                 SetValue(RProperty, _color.R);
                 SetValue(GProperty, _color.G);
                 SetValue(BProperty, _color.B);
-                updateMarkerPosition(theColor);
+                UpdateMarkerPosition(theColor);
             }
             
         }
 
-        private void updateMarkerPosition(Point p)
+        private void UpdateMarkerPosition(Point p)
         {
             markerTransform.X = p.X;
             markerTransform.Y = p.Y;
-            p.X = p.X / _colorDetail.ActualWidth;
-            p.Y = p.Y / _colorDetail.ActualHeight;
+            p.X /= _colorDetail.ActualWidth;
+            p.Y /= _colorDetail.ActualHeight;
             m_ColorPosition = p;
             determineColor(p);
         }
 
-        private void updateMarkerPosition(Color theColor)
+        private void UpdateMarkerPosition(Color theColor)
         {
             m_ColorPosition = null;
             
@@ -641,8 +641,8 @@ namespace Sketch.Controls.ColorPicker
             Point p = new Point(hsv.S, 1 - hsv.V);
             
             m_ColorPosition = p;
-            p.X = p.X * _colorDetail.ActualWidth;
-            p.Y = p.Y * _colorDetail.ActualHeight;
+            p.X *= _colorDetail.ActualWidth;
+            p.Y *= _colorDetail.ActualHeight;
             markerTransform.X = p.X;
             markerTransform.Y = p.Y;
 
@@ -651,9 +651,12 @@ namespace Sketch.Controls.ColorPicker
         private void determineColor(Point p)
         {
 
-            HsvColor hsv = new HsvColor(360 - _colorSlider.Value, 1, 1);
-            hsv.S = p.X;
-            hsv.V = 1 - p.Y;
+            HsvColor hsv = new HsvColor(360 - _colorSlider.Value, 1, 1)
+            {
+                S = p.X,
+                V = 1- p.Y,
+            };
+           
             _color = ColorUtilities.ConvertHsvToRgb(hsv.H, hsv.S, hsv.V);
             shouldFindPoint = false;
             _color.ScA = (float)GetValue(ScAProperty);

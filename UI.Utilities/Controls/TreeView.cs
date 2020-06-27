@@ -20,7 +20,7 @@ namespace UI.Utilities.Controls
 
         class ItemLocator
         {
-            ItemsControl _container;
+            readonly ItemsControl _container;
             
 
             public ItemLocator( ItemsControl container, object obj )
@@ -153,7 +153,7 @@ namespace UI.Utilities.Controls
                 try
                 {
                     _selectedItemIsChanging = true;
-                    SelectedPath = string.Join(new string(PathDelimiter, 1), _nodePath.Select<Interfaces.IHierarchicalNode, string>((x) => x.Name).ToArray<string>());
+                    SelectedPath = string.Join(new string(PathDelimiter, 1), _nodePath.Select<Interfaces.IHierarchicalNode, string>((x) => x.Label).ToArray<string>());
                 }
                 finally
                 {
@@ -285,7 +285,7 @@ namespace UI.Utilities.Controls
             var pathList = path.Split(PathDelimiter);
             ItemsControl container = this;
             object item = null;
-            TreeViewItem selected = null;
+            TreeViewItem selected;
             _selectedPathIsChanging = true;
 
             try
@@ -302,7 +302,7 @@ namespace UI.Utilities.Controls
 
                         if (node == null) return;
 
-                        if (node.Name == p)
+                        if (node.Label == p)
                         {
                             container = itemLocator.GetCurrentChildContainer();
 

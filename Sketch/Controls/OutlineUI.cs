@@ -53,13 +53,13 @@ namespace Sketch.Controls
         bool _isNotifyingMarkingChanged;
         Point _lastMouseDown; // this is used to show the tools if the model allows this
         Models.ConnectableBase _model;
-        SketchPad _parent;
+        ISketchItemDisplay _parent;
         OutlineAdorner _adorner;
         bool _isAdornderAdded;
         StackPanel _myTools;
         IEditOperation _currentOperationHandler;
 
-        public OutlineUI(SketchPad parent, ConnectableBase model)
+        public OutlineUI(ISketchItemDisplay parent, ConnectableBase model)
             :base()
         {
             _model = model;
@@ -142,7 +142,7 @@ namespace Sketch.Controls
                 {
                     _currentOperationHandler.StopOperation(true);
                 }
-                RegisterHandler(new ChangeSizeOperation(this, e.GetPosition(_parent)));
+                RegisterHandler(new ChangeSizeOperation(this, e.GetPosition(_parent.Canvas)));
                 e.Handled = true;
             }
             
@@ -283,7 +283,7 @@ namespace Sketch.Controls
         protected override void OnMouseMove(MouseEventArgs e)
         {
             e.Handled = false;
-            var p = e.GetPosition(this._parent);
+            var p = e.GetPosition(this._parent.Canvas);
             
             if (_currentOperationHandler == null)
             {
@@ -302,7 +302,7 @@ namespace Sketch.Controls
 
         protected override void OnMouseDown(System.Windows.Input.MouseButtonEventArgs e)
         {
-            _parent.Focus();
+            _parent.Canvas.Focus();
             if (_currentOperationHandler != null)
             {
                 //_currentOperationHandler.OnMouseDown(e);
@@ -314,7 +314,7 @@ namespace Sketch.Controls
                 // only react on left button
                 if (e.LeftButton == MouseButtonState.Pressed && e.RightButton == MouseButtonState.Released)
                 {
-                    Point p = e.GetPosition(this._parent);
+                    Point p = e.GetPosition(this._parent.Canvas);
                     _lastMouseDown = p;
                     if (IsSelected)
                     {
@@ -375,9 +375,9 @@ namespace Sketch.Controls
             {
                 if( _myTools != null)
                 {
-                    if( !_parent.Children.Contains(_myTools))
+                    if( !_parent.Canvas.Children.Contains(_myTools))
                     {
-                        _parent.Children.Add(_myTools);
+                        _parent.Canvas.Children.Add(_myTools);
                         Canvas.SetZIndex(_myTools, 500);
                     }
                     

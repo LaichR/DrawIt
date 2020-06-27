@@ -28,23 +28,27 @@ namespace DrawIt
     public class ApplicationViewModel : BindableBase
         , ISketchItemContainer, IColorSelectionTarget
     {
-        DelegateCommand _cmdInsertMode;
-        DelegateCommand _cmdEditMode;
+        //DelegateCommand _cmdInsertMode;
+        //DelegateCommand _cmdEditMode;
 
-        DelegateCommand _cmdSave;
-        DelegateCommand _cmdOpen;
-        DelegateCommand _cmdSavePng;
+        readonly DelegateCommand _cmdSave;
+        readonly DelegateCommand _cmdOpen;
+        readonly DelegateCommand _cmdSavePng;
 
-        DelegateCommand _deleteEntry;
+        readonly DelegateCommand _deleteEntry;
 
-        DelegateCommand _cmdAlignTop;
-        DelegateCommand _cmdAlignLeft;
-        DelegateCommand _cmdAlignCenter;
+        readonly DelegateCommand _cmdAlignTop;
+        readonly DelegateCommand _cmdAlignLeft;
+        readonly DelegateCommand _cmdAlignCenter;
+
+        readonly DelegateCommand _cmdZoomIn;
+        readonly DelegateCommand _cmdZoomOut;
 
         Dictionary<Type, System.Windows.Input.Cursor> _registeredCursors = new Dictionary<Type, Cursor>();
 
         bool _isEditMode;
         bool _isInsertMode;
+        string _label = "No Name";
         EditMode _editMode;
         
         System.Windows.Input.Cursor _editCursor;
@@ -60,12 +64,12 @@ namespace DrawIt
         static readonly System.Drawing.Bitmap _insertPicture = Properties.Resources.image;
 
 
-        ObservableCollection<ISketchItemModel> _sketchItems = new ObservableCollection<ISketchItemModel>();
-        List<UI.Utilities.Interfaces.ICommandDescriptor> _fileTools;
-        List<UI.Utilities.Interfaces.ICommandDescriptor> _alignTools;
+        readonly ObservableCollection<ISketchItemModel> _sketchItems = new ObservableCollection<ISketchItemModel>();
+        readonly List<UI.Utilities.Interfaces.ICommandDescriptor> _fileTools;
+        readonly List<UI.Utilities.Interfaces.ICommandDescriptor> _alignTools;
+        readonly List<UI.Utilities.Interfaces.ICommandDescriptor> _zoomTools;
 
-
-        public ApplicationViewModel(Action<string> savePng )
+        public ApplicationViewModel(Action<string> savePng, Action zoomIn, Action zoomOut )
         { 
             
             _editMode = Sketch.Types.EditMode.Insert;
@@ -90,6 +94,9 @@ namespace DrawIt
             _cmdAlignLeft = new DelegateCommand(AlignLeft);
             _cmdAlignCenter = new DelegateCommand(AlignCenter);
             _cmdAlignTop = new DelegateCommand(AlignTop);
+
+            _cmdZoomIn = new DelegateCommand(zoomIn);
+            _cmdZoomOut = new DelegateCommand(zoomOut);
             
             //_outlines.CollectionChanged += _outlines_CollectionChanged;
 
@@ -137,6 +144,23 @@ namespace DrawIt
                 },
                
             };
+
+            _zoomTools = new List<UI.Utilities.Interfaces.ICommandDescriptor>()
+            {
+                new UI.Utilities.Behaviors.CommandDescriptor
+                {
+                    Command = _cmdZoomIn,
+                    Bitmap = DrawIt.Properties.Resources.ZoomIn,
+                    Name = "Zoom In"
+                },
+
+                new UI.Utilities.Behaviors.CommandDescriptor
+                {
+                    Command = _cmdZoomOut,
+                    Bitmap = DrawIt.Properties.Resources.ZoomOut,
+                    Name = "Zoom Out"
+                }
+            };
             //_cmdOpen = new DelegateCommand(LodadDrawing);
         }
 
@@ -150,7 +174,7 @@ namespace DrawIt
             
         }
 
-        void _outlines_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        void Outlines_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             if ( e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
             {
@@ -176,12 +200,26 @@ namespace DrawIt
             }
         }
 
+        internal IList<UI.Utilities.Interfaces.ICommandDescriptor> ZoomTools
+        {
+            get
+            {
+                return _zoomTools;
+            }
+        }
+
         public ICommand DeleteEntries
         {
             get
             {
                 return _deleteEntry;
             }
+        }
+
+        public string Label
+        {
+            get => _label;
+            set => SetProperty<string>(ref _label, value);
         }
 
         public EditMode EditMode
@@ -256,7 +294,7 @@ namespace DrawIt
             {
                 using( var stream = dlg.OpenFile() )
                 {
-                    SketchPadHelper.TakeSnapshot(stream, _sketchItems);
+                    SketchItemDisplayHelper.TakeSnapshot(stream, _sketchItems);
                 }
             }
         }
@@ -272,7 +310,7 @@ namespace DrawIt
                     
                     using (var stream = dlg.OpenFile())
                     {
-                        SketchPadHelper.RestoreSnapshot(stream, 
+                        SketchItemDisplayHelper.RestoreSnapshot(stream, 
                             _sketchItems);
                     }
                 }
@@ -285,8 +323,9 @@ namespace DrawIt
 
         void SavePng( Action<string> savePng )
         {
-            var dlg = new Microsoft.Win32.SaveFileDialog();
-            dlg.Title = "Save PNG as";
+            var dlg = new Microsoft.Win32.SaveFileDialog()
+            { Title = "Save PNG as" };
+            
             var result = dlg.ShowDialog();
             if( result == true)
             {
@@ -296,17 +335,17 @@ namespace DrawIt
 
         public void AlignLeft()
         {
-            SketchPadHelper.AlignLeft(_sketchItems);
+            SketchItemDisplayHelper.AlignLeft(_sketchItems);
         }
 
         public void AlignTop()
         {
-            SketchPadHelper.AlignTop(_sketchItems);
+            SketchItemDisplayHelper.AlignTop(_sketchItems);
         }
 
         public void AlignCenter()
         {
-            SketchPadHelper.AlignCenter(_sketchItems);        }
+            SketchItemDisplayHelper.AlignCenter(_sketchItems);        }
 
         public void SetColor(Color newFill )
         {

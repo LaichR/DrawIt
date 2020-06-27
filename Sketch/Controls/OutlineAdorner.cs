@@ -11,6 +11,7 @@ using System.Windows.Shapes;
 using System.Windows.Controls;
 using Sketch.Models;
 using Sketch.Types;
+using Sketch.Interface;
 
 namespace Sketch.Controls
 {
@@ -22,24 +23,24 @@ namespace Sketch.Controls
         static readonly double _defaultStroke = 3.0;
         static readonly Pen _hitTestPen = new Pen(Brushes.White, 10.0);
 
-        ConnectableBase _realBody;
+        readonly ConnectableBase _realBody;
         RectangleGeometry _shadowGeometry;
         readonly List<Rect> _sensitiveBorder = new List<Rect>();
                 
 
 
-        Brush _myBrush;
-        Pen _myPen;
-        bool _moving = false;
+        readonly Brush _myBrush;
+        readonly Pen _myPen;
+        //bool _moving = false;
         bool _isActive = false;
         bool _allowResize;
-        System.Windows.Point _start = new Point();
-        OutlineUI _adorned;
-        SketchPad _parent;
-        double _strokeThickness = 3.0;
+        //System.Windows.Point _start = new Point();
+        readonly OutlineUI _adorned;
+        readonly ISketchItemDisplay _parent;
+        //double _strokeThickness = 3.0;
         DashStyle _defaultDashstile;
         
-        public OutlineAdorner(OutlineUI adorned, SketchPad parent )
+        public OutlineAdorner(OutlineUI adorned, ISketchItemDisplay parent )
             :base(adorned)
         {
             _adorned = adorned;
@@ -87,7 +88,7 @@ namespace Sketch.Controls
                 tg.Children.Add(_realBody.Rotation);
                 tg.Children.Add(transform);
                 _shadowGeometry.Transform = tg;
-                _parent.BringIntoView(_shadowGeometry.Bounds);
+                _parent.Canvas.BringIntoView(_shadowGeometry.Bounds);
                 InvalidateVisual();
             }
                
@@ -114,7 +115,7 @@ namespace Sketch.Controls
 
         protected override void OnMouseMove(System.Windows.Input.MouseEventArgs e)
         {
-            Point p = e.GetPosition(this._parent);
+            Point p = e.GetPosition(this._parent.Canvas);
             p.X = Math.Round(p.X / SketchPad.GridSize) * SketchPad.GridSize;
             p.Y = Math.Round(p.Y / SketchPad.GridSize) * SketchPad.GridSize;
 

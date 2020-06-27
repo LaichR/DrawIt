@@ -31,16 +31,23 @@ namespace DrawIt
         ApplicationViewModel _model;
         Sketch.Controls.ColorPicker.ColorPalette _palette;
 
+
         public MainWindow()
         {
             InitializeComponent();
+
+
             _sketchItemFactory = new Uml.UmlShapeFactory();
             Sketch.ModelFactoryRegistry.Instance.PushSketchItemFactory(_sketchItemFactory);
 
             _sketchItemFactory.RegisterBoundedItemSelectedNotification( factory_OnSelectElement );
             _sketchItemFactory.RegisterConnectorItemSelectedNotification( this.SketchPad.HandleAddConnector );
 
-            _model = new ApplicationViewModel( (x) => SketchPad.SaveAsPng(x) );
+            _model = new ApplicationViewModel(
+                (x) => SketchPad.SavePictureAs(x),
+                () => SketchPad.OpenChildElement(),
+                () => SketchPad.CloseChildElement()
+            ); 
             DataContext = _model;
 
             this.SketchPad.DataContext = DataContext;
@@ -49,6 +56,7 @@ namespace DrawIt
             InitTools(_model.FileTools);
             InitTools(_sketchItemFactory.Palette);
             InitTools(_model.AlignmentTools);
+            InitTools(_model.ZoomTools);
             InitColorTools();
             
             
@@ -70,9 +78,9 @@ namespace DrawIt
             tb.Items.Add(_palette);
             
             ToolbarPanel.Children.Add(tb);
-            
-            
         }
+
+       
 
         void InitTools(IEnumerable<UI.Utilities.Interfaces.ICommandDescriptor> commands)
         {

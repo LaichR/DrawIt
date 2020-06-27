@@ -44,7 +44,7 @@ namespace Sketch.Controls
 
             void HandleMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
             {
-                Point p = e.GetPosition(this._ui._parent);
+                Point p = e.GetPosition(this._ui._parent.Canvas);
                 _moveTransform = ComputeMoveformation(p);
                 _ui._adorner.Transform(_moveTransform);
                 e.Handled = true;

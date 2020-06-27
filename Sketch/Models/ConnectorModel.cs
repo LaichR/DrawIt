@@ -38,8 +38,9 @@ namespace Sketch.Models
         ConnectorDocking _endpointDocking;
         string _showHideLabelHeader = ShowLabelHeader;
         bool _isRewireing = false;
-
+        bool _isLabelShown = false;
         ConnectorLabelModel _connectorStartLabel;
+
         List<ConnectorModel> _siblingConnections = new List<ConnectorModel>(); // if i want to prevent two overlaying connections, 
                                                   // i need to have some knowledge about other connections
 
@@ -64,14 +65,41 @@ namespace Sketch.Models
             From = from;
             To = to;
             _myConnectorStrategy = ConnectorUtilities.GetConnectionType(this, _connectionType);
-            Name = string.Format("{0}->{1}", from.Name, to.Name);
+            Label = string.Format("{0}->{1}", from.Label, to.Label);
             LineWidth = 1;
+            Initialize();
+            _geometry.Children.Add(_path);
+        }
+
+        protected override void RestoreData(SerializationInfo info, StreamingContext context)
+        {
+            base.RestoreData(info, context);
+            _connectionType = (ConnectionType)info.GetValue("ConnectionType", typeof(ConnectionType));
+
+            StartPointRelativePosition = info.GetDouble("StartPointRelativePosition");
+            MiddlePointRelativePosition = info.GetDouble("MiddlePointRelativePosition");
+            EndPointRelativePosition = info.GetDouble("EndPointRelativePosition");
+            EndPointDocking = (ConnectorDocking)info.GetValue("EndPointDocking", typeof(ConnectorDocking));
+            StartPointDocking = (ConnectorDocking)info.GetValue("StartPointDocking", typeof(ConnectorDocking));
+            _isLabelShown = info.GetBoolean("IsLabelShown");
+            From = (ConnectableBase)info.GetValue("From", typeof(ConnectableBase));
+            To = (ConnectableBase)info.GetValue("To", typeof(ConnectableBase));
+            _myConnectorStrategy = ConnectorUtilities.GetConnectionType(this, _connectionType);
+
+        }
+
+        protected override void Initialize()
+        {
             _cmdShowLabel = new DelegateCommand(ExecuteShowLabel, CanExecuteShowLabel);
             _cmdHideLabel = new DelegateCommand(ExecuteHideLabel, CanExecuteHideLabel);
             _cmdReverseDirection = new DelegateCommand(ExecuteChangeDirection);
             _cmdUpdateFrom = new DelegateCommand(ExecuteChangeFrom);
             _cmdUpdateTo = new DelegateCommand(ExecuteChangeTo);
-            _geometry.Children.Add(_path);
+            if (_isLabelShown)
+            {
+                ExecuteShowLabel();
+            }
+            UpdateGeometry();
         }
 
         public virtual IList<IBoundedItemFactory> AllowableConnectorTargets
@@ -79,28 +107,8 @@ namespace Sketch.Models
             get => ModelFactoryRegistry.Instance.GetSketchItemFactory().GetConnectableFactories(this.GetType());
         }
 
-        protected ConnectorModel(SerializationInfo info, StreamingContext context):base(info, context)
-        {
-            _connectionType = (ConnectionType)info.GetValue("ConnectionType", typeof(ConnectionType));
-            
-            StartPointRelativePosition = info.GetDouble("StartPointRelativePosition");
-            MiddlePointRelativePosition = info.GetDouble("MiddlePointRelativePosition");
-            EndPointRelativePosition = info.GetDouble("EndPointRelativePosition");
-            EndPointDocking = (ConnectorDocking)info.GetValue("EndPointDocking", typeof(ConnectorDocking));
-            StartPointDocking = (ConnectorDocking)info.GetValue("StartPointDocking", typeof(ConnectorDocking));
-            var isLableVisible = info.GetBoolean("IsLabelShown");
-            From = (ConnectableBase) info.GetValue("From", typeof(ConnectableBase));
-            To = (ConnectableBase)info.GetValue("To", typeof(ConnectableBase));
-            _myConnectorStrategy = ConnectorUtilities.GetConnectionType(this, _connectionType);
-            _cmdShowLabel = new DelegateCommand(ExecuteShowLabel, CanExecuteShowLabel);
-            _cmdHideLabel = new DelegateCommand(ExecuteHideLabel, CanExecuteHideLabel);
-            // this needs to be executed in the end, since it accesses _cmdShowLabel
-            if (isLableVisible)
-            {
-                ExecuteShowLabel();
-            }
-            UpdateGeometry();
-        }
+        protected ConnectorModel(SerializationInfo info, StreamingContext context)
+            : base(info, context){ }
 
         public override ISketchItemModel RefModel
         {
@@ -347,6 +355,7 @@ namespace Sketch.Models
             ConnectorStartLabel = labelModel;
             _cmdHideLabel.RaiseCanExecuteChanged();
             _cmdShowLabel.RaiseCanExecuteChanged();
+            _isLabelShown = true;
         }
 
         public void RestoreConnectionEnd()
@@ -450,6 +459,7 @@ namespace Sketch.Models
         void ExecuteHideLabel()
         {
             ConnectorStartLabel = null;
+            _isLabelShown = false;
             _cmdHideLabel.RaiseCanExecuteChanged();
             _cmdShowLabel.RaiseCanExecuteChanged();
         }

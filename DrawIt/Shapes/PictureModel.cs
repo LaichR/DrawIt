@@ -23,7 +23,7 @@ namespace DrawIt.Shapes
 
         public PictureModel( System.Windows.Point p, string fileName, OutlineToolFactory toolFactory)
         {
-            Name = fileName;
+            Label = fileName;
             InitImageBrush();
             Bounds = new Rect(p, new System.Windows.Size(_myImage.Width, _myImage.Height));
             IsSelected = true;
@@ -80,7 +80,7 @@ namespace DrawIt.Shapes
 
         private void InitImageBrush()
         {
-            _myImage = new BitmapImage(new Uri(Name));
+            _myImage = new BitmapImage(new Uri(Label));
             _fill = new ImageBrush() { ImageSource = _myImage };
         }
     }

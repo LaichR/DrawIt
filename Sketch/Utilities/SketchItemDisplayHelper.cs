@@ -2,16 +2,94 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
 using Sketch.Interface;
 using Sketch.Models;
+using System.Windows.Controls;
+using Sketch.Controls;
+
 
 namespace Sketch.Utilities
 {
-    public static class SketchPadHelper
+    public static class SketchItemDisplayHelper
     {
+        public static void SaveAsPng(Canvas canvas, string fileName)
+        {
+            // determin the 
+            var minX = (int)canvas.ActualWidth;
+            var maxX = 0;
+            var minY = (int)canvas.ActualHeight;
+            var maxY = 0;
+
+
+            RenderTargetBitmap bmp = new RenderTargetBitmap((int)canvas.ActualWidth, (int)canvas.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+
+
+            foreach (var ui in canvas.Children.OfType<ConnectorUI>())
+            {
+                ui.IsSelected = false;
+               
+                AdjustBoundaries(ui.Model.Geometry.Bounds, ref minX, ref maxX, ref minY, ref maxY);
+
+            }
+
+
+            foreach (var ui in canvas.Children.OfType<OutlineUI>())
+            {
+                ui.IsSelected = false;
+               
+                AdjustBoundaries(ui.Model.Geometry.Bounds, ref minX, ref maxX, ref minY, ref maxY);
+            }
+
+            // x and y must not be smaller than 0
+            var x = 0; // Math.Max(0, (minX - 50));
+            var y = 0; // Math.Max(0, (minY - 50));
+
+
+
+            var label = canvas.Children.OfType<SketchItemDisplayLabel>().First();
+
+            
+
+            //var oldX = Canvas.GetLeft(label);
+            //var oldY = Canvas.GetTop(label);
+
+            //Canvas.SetLeft(label, x + 10);
+            //Canvas.SetTop(label, y + 5);
+
+            
+            bmp.Render(canvas);
+
+            var adornders = AdornerLayer.GetAdornerLayer(canvas).GetAdorners(canvas).OfType<IntersectionFinder>();
+            if( adornders.Any())
+            {
+                bmp.Render(adornders.First());
+            }
+
+            
+
+            var width = (int)Math.Min(canvas.ActualWidth, (maxX - x + 100));
+            var height = (int)Math.Min(canvas.ActualHeight, (maxY - y + 100));
+
+
+            CroppedBitmap cropped = new CroppedBitmap(bmp, new Int32Rect(x, y, width, height));
+
+            //bmp.Render( this );
+            var encoder = new PngBitmapEncoder();
+
+            encoder.Frames.Add(BitmapFrame.Create(cropped));
+
+            using (System.IO.Stream stm = new System.IO.FileStream(fileName, System.IO.FileMode.Create))
+            {
+                encoder.Save(stm);
+            }
+        }
+
         public static void AlignLeft(IEnumerable<ISketchItemModel> outlines)
         {
             RuntimeCheck.Contract.Requires(outlines != null, "list of shapes to align must not be null");
@@ -80,18 +158,45 @@ namespace Sketch.Utilities
             IFormatter formatter = new BinaryFormatter();
             var list = (List<ISketchItemModel>)formatter.Deserialize(stream);
 
+            RestoreChildren(outlines, list);
+
+
+        }
+
+        internal static void RestoreChildren(IList<ISketchItemModel> outlines, List<ISketchItemModel> children)
+        {
             //
             // is this needed? what happens if i just restore!
             // it was possible to handle the dependencies while doing the deserialisation as well?
             //
-            foreach (var connectable in list.OfType<ConnectableBase>())
+            foreach (var connectable in children.OfType<ConnectableBase>())
             {
                 outlines.Add(connectable);
             }
 
-            foreach (var connector in list.OfType<ConnectorModel>())
+            foreach (var connector in children.OfType<ConnectorModel>())
             {
                 outlines.Add(connector);
+            }
+        }
+
+        private static void AdjustBoundaries(Rect boundaries, ref int left, ref int right, ref int top, ref int bottom)
+        {
+            if (boundaries.Left < left)
+            {
+                left = (int)boundaries.Left;
+            }
+            if (boundaries.Right > right)
+            {
+                right = (int)boundaries.Right;
+            }
+            if (boundaries.Top < top)
+            {
+                top = (int)boundaries.Top;
+            }
+            if (boundaries.Bottom > bottom)
+            {
+                bottom = (int)boundaries.Bottom;
             }
         }
     }

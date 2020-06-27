@@ -13,7 +13,7 @@ namespace UI.Utilities.Interfaces
             get;
         }
 
-        string Name
+        string Label
         {
             get;
         }

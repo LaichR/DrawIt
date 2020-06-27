@@ -21,14 +21,10 @@ namespace DrawIt.Uml
     {
         public UmlGeneralizationModel( ConnectionType type, IBoundedItemModel from, IBoundedItemModel to)
             :base(type, from, to)
-        {
-            FillEndings = true;
-        }
+        {}
 
         protected UmlGeneralizationModel(SerializationInfo info, StreamingContext context) : base(info, context) 
-        {
-            FillEndings = true;
-        }
+        {}
 
         public override void UpdateGeometry()
         {
@@ -40,6 +36,12 @@ namespace DrawIt.Uml
                     Rotation = ConnectorStrategy.EndAngle
                 }.Ending);
             
+        }
+
+        protected override void Initialize()
+        {
+            base.Initialize();
+            FillEndings = true;
         }
 
 

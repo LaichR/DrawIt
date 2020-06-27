@@ -28,13 +28,15 @@ namespace DrawIt.Uml
             LabelArea = new Rect(labelAreaLocation, new Size(Bounds.Width-20, 25));
             IsSelected = true;
             AllowSizeChange = true;
-            Name = "new state";
+            Label = "new state";
             RotationAngle = 0.0;
             UpdateGeometry();
         }
 
         protected UmlStateModel(SerializationInfo info, StreamingContext context) : base(info, context) 
-        { }
+        {
+            UpdateGeometry();
+        }
 
         public override void UpdateGeometry()
         {
@@ -60,11 +62,6 @@ namespace DrawIt.Uml
                 outline.Transform = Rotation;
                 return outline;
             }
-        }
-
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
         }
 
     }

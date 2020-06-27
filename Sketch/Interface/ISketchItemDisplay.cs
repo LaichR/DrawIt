@@ -5,14 +5,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Input;
+using Sketch.Types;
 
 namespace Sketch.Interface
 {
-    public interface ISketchItemDisplay: ISketchItemContainer
+    public interface ISketchItemDisplay: ISketchItemContainer, IDisposable
     {
         Canvas Canvas
         {
             get;
+        }
+
+        EditMode EditMode
+        {
+            get;
+            set;
         }
 
         ISketchItemUI SelectedItem
@@ -24,6 +32,17 @@ namespace Sketch.Interface
         {
             get;
         }
+
+        IEnumerable<ISketchItemUI> Items
+        {
+            get;
+        }
+
+        event EventHandler SelectedItemChanged;
+
+        void HandleAddConnector(object sender, EventArgs e);
+
+        void HandleKeyDown(KeyEventArgs keyEvent);
 
         void ClearSelection();
 

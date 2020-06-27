@@ -29,9 +29,7 @@ namespace DrawIt.Uml
         }
 
         protected UmlDependencyModel(SerializationInfo info, StreamingContext context) : base(info, context) 
-        {
-            StrokeDashArray = new DoubleCollection(new double[] { 2, 2 });
-        }
+        {}
 
         public override void UpdateGeometry()
         {
@@ -44,6 +42,12 @@ namespace DrawIt.Uml
                     Rotation = ConnectorStrategy.EndAngle
                 }.Ending);
              
+        }
+
+        protected override void Initialize()
+        {
+            base.Initialize();
+            StrokeDashArray = new DoubleCollection(new double[] { 2, 2 });
         }
 
 

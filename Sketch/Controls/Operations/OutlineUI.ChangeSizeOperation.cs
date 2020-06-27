@@ -64,7 +64,7 @@ namespace Sketch.Controls
 
             void HandleMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
             {
-                Point p = e.GetPosition(this._ui._parent);
+                Point p = e.GetPosition(this._ui._parent.Canvas);
                 this._resizeTransform = ComputeResizeTransformation(p);
                 _ui._adorner.Transform(_resizeTransform);
                 e.Handled = true;
@@ -237,7 +237,7 @@ namespace Sketch.Controls
                     default:
                         return null;
                 }
-                return null;
+                //return null;
             }
         }
     }
