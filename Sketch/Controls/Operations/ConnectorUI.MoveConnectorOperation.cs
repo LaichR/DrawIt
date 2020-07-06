@@ -29,7 +29,7 @@ namespace Sketch.Controls
             Point _movePointStart;
             Point _otherPointPosition;
             double _newMoveDistance;
-
+            GeometryGroup _gg = new GeometryGroup();
             Point _p0;
             List<double> _moveSpeed = new List<double>();
             
@@ -50,8 +50,8 @@ namespace Sketch.Controls
                 _fromGeometry = new RectangleGeometry(fromRect);
                 
                 _toGeometry = new RectangleGeometry(toRect);
-
-                var initialGeometry = _moveHelper.GetGeometry(_moveHelper.LineType,
+                
+                var initialGeometry = _moveHelper.GetGeometry(_gg, _moveHelper.LineType,
                     _model.ConnectorStart, _model.ConnectorEnd, _moveHelper.Distance);
 
                 _visualizer = new ConnectorMoveVisualizer(initialGeometry); //tbd
@@ -205,7 +205,7 @@ namespace Sketch.Controls
                         lt = (LineType)((int)_movingPointDocking << 8 | (int)tmpDocking);
                     }
                     tmpPos = ConnectorUtilities.ComputePoint(_model.To.Bounds, tmpDocking, _model.EndPointRelativePosition);
-                    var geometry = _moveHelper.GetGeometry(lt, _movePointStart, tmpPos, _moveHelper.Distance);
+                    var geometry = _moveHelper.GetGeometry(_gg, lt, _movePointStart, tmpPos, _moveHelper.Distance);
                     //if( geometry is PathGeometry)
                     //{
                     //    var path = geometry as PathGeometry;
@@ -293,7 +293,7 @@ namespace Sketch.Controls
                     _newMoveDistance = (_model.From.Bounds.Left - e.X ) / 150;
                 }
                 _newMoveDistance = Math.Max(0.01, _newMoveDistance);
-                var geometry = _moveHelper.GetGeometry(_moveHelper.LineType, _model.ConnectorStart, _model.ConnectorEnd, _newMoveDistance);
+                var geometry = _moveHelper.GetGeometry(_gg, _moveHelper.LineType, _model.ConnectorStart, _model.ConnectorEnd, _newMoveDistance);
                 _visualizer.UpdateGeometry(geometry);
             }
 
@@ -321,7 +321,7 @@ namespace Sketch.Controls
                     }
                     tmpPos = ConnectorUtilities.ComputePoint(_model.From.Bounds, tmpDocking, _model.StartPointRelativePosition);
                     
-                    var geometry = _moveHelper.GetGeometry(lt, tmpPos, _movePointStart, _moveHelper.Distance);
+                    var geometry = _moveHelper.GetGeometry(_gg, lt, tmpPos, _movePointStart, _moveHelper.Distance);
                     if ((_fromGeometry.FillContainsWithDetail(geometry) == IntersectionDetail.Empty &&
                           _toGeometry.FillContainsWithDetail(geometry) == IntersectionDetail.Empty))
                     {

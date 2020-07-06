@@ -26,14 +26,17 @@ namespace Sketch.Models
         List<UI.Utilities.Interfaces.ICommandDescriptor> _tools = new List<UI.Utilities.Interfaces.ICommandDescriptor>();
 
         public ConnectorLabelModel(ConnectorModel connector, bool isStartPointLabel, Point labelPosition)
+            :base(labelPosition, 
+                 ComputeBounds( connector.Label), 
+                 connector.Label, Colors.Snow )
         {
             _connector = connector;
             _connector.PropertyChanged += _connector_PropertyChanged;
             _labelPosition = labelPosition;
             _isStartpointLabel = isStartPointLabel;
             AllowSizeChange = false;
-            FillColor = Colors.Snow;
             StrokeThickness = 0.2;
+            _formattedText = ComputeFormattedText(_connector.Label);
             UpdateGeometry();
         }
 
@@ -61,6 +64,7 @@ namespace Sketch.Models
             set
             {
                 _connector.Label = value;
+                _formattedText = ComputeFormattedText(value);
                 UpdateGeometry();
             }
         }
@@ -113,9 +117,9 @@ namespace Sketch.Models
         public override void Move(Transform translation)
         {
             _labelPosition = translation.Transform(_labelPosition);
-            var newBounds = ComputeBounds(_labelPosition);
+            var newSize = ComputeBounds(_connector.Label);
             // this assignement trigger the update process of the UI
-            LabelArea = newBounds;
+            LabelArea = new Rect(_labelPosition, newSize );
             UpdateGeometry();
         }
 
@@ -129,11 +133,10 @@ namespace Sketch.Models
             if (!_geometryUpdating && _connector !=null)
             {
                 _geometryUpdating = true; // since 
-                _formattedText = new FormattedText(_connector.Label, System.Globalization.CultureInfo.CurrentCulture,
-                    System.Windows.FlowDirection.LeftToRight, new Typeface("Arial"), 12, Brushes.Blue,
-                    VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip);
+                
 
-                LabelArea = ComputeBounds(_labelPosition);
+                var size = ComputeBounds(_connector.Label);
+                LabelArea = new Rect(_labelPosition, size );
                 
                 _outline = new RectangleGeometry(LabelArea);
                 var g = base.Geometry as GeometryGroup;
@@ -148,7 +151,6 @@ namespace Sketch.Models
             }
         }
 
-        
 
         Point ConnectorReferencePoint
         {
@@ -163,9 +165,17 @@ namespace Sketch.Models
             return new Point(pos.X + 10, pos.Y + 8);
         }
 
-        Rect ComputeBounds( Point origin)
+        static FormattedText ComputeFormattedText( string label )
         {
-            return new Rect(origin, new Size(_formattedText.Width + 20, _formattedText.Height + 16));
+            return new FormattedText(label, System.Globalization.CultureInfo.CurrentCulture,
+                    System.Windows.FlowDirection.LeftToRight, new Typeface("Arial"), 12, Brushes.Blue,
+                    VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip);
+        }
+
+        static Size ComputeBounds(  string label)
+        {
+            var formattedText = ComputeFormattedText(label);
+            return new Size(formattedText.Width + 20, formattedText.Height + 16);
         }
     }
 }

@@ -15,8 +15,8 @@ namespace DrawIt.Uml
     [Serializable]
     public class UmlFinalStateModel : ConnectableBase
     {
-        const int DefaultWidth = 26;
-        const int DefaultHeight = 27;
+        new const double DefaultWidth = 26;
+        new const double DefaultHeight = 27;
         const int OuterRadius = 12;
         const int InnerRadius1 = 11;
         const int InnerRadius2 = 8;
@@ -25,21 +25,13 @@ namespace DrawIt.Uml
         EllipseGeometry _inner;
         CombinedGeometry _outer;
         public UmlFinalStateModel(Point p)
+            :base(p, new Size(DefaultHeight, DefaultWidth), "Final-State",
+                 Colors.Black)
         {
-            var location = new Point(p.X, p.Y);
-  
-            Bounds = new Rect(location, new Size(DefaultHeight, DefaultWidth));
             AllowEdit = false;
             AllowSizeChange = false;
             LabelArea = Rect.Empty;
-            IsSelected = true;
-           
-            Label = "Final-State";
-            RotationAngle = 0.0;
-            
-            FillColor = Colors.Black;
             UpdateGeometry();
-
         }
 
         protected UmlFinalStateModel(SerializationInfo info, StreamingContext context) : 
@@ -82,9 +74,10 @@ namespace DrawIt.Uml
             }
         }
 
-        //public override IList<ICommandDescriptor> Tools
-        //{
-        //    get { return new List<UI.Utilities.Interfaces.ICommandDescriptor>(); }
-        //}
+        protected override Rect ComputeBounds(Point pos, Size size, Rect labelArea)
+        {
+            return new Rect(pos, size);
+        }
+
     }
 }

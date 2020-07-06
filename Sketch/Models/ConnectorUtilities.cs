@@ -400,6 +400,14 @@ namespace Sketch.Models
             return new Point(x, y);
         }
 
+        internal static Point RestrictRange(Rect rect, Point p, 
+            double marginX, double marginY)
+        {
+            var x = ConnectorUtilities.RestrictRange(rect.Left + marginX, rect.Right-marginX, p.X);
+            var y = ConnectorUtilities.RestrictRange(rect.Top-marginY, rect.Bottom+marginY, p.Y);
+            return new Point(x, y);
+        }
+
         static ConnectorDocking BestDockingBottomLeft(Rect r, ref Point p)
         {
             Point pBottom = r.BottomLeft; pBottom.Offset(2, 0);

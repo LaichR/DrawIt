@@ -17,8 +17,10 @@ namespace DrawIt.Uml
     [AllowableConnector(typeof(UmlTransitionModel))]
     public class UmlStateModel : ContainerModel
     {
-        const int DefaultWidth = 150;
-        const int DefaultHeight = 75;
+        new static readonly double DefaultWidth = 150;
+        new static readonly double DefaultHeight = 60;
+
+        static readonly double DefaultRoundingEdgeRadius = DefaultHeight / 3; 
 
         public UmlStateModel(Point p)
             : base(p, new Size( DefaultWidth, DefaultHeight)) 
@@ -48,7 +50,7 @@ namespace DrawIt.Uml
             var body = new Rect(Bounds.Left, Bounds.Top, Bounds.Width, Bounds.Height);
             myGeometry.Children.Add(new LineGeometry(new Point(Bounds.Left, LabelArea.Bottom),
                                                       new Point(Bounds.Right, LabelArea.Bottom)));
-            myGeometry.Children.Add(new RectangleGeometry(body, Bounds.Height / 4, Bounds.Height / 4));
+            myGeometry.Children.Add(new RectangleGeometry(body, DefaultRoundingEdgeRadius, DefaultRoundingEdgeRadius));
             myGeometry.Transform = Rotation;
             
 
@@ -58,7 +60,7 @@ namespace DrawIt.Uml
         {
             get
             {
-                var outline = new System.Windows.Media.RectangleGeometry(Bounds, Bounds.Height/4, Bounds.Height/4);
+                var outline = new System.Windows.Media.RectangleGeometry(Bounds, DefaultRoundingEdgeRadius, DefaultRoundingEdgeRadius);
                 outline.Transform = Rotation;
                 return outline;
             }

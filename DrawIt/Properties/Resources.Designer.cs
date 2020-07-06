@@ -113,6 +113,26 @@ namespace DrawIt.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap UmlActionConnectorShape {
+            get {
+                object obj = ResourceManager.GetObject("UmlActionConnectorShape", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap UmlActionShape {
+            get {
+                object obj = ResourceManager.GetObject("UmlActionShape", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap UmlAssociationShape {
             get {
                 object obj = ResourceManager.GetObject("UmlAssociationShape", resourceCulture);

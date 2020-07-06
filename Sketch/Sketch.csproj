@@ -116,6 +116,7 @@
     <Compile Include="Controls\ConnectorUI.cs" />
     <Compile Include="Controls\ConnectablePairSelector.cs" />
     <Compile Include="Controls\IntersectionFinder.cs" />
+    <Compile Include="Controls\BoundsComparer.cs" />
     <Compile Include="Controls\LineSegmentDecorator.cs" />
     <Compile Include="Controls\Operations\OutlineUI.MoveOperation.cs" />
     <Compile Include="Controls\Operations\RewireConnectorOperation.cs" />

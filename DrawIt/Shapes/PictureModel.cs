@@ -16,31 +16,28 @@ namespace DrawIt.Shapes
     [Serializable]
     public class PictureModel: ConnectableBase
     {
-        IList<UI.Utilities.Interfaces.ICommandDescriptor> _tools;
-        OutlineToolFactory _toolFactory;
+        new public const double DefaultHeight = 100;
+        new public const double DefaultWidth = 150;
+
+       
+        
         BitmapImage _myImage;
         Brush _fill;
 
-        public PictureModel( System.Windows.Point p, string fileName, OutlineToolFactory toolFactory)
+        public PictureModel( System.Windows.Point p, string fileName)
+            :base(p, new Size(PictureModel.DefaultWidth, PictureModel.DefaultHeight),
+                 fileName, Colors.Snow)
         {
             Label = fileName;
-            InitImageBrush();
-            Bounds = new Rect(p, new System.Windows.Size(_myImage.Width, _myImage.Height));
-            IsSelected = true;
             AllowSizeChange = true;
             RotationAngle = 0.0;
-            FillColor = System.Windows.Media.Colors.Snow;
-            _toolFactory = toolFactory;
-            _tools = _toolFactory.GetTools();   
+            UpdateGeometry();
         }
 
         protected PictureModel(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            _toolFactory = (OutlineToolFactory)
-            info.GetValue("ToolFactory", typeof(OutlineToolFactory));
-            _tools = _toolFactory.GetTools();
-            InitImageBrush();
+            UpdateGeometry();
         }
 
         public override System.Windows.Media.Brush Fill
@@ -51,37 +48,20 @@ namespace DrawIt.Shapes
             }
         }
 
-        public override System.Windows.Media.RectangleGeometry Outline
-        {
-            get { return new RectangleGeometry(Bounds); }
-        }
-
-        //public override IList<UI.Utilities.Interfaces.ICommandDescriptor> Tools
-        //{
-        //    get { return _tools; }
-        //}
-
-        public override System.Windows.Media.Geometry Geometry
-        {
-            get { return new RectangleGeometry(Bounds); }
-        }
-
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-            info.AddValue("ToolFactory", _toolFactory);
-            
-        }
+        public override RectangleGeometry Outline =>
+            new RectangleGeometry(Bounds);
 
         public override void RenderAdornments(DrawingContext drawingContext)
         {
             //base.RenderAdornments(drawingContext);
         }
 
-        private void InitImageBrush()
+        protected override void Initialize()
         {
+            base.Initialize();
             _myImage = new BitmapImage(new Uri(Label));
-            _fill = new ImageBrush() { ImageSource = _myImage };
+            _fill = new ImageBrush(_myImage) { Stretch = Stretch.Fill };
         }
+
     }
 }

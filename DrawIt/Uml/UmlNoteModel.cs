@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
-using UI.Utilities.Interfaces;
-using Sketch.Types;
 using Sketch.Models;
 using System.Runtime.Serialization;
 
@@ -16,6 +12,9 @@ namespace DrawIt.Uml
     public class UmlNoteModel:ConnectableBase
     {
         //IList<Bluebottle.Base.Interfaces.ICommandDescriptor> _tools;
+
+        new public const double DefaultHeight = 50;
+        new public const double DefaultWidth = 100;
 
 
         static readonly double TopMargin = 20;
@@ -28,14 +27,14 @@ namespace DrawIt.Uml
         
 
         public UmlNoteModel(Point p )
+            :base(p, new Size(DefaultWidth, DefaultHeight), 
+                 "new note",
+                 Colors.White)
         {
-            Bounds = new Rect(p, new Size(100, 50));
-            IsSelected = true;
             AllowSizeChange = true;
-            Label = "new note";
             Note = "a note";
-            RotationAngle = 0.0;
-            FillColor = Colors.White;
+            
+            
             UpdateGeometry();
 
         }

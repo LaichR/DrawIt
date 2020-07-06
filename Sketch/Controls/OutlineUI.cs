@@ -15,6 +15,7 @@ using UI.Utilities.Interfaces;
 using Sketch.Types;
 using Sketch.Models;
 using Sketch.Interface;
+using Prism.Commands;
 
 namespace Sketch.Controls
 {
@@ -130,7 +131,22 @@ namespace Sketch.Controls
             var commands = model.Commands;
             if( commands != null && commands.Count > 0)
             {
+
                 ContextMenu = OutlineHelper.InitContextMenu(commands);
+                ContextMenu.Items.Add(
+                    new MenuItem()
+                    {
+                        Header = "Copy",
+                        Command = new DelegateCommand(() =>
+                        {
+                            var newElem = _model.Clone();
+                            var t = new TranslateTransform(
+                                ConnectableBase.DefaultWidth / 4,
+                                ConnectableBase.DefaultHeight / 4);
+                            newElem.Move(t);
+                            _parent.SketchItems.Add(newElem);
+                        })
+                    });
             }
         }
 
@@ -232,6 +248,8 @@ namespace Sketch.Controls
             var editOperation = new EditLabelOperation(this); 
             RegisterHandler(editOperation);
         }
+
+        
 
         private void RegisterHandler(IEditOperation handler)
         {

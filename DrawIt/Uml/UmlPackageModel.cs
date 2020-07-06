@@ -18,8 +18,8 @@ namespace DrawIt.Uml
     [AllowableConnector(typeof(UmlAssociationModel))]
     public class UmlPackageModel: ContainerModel
     {
-        const int DefaultWidth = 150;
-        const int DefaultHeight = 95;
+        new const int DefaultWidth = 150;
+        new const int DefaultHeight = 95;
         public UmlPackageModel( Point p )
             : base(p, new Size( DefaultWidth, DefaultHeight)) 
         {

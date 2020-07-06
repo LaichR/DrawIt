@@ -33,7 +33,9 @@ namespace Sketch.Models
                 }
             }
 
-            public System.Windows.Media.Geometry GetGeometry(Types.LineType lineType, Point start, Point end, double distance)
+            public System.Windows.Media.Geometry GetGeometry(
+                GeometryGroup gg,
+                Types.LineType lineType, Point start, Point end, double distance)
             {
                 
                 if( _moveType == Types.MoveType.MoveStartPoint)
@@ -44,7 +46,7 @@ namespace Sketch.Models
                 {
                     _end = end;
                 }
-                var gg = new GeometryGroup();
+                gg.Children.Clear();
                 gg.Children.Add(new LineGeometry(_start, _end));
                 return gg;
                 //PathFigure path = ConnectorUtilities.GetPathFigureFromPoints(new Point[] { _start, _end }); 

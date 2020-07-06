@@ -71,13 +71,14 @@ namespace Sketch.Models
                 }
             }
 
-            public System.Windows.Media.Geometry GetGeometry(Types.LineType lineType, Point start, Point end, double distance)
+            public System.Windows.Media.Geometry GetGeometry(
+                GeometryGroup gg, Types.LineType lineType, Point start, Point end, double distance)
             {
                 _distance = distance;
                 lineType = (Types.LineType)(((int)Types.ConnectorDocking.Self << 8) | ((int)lineType & 0xFF));               
                
                 _parent.ComputePath(lineType, start, end, _distance);
-                GeometryGroup gg = new GeometryGroup();
+                gg.Children.Clear();
                 var pf = _parent._myPath.First();
                 var p = pf.StartPoint;
                 foreach( var ls in pf.Segments.OfType<LineSegment>())

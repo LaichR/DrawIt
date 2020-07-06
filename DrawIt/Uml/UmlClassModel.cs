@@ -21,8 +21,8 @@ namespace DrawIt.Uml
     
     public class UmlClassModel: ContainerModel
     {
-        const int DefaultWidth = 150;
-        const int DefaultHeight = 75;
+        new const int DefaultWidth = 150;
+        new const int DefaultHeight = 75;
 
         public UmlClassModel(Point p)
             : base(p, new Size(DefaultWidth, DefaultHeight)) 

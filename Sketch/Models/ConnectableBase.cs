@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Media;
 using UI.Utilities.Interfaces;
 using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using Prism.Commands;
 using UI.Utilities;
 using Sketch.Interface;
@@ -18,7 +19,13 @@ namespace Sketch.Models
 
     public abstract class ConnectableBase: ModelBase, IBoundedItemModel
     {
-        
+
+        public static readonly double DefaultWidth = 100;
+        public static readonly double DefaultHeight = 100;
+        public const double DefaultFontSize = 12;
+        public static readonly Color DefaultColor = Colors.Snow;
+        public static readonly Brush DefaultStroke = Brushes.Black;
+        public static readonly Typeface DefaultFont = new Typeface(new FontFamily("Arial"), FontStyles.Normal, FontWeights.UltraLight, FontStretches.UltraExpanded);
 
         Rect _bounds;
         
@@ -26,19 +33,25 @@ namespace Sketch.Models
         double _rotationAngle = 0.0;
         RotateTransform _rotateTransform = null;
         SerializableColor _fillColor = new SerializableColor();
-        Color _initialColor = Colors.Wheat;
-        Typeface _lableFont = new Typeface(new FontFamily("Arial"), FontStyles.Oblique, FontWeights.UltraLight, FontStretches.UltraExpanded );
-        double _fontSize = 12;
         
-        Brush _stroke = Brushes.Black;
+        
+        double _fontSize = DefaultFontSize;
+        Brush _stroke = DefaultStroke;
         double _strokeThickness = 1;
 
         DelegateCommand _cmdSelectColor;
         GeometryGroup _geometry = new GeometryGroup();
 
-        public ConnectableBase() 
+        public ConnectableBase(Point pos, Size size, 
+            string label,
+            Color color) 
         {
-            FillColor = Colors.Wheat;
+            IsSelected = true;
+            Label = label;
+            FillColor = color;
+            LabelArea = ComputeLabelArea(label, pos);
+            _bounds = ComputeBounds(pos, size, LabelArea);
+            
             Initialize();
         }
 
@@ -138,10 +151,31 @@ namespace Sketch.Models
             set { SetProperty<bool>(ref _allowSizeChange, value); }
         }
 
-        public abstract RectangleGeometry Outline
+        public virtual RectangleGeometry Outline
         {
-            get;
+            get => new RectangleGeometry(Bounds);
         }
+
+        protected virtual FormattedText ComputeFormattedText(
+                        string label,  
+                        Typeface typeface, double size,
+                        FlowDirection flowDirection = System.Windows.FlowDirection.LeftToRight
+            )
+        {
+            return new FormattedText(label, System.Globalization.CultureInfo.CurrentCulture,
+                    flowDirection, typeface, size, Stroke,
+                    VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip);
+        }
+
+        protected virtual Size ComputeFormattedTextSize(string label,
+                        Typeface typeface, double size, 
+                        double marginX, double marginY)
+        {
+            var formattedText = ComputeFormattedText(label, typeface, size);
+            return new Size(formattedText.Width + marginX,
+                formattedText.Height + marginY);
+        }
+
 
         /// <summary>
         /// provide an interface to populate a toolbar from close to the view!
@@ -156,7 +190,7 @@ namespace Sketch.Models
         {
             // draw the lable
             FormattedText t = new FormattedText(Label, System.Globalization.CultureInfo.CurrentCulture,
-                System.Windows.FlowDirection.LeftToRight, _lableFont, _fontSize,
+                System.Windows.FlowDirection.LeftToRight, DefaultFont, _fontSize,
                 System.Windows.Media.Brushes.Black,
                 VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip);
             var position = new System.Windows.Point(LabelArea.Left + 5, LabelArea.Top + 2);
@@ -200,13 +234,7 @@ namespace Sketch.Models
 
         public event EventHandler<OutlineChangedEventArgs> ShapeChanged;
 
-        protected virtual void NotifyShapeChanged(ref Rect old, ref Rect @new)
-        {
-            if( ShapeChanged != null)
-            {
-                ShapeChanged( this, new OutlineChangedEventArgs(old,@new));
-            }
-        }
+
 
         public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
@@ -216,7 +244,50 @@ namespace Sketch.Models
             info.AddValue("Fill", _fillColor.ScRgb );
         }
 
+        public ConnectableBase Clone()
+        {
+            using (var inputStream = new System.IO.MemoryStream())
+            {
+                IFormatter formatter = new BinaryFormatter();
+                formatter.Serialize(inputStream, this);
+                var data = inputStream.ToArray();
+                using (var outputStream = new System.IO.MemoryStream(data))
+                {
+                    var newObj = formatter.Deserialize(outputStream) as ConnectableBase;
+                    return newObj;
+                }
+            }
+        }
+
         #region private helpers
+
+        protected virtual Rect ComputeLabelArea(string label, Point pos)
+        {
+            if (!string.IsNullOrEmpty(Label))
+            {
+                return new Rect(
+                    new Point(pos.X + 5, pos.Y + 5),
+                    ComputeFormattedTextSize(label, DefaultFont, DefaultFontSize, 10, 10));
+            }
+            return Rect.Empty;
+        }
+
+        protected virtual Rect ComputeBounds(Point pos, Size size, Rect labelArea )
+        {
+
+            return new Rect(pos,
+                new Size(Math.Max(labelArea.Width + 5, size.Width),
+                         Math.Max(labelArea.Height + 5, size.Height)));
+            
+        }
+
+        protected virtual void NotifyShapeChanged(ref Rect old, ref Rect @new)
+        {
+            if (ShapeChanged != null)
+            {
+                ShapeChanged(this, new OutlineChangedEventArgs(old, @new));
+            }
+        }
         void SelectColor()
         {
             var dlg = new Controls.ColorPicker.ColorPickerDialog();
@@ -228,6 +299,8 @@ namespace Sketch.Models
                 this.FillColor = dlg.SelectedColor;
             }
         }
+
+        
 
         protected override void RestoreData(SerializationInfo info, StreamingContext context)
         {
@@ -249,7 +322,7 @@ namespace Sketch.Models
             }
             catch { }
 
-            Initialize();
+            //Initialize();
         }
 
         protected override void Initialize()

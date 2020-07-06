@@ -52,9 +52,6 @@ namespace DrawIt
         EditMode _editMode;
         
         System.Windows.Input.Cursor _editCursor;
-        System.Windows.Input.Cursor _insertCursor;
-
-
 
         static readonly System.Drawing.Bitmap _insertPackage = Properties.Resources.UmlPackageShape;
         static readonly System.Drawing.Bitmap _insertState = Properties.Resources.UmlStateShape;

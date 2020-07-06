@@ -67,8 +67,8 @@ namespace Sketch.Models
             _myConnectorStrategy = ConnectorUtilities.GetConnectionType(this, _connectionType);
             Label = string.Format("{0}->{1}", from.Label, to.Label);
             LineWidth = 1;
-            Initialize();
             _geometry.Children.Add(_path);
+            Initialize();
         }
 
         protected override void RestoreData(SerializationInfo info, StreamingContext context)

@@ -22,7 +22,7 @@
                 <StackPanel Orientation="Horizontal">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Title"/>
-                    <TextBox x:Name="Title" Text="{Binding Label}" MinWidth="100"/>
+                    <TextBox x:Name="SketchTitle" Text="{Binding Label}" MinWidth="100"/>
                 </StackPanel>
                 <StackPanel Name="EditTools" Orientation="Vertical">
                     <RadioButton Content="Insert"  IsChecked="{Binding IsInsertMode, Mode=TwoWay}"/>

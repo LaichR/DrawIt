@@ -8,7 +8,7 @@ namespace Sketch.Types
     public class LinkedAvlTree<T> where T: IComparable
     {
         object _synchRoot = new object();
-        /*volatile*/ int _count = 0;
+        int _count = 0;
         LinkedAvlTreeNode<T> _root = null;
 
         public void Add(T data)

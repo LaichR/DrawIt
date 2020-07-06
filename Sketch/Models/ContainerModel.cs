@@ -20,12 +20,9 @@ namespace Sketch.Models
         ObservableCollection<ISketchItemModel> _children = new ObservableCollection<ISketchItemModel>();
         
         public ContainerModel(Point location, Size size )
-            //:base(new Guid())
+            :base(location, size, "new container", ConnectableBase.DefaultColor)
         {
-            Bounds = new Rect(location, size);
             LabelArea = new Rect(location, new Size(size.Width, 20));
-            IsSelected = true;
-            Label = "hello world";
         }
 
         protected ContainerModel(SerializationInfo info, StreamingContext context)

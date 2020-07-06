@@ -22,6 +22,7 @@ namespace Sketch.Models
             Pen _connectorPen = new Pen(Brushes.White, ComputeConnectorLine.LineWidth);
             Point _startPoint;
             double _distance;
+            GeometryGroup _geometry = new GeometryGroup();
 
             public MovingState( ConnectorModel connectorModel, AutoRoutingConnectorStrategy parent, Point p)
             {
@@ -80,13 +81,13 @@ namespace Sketch.Models
                 set { _moveType = value; }
             }
 
-            public Geometry GetGeometry(LineType lineType, Point start, Point end, double distance)
+            public Geometry GetGeometry(GeometryGroup gg, LineType lineType, Point start, Point end, double distance)
             {
                 ComputeLinePointsDelegate computeLinePoints = null;
                 if( ComputeConnectorLine.Table.TryGetValue(lineType, out computeLinePoints) )
                 {
                     var linePoints = computeLinePoints(start, end, distance);
-                    GeometryGroup gg = new GeometryGroup();
+                    gg.Children.Clear();
                     Point p1 = linePoints.First();
                     foreach (var p2 in linePoints.Skip(1))
                     {

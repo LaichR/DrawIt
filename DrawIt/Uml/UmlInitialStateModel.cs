@@ -17,8 +17,8 @@ namespace DrawIt.Uml
     [AllowableConnector(typeof(UmlTransitionModel))]
     public class UmlInitialStateModel : ContainerModel
     {
-        const int DefaultWidth = 26;
-        const int DefaultHeight = 26;
+        new const int DefaultWidth = 26;
+        new const int DefaultHeight = 26;
 
 
         EllipseGeometry _geometry;
