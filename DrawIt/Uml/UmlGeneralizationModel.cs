@@ -19,8 +19,9 @@ namespace DrawIt.Uml
     [Serializable]
     public class UmlGeneralizationModel: ConnectorModel
     {
-        public UmlGeneralizationModel( ConnectionType type, IBoundedItemModel from, IBoundedItemModel to)
-            :base(type, from, to)
+        public UmlGeneralizationModel( ConnectionType type, IBoundedItemModel from, IBoundedItemModel to,
+            ISketchItemContainer container)
+            :base(type, from, to, container)
         {}
 
         protected UmlGeneralizationModel(SerializationInfo info, StreamingContext context) : base(info, context) 

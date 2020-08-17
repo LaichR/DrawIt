@@ -30,36 +30,63 @@ namespace Sketch.Models
 
         DoubleCollection _dashArray;
         IConnectorStrategy _myConnectorStrategy;
+
         
-        ConnectionType _connectionType;
         PathGeometry _path = new PathGeometry();
         GeometryGroup _geometry = new GeometryGroup();
-        ConnectorDocking _startpointDocking;
-        ConnectorDocking _endpointDocking;
-        string _showHideLabelHeader = ShowLabelHeader;
-        bool _isRewireing = false;
-        bool _isLabelShown = false;
-        ConnectorLabelModel _connectorStartLabel;
 
-        List<ConnectorModel> _siblingConnections = new List<ConnectorModel>(); // if i want to prevent two overlaying connections, 
+        [PersistentField(ModelVersion.V_0_1, "ConnectionType")]
+        ConnectionType _connectionType;
+        [PersistentField(ModelVersion.V_0_1, "StartPointDocking")]
+        ConnectorDocking _startpointDocking;
+        [PersistentField(ModelVersion.V_0_1, "EndPointDocking")]
+        ConnectorDocking _endpointDocking;
+
+        [PersistentField(ModelVersion.V_0_1, "StartPointRelativePosition")]
+        double _startPointRelativePosition;
+        [PersistentField(ModelVersion.V_0_1, "EndPointRelativePosition")]
+        double _endPointRelativePosition;
+        [PersistentField(ModelVersion.V_0_1, "MiddlePointRelativePosition")]
+        double _middlePointRelativePosition;
+
+        [PersistentField(ModelVersion.V_0_1, "IsLabelShown")]
+        bool _isLabelShown = false;
+
+        [PersistentField(ModelVersion.V_0_1, "Container")]
+        SketchItemContainerProxy _containerProxy;
+        ISketchItemContainer _container;          // if i want to prevent two overlaying connections, 
                                                   // i need to have some knowledge about other connections
 
+        [PersistentField(ModelVersion.V_0_1, "From")]
+        ConnectableBase _from;
+
+        [PersistentField(ModelVersion.V_0_1, "To")]
+        ConnectableBase _to;
+
+        string _showHideLabelHeader = ShowLabelHeader;
+        bool _isRewireing = false;
+
+        
+        ConnectorLabelModel _connectorStartLabel;
+
+        
         DelegateCommand _cmdShowLabel;
         DelegateCommand _cmdHideLabel;
         DelegateCommand _cmdReverseDirection;
         DelegateCommand _cmdUpdateFrom;
         DelegateCommand _cmdUpdateTo;
 
-        ConnectableBase _from;
-        ConnectableBase _to;
+        
         IBoundedItemModel _backup;
         Action _restoreAction;
 
 
-        public ConnectorModel( ConnectionType type,
-            IBoundedItemModel from, IBoundedItemModel to)
+        public ConnectorModel(ConnectionType type,
+            IBoundedItemModel from, IBoundedItemModel to,
+            ISketchItemContainer container)
         //:base(new Guid())
         {
+            _container = container;
             _connectionType = type;
             MiddlePointRelativePosition = 0.5;
             From = from;
@@ -71,21 +98,9 @@ namespace Sketch.Models
             Initialize();
         }
 
-        protected override void RestoreData(SerializationInfo info, StreamingContext context)
+        protected override void RestoreFieldData(SerializationInfo info, StreamingContext context)
         {
-            base.RestoreData(info, context);
-            _connectionType = (ConnectionType)info.GetValue("ConnectionType", typeof(ConnectionType));
-
-            StartPointRelativePosition = info.GetDouble("StartPointRelativePosition");
-            MiddlePointRelativePosition = info.GetDouble("MiddlePointRelativePosition");
-            EndPointRelativePosition = info.GetDouble("EndPointRelativePosition");
-            EndPointDocking = (ConnectorDocking)info.GetValue("EndPointDocking", typeof(ConnectorDocking));
-            StartPointDocking = (ConnectorDocking)info.GetValue("StartPointDocking", typeof(ConnectorDocking));
-            _isLabelShown = info.GetBoolean("IsLabelShown");
-            From = (ConnectableBase)info.GetValue("From", typeof(ConnectableBase));
-            To = (ConnectableBase)info.GetValue("To", typeof(ConnectableBase));
-            _myConnectorStrategy = ConnectorUtilities.GetConnectionType(this, _connectionType);
-
+            base.RestoreFieldData(info, context);
         }
 
         protected override void Initialize()
@@ -104,7 +119,7 @@ namespace Sketch.Models
 
         public virtual IList<IBoundedItemFactory> AllowableConnectorTargets
         {
-            get => ModelFactoryRegistry.Instance.GetSketchItemFactory().GetConnectableFactories(this.GetType());
+            get => SketchItemFactory.ActiveFactory?.GetConnectableFactories(this.GetType());
         }
 
         protected ConnectorModel(SerializationInfo info, StreamingContext context)
@@ -209,14 +224,11 @@ namespace Sketch.Models
             }
         }
 
-        internal void SetSiblings(IEnumerable<ConnectorModel> siblings)
-        {
-            RuntimeCheck.Contract.Requires<ArgumentNullException>(siblings != null, "siblings must not be null");
-            _siblingConnections.Clear();
-            _siblingConnections.AddRange(siblings);
-        }
+        public IEnumerable<ConnectorModel> SiblingConnections => 
+            _container?.SketchItems.OfType<ConnectorModel>().Where((x)=> x != this);
 
-        public IEnumerable<ConnectorModel> Siblings => _siblingConnections;
+        public IEnumerable<ConnectableBase> Connectables =>
+            _container?.SketchItems.OfType<ConnectableBase>();
 
         public IList<ICommandDescriptor> ContextMenuDeclaration
         {
@@ -263,6 +275,7 @@ namespace Sketch.Models
             }
         }
 
+
         public override void Move(Transform translation)
         {
             if( ConnectorStartSelected )
@@ -308,20 +321,20 @@ namespace Sketch.Models
 
         public double StartPointRelativePosition
         {
-            get;
-            set;
+            get => _startPointRelativePosition;
+            set => _startPointRelativePosition = value;
         }
 
         public double EndPointRelativePosition
         {
-            get;
-            set;
+            get => _endPointRelativePosition;
+            set => _endPointRelativePosition = value;
         }
 
         public double MiddlePointRelativePosition
         {
-            get;
-            set;
+            get => _middlePointRelativePosition;
+            set => _middlePointRelativePosition = value;
         }
 
         public IConnectorStrategy ConnectorStrategy
@@ -332,22 +345,25 @@ namespace Sketch.Models
             }
         }
 
-        
-
         public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
             base.GetObjectData(info, context);
-            info.AddValue("ConnectionType", _connectionType);
-            info.AddValue("StartPointRelativePosition", StartPointRelativePosition);
-            info.AddValue("MiddlePointRelativePosition", MiddlePointRelativePosition);
-            info.AddValue("EndPointRelativePosition", EndPointRelativePosition);
-            info.AddValue("EndPointDocking", EndPointDocking);
-            info.AddValue("StartPointDocking", StartPointDocking);
-            info.AddValue("IsLabelShown", _connectorStartLabel != null);
-            info.AddValue("From", From);
-            info.AddValue("To", To);
-            
         }
+
+        protected override void PrepareFieldBackup()
+        {
+            base.PrepareFieldBackup();
+            _containerProxy = new SketchItemContainerProxy(this._container);
+        }
+
+        protected override void FieldDataRestored()
+        {
+            base.FieldDataRestored();
+            _container = _containerProxy.Container;
+            _myConnectorStrategy = ConnectorUtilities.GetConnectionType(this, _connectionType);
+
+        }
+
 
         public void ShowLabelConnectorStart( Point p)
         {
@@ -372,10 +388,7 @@ namespace Sketch.Models
                 _geometry.Children.Clear();
                 _path.Figures = new PathFigureCollection(_myConnectorStrategy.ConnectorPath);
                 _geometry.Children.Add(_path);
-                if (_connectorStartLabel != null)
-                {
-                    _connectorStartLabel.UpdateGeometry();
-                }
+                ConnectorStartLabel?.UpdateGeometry();
             }
         }
 

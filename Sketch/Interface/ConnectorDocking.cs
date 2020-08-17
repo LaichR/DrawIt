@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sketch.Types
+namespace Sketch.Interface
 {
     
     /// <summary>
@@ -19,6 +19,6 @@ namespace Sketch.Types
         Bottom = 0x4,
         Left = 0x8,
         Self = 0x10,
-        DockingIsLocked = 0x100
+        //DockingIsLocked = 0x100
     }
 }

@@ -43,6 +43,13 @@ namespace Sketch.Types
                 RelativePosition.W, RelativePosition.NW, RelativePosition.SW
             };
 
+        static readonly SortedSet<RelativePosition> _all = new SortedSet<RelativePosition>
+            {
+                RelativePosition.E, RelativePosition.NE, RelativePosition.SE,
+                RelativePosition.W, RelativePosition.NW, RelativePosition.SW,
+                RelativePosition.S, RelativePosition.N
+            };
+
         public static readonly Dictionary<LineType, SortedSet<RelativePosition>>
             Table = new Dictionary<LineType, SortedSet<RelativePosition>>
             {
@@ -50,6 +57,7 @@ namespace Sketch.Types
                 {LineType.BottomTop, _anySouthernPos},
                 {LineType.LeftRight, _anyWesternPos},
                 {LineType.RightLeft,  _anyEasternPos},
+                //{LineType.RightLeft,  _all},
                 {LineType.LeftTop, _southWest},
                 {LineType.TopLeft, _northEast},
                 {LineType.TopRight, _northWest},

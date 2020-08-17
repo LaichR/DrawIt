@@ -71,8 +71,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="PropertyGrid.cs" />
     <Compile Include="Uml\UmlActionConnector.cs" />
+    <Compile Include="Uml\UmlActivityModel.cs" />
+    <Compile Include="Uml\UmlStereotypes.cs" />
+    <Compile Include="Uml\UmlActivityDiagramEdge.cs" />
     <Compile Include="Uml\UmlTansitionModel.cs" />
     <Compile Include="Uml\UmlAssociationModel.cs" />
     <Compile Include="Uml\UmlCompositionModel.cs" />
@@ -96,7 +98,6 @@
     </Compile>
     <Compile Include="Uml\UmlChoiceModel.cs" />
     <Compile Include="Uml\UmlClassModel.cs" />
-    <Compile Include="Uml\UmlElementType.cs" />
     <Compile Include="Uml\UmlNoteModel.cs" />
     <Compile Include="Uml\UmlPackageModel.cs" />
     <Compile Include="Uml\UmlShapeFactory.cs" />
@@ -159,13 +160,13 @@
     <None Include="Resources\ZoomOut.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\UmlFinalStateShape1.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\UmlActionConnectorShape.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\UmlActionShape.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\CallActionIndicator.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

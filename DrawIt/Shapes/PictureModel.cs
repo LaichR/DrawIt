@@ -48,8 +48,6 @@ namespace DrawIt.Shapes
             }
         }
 
-        public override RectangleGeometry Outline =>
-            new RectangleGeometry(Bounds);
 
         public override void RenderAdornments(DrawingContext drawingContext)
         {

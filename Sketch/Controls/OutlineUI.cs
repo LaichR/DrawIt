@@ -19,7 +19,7 @@ using Prism.Commands;
 
 namespace Sketch.Controls
 {
-    public partial class OutlineUI: Shape, ISketchItemUI
+    public partial class OutlineUI: ContentControl, ISketchItemUI
     {
         
         public static readonly DependencyProperty BoundsProperty =
@@ -34,6 +34,10 @@ namespace Sketch.Controls
             DependencyProperty.Register("IsMarked", typeof(bool), typeof(OutlineUI),
             new PropertyMetadata(OnIsMarkedChanged));
 
+        public static readonly DependencyProperty LabelProperty =
+            DependencyProperty.Register("Label", typeof(string), typeof(OutlineUI),
+            new PropertyMetadata(OnLabelChanged));
+
         public static readonly DependencyProperty GeometryProperty =
             DependencyProperty.Register("Geometry", typeof(Geometry), typeof(OutlineUI),
             new PropertyMetadata(OnGeometryChanged));
@@ -47,23 +51,30 @@ namespace Sketch.Controls
             new PropertyMetadata(OnContextMenuDeclarationChanged));
 
 
-        
-
-        Geometry _geometry;
+        //Geometry _geometry;
         bool _isNotifyingSelectionChange;
         bool _isNotifyingMarkingChanged;
+        RelativePosition _mouseMoveHitResult;
         Point _lastMouseDown; // this is used to show the tools if the model allows this
         Models.ConnectableBase _model;
         ISketchItemDisplay _parent;
+        SketchPad _sketchPad;
         OutlineAdorner _adorner;
         bool _isAdornderAdded;
         StackPanel _myTools;
         IEditOperation _currentOperationHandler;
+        ISketchItemDisplay _brushDisplay;
+        Brush _visualBrush;
 
-        public OutlineUI(ISketchItemDisplay parent, ConnectableBase model)
+        public OutlineUI(SketchPad pad, ISketchItemDisplay parent, ConnectableBase model)
             :base()
         {
+            _sketchPad = pad;
             _model = model;
+            Content = model;
+            IsHitTestVisible = true;
+            Canvas.SetLeft(this, model.Bounds.Left);
+            Canvas.SetTop(this, model.Bounds.Top);
             _parent = parent;
             var tools = model.AllowableConnectors;
             if (tools.Count > 0)
@@ -72,11 +83,19 @@ namespace Sketch.Controls
             }
 
             this.DataContext = model;
-            this.SetBinding(BoundsProperty, "Bounds");
-            this.SetBinding(GeometryProperty, "Geometry");
+            this.SetBinding(LabelProperty, model.LabelPropertyName );
+
+            var boundsBinding = new Binding(nameof(Bounds));
+            boundsBinding.Mode = BindingMode.OneWay;
+            //boundsBinding.IsAsync = true;
+            
+            this.SetBinding(BoundsProperty, boundsBinding) ;
+            this.SetBinding(GeometryProperty, nameof(Geometry));
+            
             
             this.Visibility = System.Windows.Visibility.Visible;
 
+            /* commented
 
             // allow to bind Fill property
             if (model.GetType().GetProperty("Fill") != null)
@@ -113,7 +132,7 @@ namespace Sketch.Controls
             {
                 this.SetBinding(StrokeDashArrayProperty, "StrokeDashArray");
             }
-
+            */
 
             // some of the bindings must only occur after the shadow was created!
             _adorner = new OutlineAdorner(this, parent);
@@ -150,6 +169,25 @@ namespace Sketch.Controls
             }
         }
 
+        public Brush VisualBrush
+        {
+            get 
+            {
+                if( _visualBrush == null )
+                {
+                    _visualBrush = CreateVisualBrush();
+                }
+                return _visualBrush;
+            }
+        }
+
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+            
+            //ContentTemplate = FindResource("UmlState") as DataTemplate;
+        }
+
         void HandleShadowMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed && e.RightButton == MouseButtonState.Released)
@@ -158,10 +196,9 @@ namespace Sketch.Controls
                 {
                     _currentOperationHandler.StopOperation(true);
                 }
-                RegisterHandler(new ChangeSizeOperation(this, e.GetPosition(_parent.Canvas)));
+                RegisterHandler(new ChangeSizeOperation(this, e) );
                 e.Handled = true;
-            }
-            
+            } 
         }
 
 
@@ -200,7 +237,7 @@ namespace Sketch.Controls
         }
 
 
-        public Shape Shape
+        public UIElement Shape
         {
             get { return this; }
         }
@@ -243,12 +280,6 @@ namespace Sketch.Controls
             }
         }
 
-        public void StartEdit()
-        {
-            var editOperation = new EditLabelOperation(this); 
-            RegisterHandler(editOperation);
-        }
-
         
 
         private void RegisterHandler(IEditOperation handler)
@@ -264,10 +295,10 @@ namespace Sketch.Controls
         public event EventHandler<bool> SelectionChanged;
         public event EventHandler<bool> IsMarkedChanged;
 
-        protected override Geometry DefiningGeometry
-        {
-            get { return Geometry; }
-        }
+        //protected /*override*/ Geometry DefiningGeometry
+        //{
+        //    get { return Geometry; }
+        //}
 
         protected override void OnKeyDown(KeyEventArgs e)
         {
@@ -301,19 +332,26 @@ namespace Sketch.Controls
         protected override void OnMouseMove(MouseEventArgs e)
         {
             e.Handled = false;
-            var p = e.GetPosition(this._parent.Canvas);
+            var p = RoundToGrid( e.GetPosition(this));
             
             if (_currentOperationHandler == null)
             {
                 e.Handled = true;
-                if (LabelArea.Contains(p) && Model.AllowEdit)
-                {
-                    Mouse.OverrideCursor = Cursors.Hand;
-                }
-                else if (e.LeftButton == MouseButtonState.Released &&
+                //if (LabelArea.Contains(p) && Model.AllowEdit)
+                //{
+                //    Mouse.OverrideCursor = Cursors.Hand;
+                //}
+                //else 
+                if (e.LeftButton == MouseButtonState.Released &&
                     e.RightButton == MouseButtonState.Released)
                 {
-                    Mouse.OverrideCursor = Cursors.SizeAll;
+
+                    _mouseMoveHitResult = RelativePosition.Undefined;
+                    if (IsSelected)
+                    {
+                        _mouseMoveHitResult = _adorner.HitShadowBorder(p);
+                    }
+                    SetMouseCursor(_mouseMoveHitResult);
                 }
             }
         }
@@ -330,36 +368,34 @@ namespace Sketch.Controls
             {
                 e.Handled = true;
                 // only react on left button
-                if (e.LeftButton == MouseButtonState.Pressed && e.RightButton == MouseButtonState.Released)
+                if (e.LeftButton == MouseButtonState.Pressed 
+                    && e.RightButton == MouseButtonState.Released)
                 {
-                    Point p = e.GetPosition(this._parent.Canvas);
-                    _lastMouseDown = p;
-                    if (IsSelected)
-                    {
-                        if (LabelArea.Contains(p) && this.Model.AllowEdit )
-                        {
-                            RegisterHandler(new EditLabelOperation(this));
-                            return;
-                        }
-                    }
+                    Point p = RoundToGrid( e.GetPosition(this._parent.Canvas));
+                    var hitResult = _adorner.HitShadowBorder(p);
+                    SetMouseCursor(hitResult);
                     // toggle on mouse press
                     if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
                     {
                         IsMarked = !IsMarked;
-                        //NotifyIsMarkedChanged();
+                        
                     }
                     else
                     {
-                        IsSelected = true;
-                        //NotifySelectionChanged();
-                        if (_adorner.HitShadowBorder(p) != RelativePosition.Undefined
-                            && _model.AllowSizeChange )
+                        if (hitResult == _mouseMoveHitResult)
                         {
-                            RegisterHandler(new ChangeSizeOperation(this, p));
-                            return;
+                            if (_mouseMoveHitResult != RelativePosition.Undefined
+                                && _model.AllowSizeChange)
+                            {
+                                RegisterHandler(new ChangeSizeOperation(this, e));
+
+                            }
+                            else
+                            {
+                                RegisterHandler(new MoveOperation(this, p));
+                            }
                         }
-                        RegisterHandler(new MoveOperation(this, p));
-                        
+                        IsSelected = true;
                     }
                 }
             }
@@ -459,8 +495,63 @@ namespace Sketch.Controls
                 }
                 
             }
+        }
+
+        void SetMouseCursor(RelativePosition d)
+        {
+            switch(d)
+            {
+                case RelativePosition.E:
+                case RelativePosition.W:
+                    Mouse.OverrideCursor = Cursors.SizeWE;
+                    break;
+                case RelativePosition.N:
+                case RelativePosition.S:
+                    Mouse.OverrideCursor = Cursors.SizeNS;
+                    break;
+                case RelativePosition.SE:
+                case RelativePosition.NW:
+                    Mouse.OverrideCursor = Cursors.SizeNWSE;
+                    break;
+                case RelativePosition.NE:
+                case RelativePosition.SW:
+                    Mouse.OverrideCursor = Cursors.SizeNESW;
+                    break;
+                default:
+                    Mouse.OverrideCursor = Cursors.SizeAll;
+                    break;
+            }
+            
+        }
+
+        private Brush CreateVisualBrush()
+        {
+            if( _model is ISketchItemContainer container )
+            {
+                _brushDisplay = new SketchItemDisplay(_sketchPad, container, false);
+                _visualBrush = new VisualBrush(_brushDisplay.Canvas);
+            }
+            else
+            {
+                _visualBrush = new VisualBrush(
+                    new GeometryBorder()
+                    { 
+                        BorderThickness = new Thickness(1,1,1,1),
+                        BorderBrush = _model.Stroke,
+                        Background = _model.Fill,
+                        BorderGeometry = _model.Geometry }
+                    );
+            }
+            return _visualBrush;
+        }
+
+        private static void OnLabelChanged(DependencyObject source,
+             DependencyPropertyChangedEventArgs e)
+        {
+            if( source is OutlineUI outlineUI) outlineUI.Model.UpdateGeometry();
 
         }
+
 
         private static void OnSelectedChanged(DependencyObject source,
              DependencyPropertyChangedEventArgs e)
@@ -472,10 +563,6 @@ namespace Sketch.Controls
                 outlineUI.NotifySelectionChanged();
                 outlineUI.ShowHideTools();
                 outlineUI.AddRemoveAdorner();
-                if (outlineUI._currentOperationHandler is EditLabelOperation)
-                {
-                    outlineUI._currentOperationHandler.StopOperation(true);
-                }
             }
         }
 
@@ -488,10 +575,6 @@ namespace Sketch.Controls
                 outlineUI.NotifyIsMarkedChanged();
                 outlineUI.ShowHideTools();
                 outlineUI.AddRemoveAdorner();
-                if (outlineUI._currentOperationHandler is EditLabelOperation)
-                {
-                    outlineUI._currentOperationHandler.StopOperation(true);
-                }
             }
         }
 
@@ -501,13 +584,24 @@ namespace Sketch.Controls
             OutlineUI gadgetUI = source as OutlineUI;
             if (e.NewValue != e.OldValue)
             {
-                gadgetUI.InvalidateVisual();
+                var r = (Rect)e.NewValue;
+                
                 gadgetUI.ShowHideTools();
                 if (gadgetUI._isAdornderAdded)
                 {
                     gadgetUI._adorner.UpdateGeometry();
                 }
+
+                var loc = r.Location;
+
+                Canvas.SetLeft(gadgetUI, loc.X);
+                Canvas.SetTop(gadgetUI, loc.Y);
+                gadgetUI.Height = r.Height;
+                gadgetUI.Width = r.Width;
             }
+            gadgetUI.Model?.UpdateGeometry();
+            gadgetUI.InvalidateVisual();
+            gadgetUI.UpdateLayout();
         }
 
 
@@ -517,7 +611,6 @@ namespace Sketch.Controls
             OutlineUI gadgetUI = source as OutlineUI;
             if (e.NewValue != e.OldValue)
             {
-                gadgetUI._geometry = (Geometry)e.NewValue;
                 gadgetUI.InvalidateVisual();
                 gadgetUI.ShowHideTools();
                 if (gadgetUI._adorner != null)
@@ -551,6 +644,16 @@ namespace Sketch.Controls
             DependencyPropertyChangedEventArgs e)
         {
 
+        }
+
+        internal static Point RoundToGrid(Point p)
+        {
+            return new Point(RoundToGrid(p.X), RoundToGrid(p.Y));
+        }
+
+        internal static double RoundToGrid(double val)
+        {
+            return Math.Round(val / SketchPad.GridSize) * SketchPad.GridSize;
         }
 
     }

@@ -12,12 +12,12 @@ namespace UI.Utilities.Configuration
     public class ConfigurationContainer
     {
 
-        object _wrapped;
-        string _name;
-        string _fileName;
-        string _path;
-        List<PropertyInfo> _configurationProperties;
-        Dictionary<string, PropertyInfo> _propertyDictionary = new Dictionary<string,PropertyInfo>();
+        readonly object _wrapped;
+        readonly string _name;
+        readonly string _fileName;
+        readonly string _path;
+        readonly List<PropertyInfo> _configurationProperties;
+        readonly Dictionary<string, PropertyInfo> _propertyDictionary = new Dictionary<string,PropertyInfo>();
 
         public ConfigurationContainer( object wrapped )
         {
@@ -57,8 +57,8 @@ namespace UI.Utilities.Configuration
 
                     foreach (var pi in _configurationProperties)
                     {
-                        object value = null;
-                        if (configValues.TryGetValue(pi.Name, out value))
+                        
+                        if (configValues.TryGetValue(pi.Name, out object value))
                         {
                             ActionDecorator.DecorateCatchAndShowException(string.Format("Error by applying the configuration of: {0}. Property: {1}",
                             _fileName, pi.Name), () => { pi.SetValue(_wrapped, value); })();

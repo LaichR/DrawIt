@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Documents;
@@ -10,9 +12,9 @@ using Prism.Regions;
 using RuntimeCheck;
 using Sketch.Interface;
 
-namespace Sketch.Controls
+namespace Sketch.Utilities
 {
-    class BoundsComparer : IComparable
+    public class BoundsComparer : IComparable
     {
 
         public enum CompareType
@@ -21,31 +23,33 @@ namespace Sketch.Controls
             CompareY
         };
 
-        IBoundedItemModel _boundedItem;
+        IBoundsProvider _boundedItem;
         CompareType _compareType = CompareType.CompareX;
         Func<object, int> _compareFunction;
 
-        public BoundsComparer(IBoundedItemModel item, CompareType compareType = CompareType.CompareX )
+
+        public BoundsComparer(IBoundsProvider item, CompareType compareType = CompareType.CompareX )
         {
             _compareType = compareType;
             _boundedItem = item;
 
             if (compareType == CompareType.CompareX)
             {
-                _compareFunction = (x) => CompareX(x);
+                _compareFunction = (x) => CompareX(x, true);
             }
             else
             {
-                _compareFunction = (x) => CompareY(x);
+                _compareFunction = (x) => CompareY(x, true);
             }
         }
+
 
         public bool Contains(Point p)
         {
             return _boundedItem.Bounds.Contains(p);
         }
 
-        public IBoundedItemModel Item
+        public IBoundsProvider Item
         {
             get 
             {
@@ -53,13 +57,22 @@ namespace Sketch.Controls
             }
         }
 
+        public static implicit operator BoundsComparer(Rect r)
+        {
+            return new BoundsComparer(new RectangleWrapper(r));
+        }
+
         public double Left => _boundedItem.Bounds.Left;
 
         public double Right => _boundedItem.Bounds.Right;
-        
+
         public double Top => _boundedItem.Bounds.Top;
 
         public double Bottom => _boundedItem.Bounds.Bottom;
+
+        public double Width => _boundedItem.Bounds.Width;
+
+        public double Height => _boundedItem.Bounds.Height;
 
 
         public Point End
@@ -73,19 +86,25 @@ namespace Sketch.Controls
             return _compareFunction(obj);
         }
         
-        int CompareX(object obj)
+        int CompareX(object obj, bool callCompareY )
         {
             var item = Assert.IsOfType<BoundsComparer>(obj);
-            if (item.Left < Left) return -1;
-            if (item.Left > Left) return 1;
+            if (item.Right < Right) return 1;
+            if (item.Right > Right) return -1;
+            if (item.Width < Width) return 1;
+            if (item.Width > Width) return -1;
+            if (callCompareY) return CompareY(item, false);
             return 0;
         }
 
-        int CompareY(object obj)
+        int CompareY(object obj, bool callCompareX)
         {
             var item = Assert.IsOfType<BoundsComparer>(obj);
-            if (item.Top < Top) return -1;
-            if (item.Top > Top) return 1;
+            if (item.Bottom < Bottom) return 1;
+            if (item.Bottom > Bottom) return -1;
+            if (item.Height < Height) return 1;
+            if (item.Height > Height) return -1;
+            if (callCompareX) return CompareX(item, false);
             return 0;
         }
 

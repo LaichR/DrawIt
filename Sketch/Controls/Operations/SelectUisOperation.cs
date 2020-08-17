@@ -25,7 +25,6 @@ namespace Sketch.Controls
         public SelectUisOperation(ISketchItemDisplay pad)
         {
             _pad = pad;
-
             _pad.Canvas.MouseLeftButtonDown += MouseLeftButtonDown;
             _pad.Canvas.KeyDown += KeyDown;
         }
@@ -63,7 +62,10 @@ namespace Sketch.Controls
             if (ok)
             {
                 _pad.ClearSelection();
-                var selectionArea = new Rect(_startPoint, new Size(_selectionAreaVisualizer.Width, _selectionAreaVisualizer.Height));
+                var left = Canvas.GetLeft(_selectionAreaVisualizer);
+                var top = Canvas.GetTop(_selectionAreaVisualizer);
+
+                var selectionArea = new Rect(new Point(left, top), new Size(_selectionAreaVisualizer.Width, _selectionAreaVisualizer.Height));
                 foreach (var ui in _pad.Canvas.Children.OfType<ISketchItemUI>().Where((x) => !(x.Model is ConnectorModel)))
                 {
                     var model = ui.Model as ConnectableBase;
@@ -101,15 +103,22 @@ namespace Sketch.Controls
         void MouseMove(object sender, MouseEventArgs e)
         {
             var pos = e.GetPosition(_pad.Canvas);
-            if (pos.X > _startPoint.X + _selectionAreaVisualizer.MinWidth)
+            var dx = Math.Abs(_startPoint.X - pos.X);
+            var dy = Math.Abs(_startPoint.Y - pos.Y);
+            _selectionAreaVisualizer.Width = Math.Max(dx, _selectionAreaVisualizer.MinWidth);
+            _selectionAreaVisualizer.Height = Math.Max(dy, _selectionAreaVisualizer.MinHeight);
+            if (pos.X < _startPoint.X)
             {
-                _selectionAreaVisualizer.Width = pos.X - _startPoint.X;
+                Canvas.SetLeft(_selectionAreaVisualizer, pos.X);
             }
-            if (pos.Y > _startPoint.Y + _selectionAreaVisualizer.MinHeight)
+            
+            if (pos.Y < _startPoint.Y )
             {
-                _selectionAreaVisualizer.Height = pos.Y - _startPoint.Y;
+                Canvas.SetTop(_selectionAreaVisualizer, pos.Y);
             }
+            
             _pad.Canvas.BringIntoView(new Rect(pos, new Size(1, 1)));
+            
             _selectionAreaVisualizer.InvalidateVisual();
         }
 

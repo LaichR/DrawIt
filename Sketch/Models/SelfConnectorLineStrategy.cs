@@ -75,7 +75,7 @@ namespace Sketch.Models
                 GeometryGroup gg, Types.LineType lineType, Point start, Point end, double distance)
             {
                 _distance = distance;
-                lineType = (Types.LineType)(((int)Types.ConnectorDocking.Self << 8) | ((int)lineType & 0xFF));               
+                lineType = (Types.LineType)(((int)ConnectorDocking.Self << 8) | ((int)lineType & 0xFF));               
                
                 _parent.ComputePath(lineType, start, end, _distance);
                 gg.Children.Clear();
@@ -90,8 +90,8 @@ namespace Sketch.Models
                 return geometry;
             }
 
-            public void Commit(Types.ConnectorDocking movePointDocking, 
-                Types.ConnectorDocking otherPointDocking, 
+            public void Commit(ConnectorDocking movePointDocking, 
+                ConnectorDocking otherPointDocking, 
                 Point newPositionStartPoint, 
                 Point newPositionEndPoint, double newDistance)
             {
@@ -116,12 +116,12 @@ namespace Sketch.Models
                     _parent._model.EndPointRelativePosition =
                             ConnectorUtilities.ComputeRelativePosition(_parent._model.To.Bounds, newPositionStartPoint, movePointDocking);
                 }
-                System.Diagnostics.Debug.Assert(_parent._model.StartPointDocking != Types.ConnectorDocking.Undefined);
-                System.Diagnostics.Debug.Assert(_parent._model.EndPointDocking != Types.ConnectorDocking.Undefined);
+                System.Diagnostics.Debug.Assert(_parent._model.StartPointDocking != ConnectorDocking.Undefined);
+                System.Diagnostics.Debug.Assert(_parent._model.EndPointDocking != ConnectorDocking.Undefined);
 
             }
 
-            public void ComputeDockingDuringMove(Rect rect, Point p, ref Types.ConnectorDocking currentDocking, ref Point lastPos)
+            public void ComputeDockingDuringMove(Rect rect, Point p, ref ConnectorDocking currentDocking, ref Point lastPos)
             {
                 double top = rect.Top;
                 double bottom = rect.Bottom;
@@ -135,78 +135,78 @@ namespace Sketch.Models
                 newPos.Y = ConnectorUtilities.RestrictRange(top, bottom, newPos.Y);
                 //newPos.Offset( delta.X, delta.Y);
                 // in this case we cannot move in y direction unless we change the  point docking
-                if (currentDocking == Types.ConnectorDocking.Bottom || currentDocking == Types.ConnectorDocking.Top)
+                if (currentDocking == ConnectorDocking.Bottom || currentDocking == ConnectorDocking.Top)
                 {
                     // point is within it's original boundary
                     if (newPos.X > (left + DistanceFromEdge) && newPos.X < (right - DistanceFromEdge))
                     {
                         newPos.Y = lastPos.Y; // we are on the line bottom/top; y has not to be adapted
                     }
-                    else if (currentDocking == Types.ConnectorDocking.Bottom)
+                    else if (currentDocking == ConnectorDocking.Bottom)
                     {
 
                         // we may need to change the point docking
                         if (newPos.X <= left + DistanceFromEdge)
                         {
-                            currentDocking = Types.ConnectorDocking.Left;
+                            currentDocking = ConnectorDocking.Left;
                             newPos.X = left;
                            
                         }
                         else
                         {
-                            currentDocking = Types.ConnectorDocking.Right;
+                            currentDocking = ConnectorDocking.Right;
                             newPos.X = right;
                         }
                         newPos.Y = bottom - DistanceFromEdge;
                     }
-                    else if (currentDocking == Types.ConnectorDocking.Top)
+                    else if (currentDocking == ConnectorDocking.Top)
                     {
                         if (newPos.X <= left + DistanceFromEdge)
                         {
-                            currentDocking = Types.ConnectorDocking.Left;
+                            currentDocking = ConnectorDocking.Left;
                             newPos.X = left;
 
                         }
                         else
                         {
-                            currentDocking = Types.ConnectorDocking.Right;
+                            currentDocking = ConnectorDocking.Right;
                             newPos.X = right;
                         }
                         newPos.Y = top + DistanceFromEdge;
                     }
                 }
-                else if (currentDocking == Types.ConnectorDocking.Left || currentDocking == Types.ConnectorDocking.Right)
+                else if (currentDocking == ConnectorDocking.Left || currentDocking == ConnectorDocking.Right)
                 {
                     // point is within it's original boundary
                     if (newPos.Y < bottom - DistanceFromEdge && newPos.Y > top + DistanceFromEdge)
                     {
                         newPos.X = lastPos.X; // we are on the line bottom/top; y has not to be adapted
                     }
-                    else if (currentDocking == Types.ConnectorDocking.Left)
+                    else if (currentDocking == ConnectorDocking.Left)
                     {
                         // we may need to change the point docking
                         if (newPos.Y < top + DistanceFromEdge)
                         {
-                            currentDocking = Types.ConnectorDocking.Top;
+                            currentDocking = ConnectorDocking.Top;
                             newPos.Y = top;
                         }
                         else
                         {
-                            currentDocking = Types.ConnectorDocking.Bottom;
+                            currentDocking = ConnectorDocking.Bottom;
                             newPos.Y = bottom;
                         }
                         newPos.X = left + DistanceFromEdge;
                     }
-                    else if (currentDocking == Types.ConnectorDocking.Right)
+                    else if (currentDocking == ConnectorDocking.Right)
                     {
                         if (newPos.Y < top + DistanceFromEdge)
                         {
-                            currentDocking = Types.ConnectorDocking.Top;
+                            currentDocking = ConnectorDocking.Top;
                             newPos.Y = top;
                         }
                         else
                         {
-                            currentDocking = Types.ConnectorDocking.Bottom;
+                            currentDocking = ConnectorDocking.Bottom;
                             newPos.Y = bottom;
                         }
                         newPos.X = right - DistanceFromEdge;
@@ -290,12 +290,12 @@ namespace Sketch.Models
         {
             _myPath.Clear();
 
-            if (_model.StartPointDocking == Types.ConnectorDocking.Undefined &&
-                _model.EndPointDocking == Types.ConnectorDocking.Undefined)
+            if (_model.StartPointDocking == ConnectorDocking.Undefined &&
+                _model.EndPointDocking == ConnectorDocking.Undefined)
             {
-                _model.StartPointDocking = Types.ConnectorDocking.Top;
+                _model.StartPointDocking = ConnectorDocking.Top;
                 _model.StartPointRelativePosition = 0.20;
-                _model.EndPointDocking = Types.ConnectorDocking.Top;
+                _model.EndPointDocking = ConnectorDocking.Top;
                 _model.EndPointRelativePosition = 0.80;
                 _model.MiddlePointRelativePosition = 0.30;                
             }
@@ -322,13 +322,13 @@ namespace Sketch.Models
                 var angle = 90.0;
                 switch (_model.StartPointDocking)
                 {
-                    case Types.ConnectorDocking.Top: angle = 270.0;
+                    case ConnectorDocking.Top: angle = 270.0;
                         break;
-                    case Types.ConnectorDocking.Left: angle = 180;
+                    case ConnectorDocking.Left: angle = 180;
                         break;
-                    case Types.ConnectorDocking.Bottom: angle = 90;
+                    case ConnectorDocking.Bottom: angle = 90;
                         break;
-                    case Types.ConnectorDocking.Right: angle = 0;
+                    case ConnectorDocking.Right: angle = 0;
                         break;
                     default:
                         break;
@@ -344,13 +344,13 @@ namespace Sketch.Models
                 var angle = 90.0;
                 switch (_model.StartPointDocking)
                 {
-                    case Types.ConnectorDocking.Top: angle = 90.0;
+                    case ConnectorDocking.Top: angle = 90.0;
                         break;
-                    case Types.ConnectorDocking.Left: angle = 0;
+                    case ConnectorDocking.Left: angle = 0;
                         break;
-                    case Types.ConnectorDocking.Bottom: angle = 270;
+                    case ConnectorDocking.Bottom: angle = 270;
                         break;
-                    case Types.ConnectorDocking.Right: angle = 180;
+                    case ConnectorDocking.Right: angle = 180;
                         break;
                     default:
                         break;
@@ -416,21 +416,21 @@ namespace Sketch.Models
             return path;
         }
 
-        static Types.LineType GetLineTypeFromDocking( Types.ConnectorDocking startPointDocking)
+        static Types.LineType GetLineTypeFromDocking( ConnectorDocking startPointDocking)
         {
             Types.LineType lt = Types.LineType.Undefined;
             switch (startPointDocking)
             {
-                case Types.ConnectorDocking.Bottom:
+                case ConnectorDocking.Bottom:
                     lt = Types.LineType.SelfBottom;
                     break;
-                case Types.ConnectorDocking.Top:
+                case ConnectorDocking.Top:
                     lt = Types.LineType.SelfTop;
                     break;
-                case Types.ConnectorDocking.Left:
+                case ConnectorDocking.Left:
                     lt = Types.LineType.SelfLeft;
                     break;
-                case Types.ConnectorDocking.Right:
+                case ConnectorDocking.Right:
                     lt = Types.LineType.SelfRight;
                     break;
                 default:

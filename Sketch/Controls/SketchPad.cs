@@ -17,11 +17,12 @@ using Sketch.Interface;
 using Sketch.Utilities;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Windows.Data;
 
 namespace Sketch.Controls
 {
     
-    public class SketchPad: Canvas, ISketchItemContainer
+    public class SketchPad: Canvas, ISketchPadControl, ISketchItemContainer
     {
         public static readonly RoutedEvent SelectedItemChangedEvent = EventManager.RegisterRoutedEvent(
             "SelectedItemChanged", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(SketchPad));
@@ -30,11 +31,15 @@ namespace Sketch.Controls
             DependencyProperty.Register("Label", typeof(string),
                 typeof(SketchPad), new PropertyMetadata(OnLabelChanged));
 
-        public static readonly DependencyProperty SketchItemsPropery =
-            DependencyProperty.Register("SketchItems", 
-            typeof(ObservableCollection<Sketch.Interface.ISketchItemModel>), 
-            typeof(SketchPad), new PropertyMetadata(OnSketchItemsChanged));
+        public static readonly DependencyProperty SketchPropery =
+            DependencyProperty.Register("Sketch", 
+            typeof(Sketch.Models.Sketch), 
+            typeof(SketchPad), new PropertyMetadata(OnSketchChanged));
 
+        public static readonly DependencyProperty SelectedItemProperty =
+            DependencyProperty.Register("SelectedItem",
+                typeof(ISketchItemModel), typeof(SketchPad),
+                new PropertyMetadata(OnSelectedItemChanged));
 
         public static readonly DependencyProperty LogicalWidthProperty =
             DependencyProperty.Register("LogicalWidth", typeof(double), 
@@ -61,8 +66,8 @@ namespace Sketch.Controls
        
         public SketchPad():base()
         {
-            EditMode = Types.EditMode.Insert;       
-            
+            EditMode = Types.EditMode.Insert;
+            SketchItemFactory.ActiveFactory = new SketchItemFactory();
         }
 
 
@@ -104,17 +109,29 @@ namespace Sketch.Controls
             set => SetValue(LabelProperty, value);
         }
 
+        public ISketchItemModel SelectedItem
+        {
+            get => GetValue(SelectedItemProperty) as ISketchItemModel;
+            set { SetValue(SelectedItemProperty, value); }
+        }
+
         public EditMode EditMode
         {
             get { return (EditMode)GetValue(EditModeProperty); }
             set { SetValue(EditModeProperty, value); }
         }
 
+        public Sketch.Models.Sketch Sketch
+        {
+            get => (Sketch.Models.Sketch)GetValue(SketchPropery);
+            set => SetValue(SketchPropery, value);
+        }
+
+        public ISketchItemFactory ItemFactory => Sketch.SketchItemFactory;
 
         public ObservableCollection<ISketchItemModel> SketchItems
         {
-            get { return (ObservableCollection<ISketchItemModel>)GetValue(SketchItemsPropery);}
-            set { SetValue(SketchItemsPropery, value); }
+            get { return Sketch.SketchItems; }
         }
 
         public void HandleAddConnector(object sender, EventArgs e)
@@ -146,6 +163,7 @@ namespace Sketch.Controls
                     EditMode = EditMode.Insert;
                     var container = topMost.SelectedItem.Model as ISketchItemContainer;
                     topMost.ClearSelection();
+                    topMost.EndEdit();
                     this.Children.Remove(topMost.Canvas);
                     //topMost.Canvas.Visibility = Visibility.Hidden;
                     topMost.SelectedItemChanged -= Display_SelectedItemChanged;
@@ -154,6 +172,7 @@ namespace Sketch.Controls
                     _displayStack.Push(display);
                     this.Children.Add(display);
                     Display_SelectedItemChanged(this, EventArgs.Empty);
+                    EditMode = EditMode.Select;
                 }
             }
         }
@@ -165,24 +184,30 @@ namespace Sketch.Controls
                 var topMost = _displayStack.Peek();
                 if( topMost != _rootDisplay)
                 {
+                    topMost.EndEdit();
+
                     this.Children.Remove(topMost.Canvas);
                     topMost.SelectedItemChanged -= Display_SelectedItemChanged;
                     //topMost.Canvas.Visibility = Visibility.Hidden;
                     _displayStack.Pop();
-                    topMost = _displayStack.Peek();
-                    topMost.SelectedItemChanged += Display_SelectedItemChanged;
-                    this.Children.Add(topMost.Canvas);
-                    topMost.Canvas.Visibility = Visibility.Visible;
                     
-                    Display_SelectedItemChanged(this, EventArgs.Empty);
+                    topMost = _displayStack.Peek();
+                    this.Children.Add(topMost.Canvas);
                 }
+                
+                topMost.SelectedItemChanged += Display_SelectedItemChanged;
+                topMost.Canvas.Visibility = Visibility.Visible;
+                Display_SelectedItemChanged(this, EventArgs.Empty);
+                EditMode = EditMode.Select;
+                topMost.BeginEdit(new SelectUisOperation(topMost));
             }
+            
         }
 
         //override 
 
 
-        private static void OnSketchItemsChanged(DependencyObject source,
+        private static void OnSketchChanged(DependencyObject source,
             DependencyPropertyChangedEventArgs e)
         {
             SketchPad pad = source as SketchPad;
@@ -191,9 +216,11 @@ namespace Sketch.Controls
                 if( e.NewValue != e.OldValue)
                 {
                     pad.Children.Clear();
-                    var oldCollection = e.OldValue as ObservableCollection<ISketchItemModel>;
-                    if (oldCollection != null)
+                    //var oldCollection = e.OldValue as ObservableCollection<ISketchItemModel>;
+                    var oldSketch = e.OldValue as Sketch.Models.Sketch;
+                    if (oldSketch != null)
                     {
+                        oldSketch.SketchItemFactory.UnregisterBoundedItemSelectedNotification(pad.HandleAddConnector);
                         if( pad._displayStack != null && pad._displayStack.Any())
                         {
                             foreach( var display in pad._displayStack )
@@ -201,11 +228,18 @@ namespace Sketch.Controls
                                 display.Dispose();
                             }
                             pad._displayStack.Clear();
-                        }
+                        }   
                     }
-                    var newCollection = e.NewValue as ObservableCollection<ISketchItemModel>;
-                    if (newCollection != null)
+                    var newSketch = e.NewValue as Sketch.Models.Sketch;
+                    
+                    if (newSketch != null)
                     {
+                        SketchItemFactory.ActiveFactory = newSketch.SketchItemFactory;
+                        newSketch.RegisterControlImplementation(pad);
+                        newSketch.SketchItemFactory.RegisterConnectorItemSelectedNotification(pad.HandleAddConnector);
+                        var b = new Binding("Sketch.Label");
+                        b.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+                        pad.SetBinding(SketchPad.LabelProperty, b); 
                         var display = new SketchItemDisplay(pad, pad);
                         pad._rootDisplay = display;
                         pad.Children.Add(display);
@@ -216,10 +250,12 @@ namespace Sketch.Controls
             }
         }
 
+
         private void Display_SelectedItemChanged(object sender, EventArgs e)
         {
-            var changedEvent = new RoutedEventArgs(SelectedItemChangedEvent);
-            RaiseEvent(changedEvent);
+            
+            SelectedItem = _displayStack.Peek().SelectedItem?.Model;
+            
         }
 
         private static void OnLogicalWidthChanged(DependencyObject source,
@@ -268,6 +304,79 @@ namespace Sketch.Controls
             }
         }
 
+        private static void OnSelectedItemChanged(DependencyObject source,
+            DependencyPropertyChangedEventArgs e)
+        {
+            if( source is SketchPad pad )
+            {
+                var changedEvent = new RoutedEventArgs(SelectedItemChangedEvent);
+                pad.RaiseEvent(changedEvent);
+            }
+        }
 
+        public void ExportDiagram(string fileName)
+        {
+
+            if (_displayStack.Any())
+            {
+                var top = _displayStack.Peek();
+                SketchItemDisplayHelper.SaveAsPng(top.Canvas, fileName);
+            }
+        }
+
+        public void SaveFile(string fileName, bool silent)
+        {
+            using(var stream = new FileStream(fileName, FileMode.OpenOrCreate))
+            {
+                SketchItemDisplayHelper.TakeSnapshot(stream, this);
+            }
+        }
+
+        public void OpenFile(string fileName)
+        {
+            if(!File.Exists(fileName))
+            {
+                throw new FileNotFoundException("Failed to load the diagram", fileName);
+            }
+            using (var stream = new FileStream(fileName, FileMode.Open))
+            {
+                SketchItemDisplayHelper.RestoreSnapshot(stream, this);
+                EditMode = EditMode.Select;
+            }
+        }
+
+        public void AlignLeft()
+        {
+            if (_displayStack.Any())
+            {
+                SketchItemDisplayHelper.AlignLeft(_displayStack.Peek().SketchItems);
+            }
+        }
+
+        public void AlignTop()
+        {
+            if (_displayStack.Any())
+            {
+                SketchItemDisplayHelper.AlignTop(_displayStack.Peek().SketchItems);
+            }
+        }
+
+        public void AlignCenter()
+        {
+            if (_displayStack.Any())
+            {
+                SketchItemDisplayHelper.AlignCenter(_displayStack.Peek().SketchItems);
+            }
+        }
+
+        public void ZoomIn()
+        {
+            OpenChildElement();
+        }
+
+        public void ZoomOut()
+        {
+            CloseChildElement();
+        }
     }
 }

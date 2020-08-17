@@ -17,7 +17,7 @@ using System.Security.Cryptography;
 using Sketch.Models;
 using System.Drawing;
 
-namespace Sketch
+namespace Sketch.Models
 {
     public class SketchItemFactory: ISketchItemFactory
     {
@@ -30,7 +30,8 @@ namespace Sketch
         {
             typeof(ConnectionType),
             typeof(IBoundedItemModel),
-            typeof(IBoundedItemModel)
+            typeof(IBoundedItemModel),
+            typeof(ISketchItemContainer)
         };
 
         Type _selectedType = null;
@@ -43,6 +44,11 @@ namespace Sketch
         Dictionary<Type, List<Type>> _allowableConnectorTargetTypes = new Dictionary<Type, List<Type>>();
         Dictionary<Type, List<IBoundedItemFactory>> _allowableConnectorTargetTypesFactories = new Dictionary<Type, List<IBoundedItemFactory>>();
 
+        internal static ISketchItemFactory ActiveFactory
+        {
+            get;
+            set;
+        }
 
 
         public void RegisterBoundedItemSelectedNotification(EventHandler handler)
@@ -105,11 +111,12 @@ namespace Sketch
             throw new KeyNotFoundException(string.Format("No factory operation registered for class {0}", cls.Name));
         }
 
-        public IConnectorItemModel CreateConnector(Type cls, ConnectionType type, IBoundedItemModel from, IBoundedItemModel to)
+        public IConnectorItemModel CreateConnector(Type cls, ConnectionType type, 
+            IBoundedItemModel from, IBoundedItemModel to, ISketchItemContainer container)
         {
             if( _createConnectorItem.TryGetValue(cls, out CreateConnectorDelegate factorOp))
             {
-                return factorOp(type, from, to);
+                return factorOp(type, from, to, container);
             }
             throw new KeyNotFoundException(string.Format("No factory operation registered for class {0}", cls.Name));
         }

@@ -16,10 +16,12 @@ using Sketch.Models.Geometries;
 namespace DrawIt.Uml
 {
     [Serializable]
+    [AllowableConnectorTarget(typeof(UmlClassModel))]
     public class UmlCompositionModel: ConnectorModel
     {
-        public UmlCompositionModel(ConnectionType type, IBoundedItemModel from, IBoundedItemModel to)
-            :base(type, from, to)
+        public UmlCompositionModel(ConnectionType type, IBoundedItemModel from, IBoundedItemModel to,
+            ISketchItemContainer container)
+            :base(type, from, to, container)
         {
             UpdateGeometry();
         }

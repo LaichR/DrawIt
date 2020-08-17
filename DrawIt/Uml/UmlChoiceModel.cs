@@ -28,8 +28,7 @@ namespace DrawIt.Uml
         {
             
             AllowSizeChange = false;
-            LabelArea = new Rect(p, new Size(Bounds.Width, 20));
-            UpdateGeometry();
+            
         }
 
         protected UmlChoiceModel(SerializationInfo info, StreamingContext context)
@@ -39,40 +38,28 @@ namespace DrawIt.Uml
         }
         
 
-        public override System.Windows.Media.RectangleGeometry Outline
-        {
-            get { return new System.Windows.Media.RectangleGeometry(Bounds); }
-        }
-
-        //public override IList<ICommandDescriptor> Tools
-        //{
-        //    get { return _tools; }
-        //}
-
-        public override void RenderAdornments(DrawingContext drawingContext) { }
-
         public override void UpdateGeometry()
         {
-
             var g = Geometry as GeometryGroup;
             g.Children.Clear();
 
             List<Point> border = new List<Point>
                 {
-                    new Point( Bounds.Left, Bounds.Top + Bounds.Height/2),
-                    new Point( Bounds.Left + Bounds.Width/2, Bounds.Top),
-                    new Point( Bounds.Right, Bounds.Top + Bounds.Height/2),
-                    new Point( Bounds.Left + Bounds.Width/2, Bounds.Bottom),
+                    new Point( 0, Bounds.Height/2),
+                    new Point( Bounds.Width/2, 0),
+                    new Point( Bounds.Width, Bounds.Height/2),
+                    new Point( Bounds.Width/2, Bounds.Height),
                 };
             var pf = GeometryHelper.GetPathFigureFromPoint(border);
             pf.IsClosed = true;
+            pf.IsFilled = true;
             g.Children.Add(GeometryHelper.GetGeometryFromPath(pf));
 
         }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        protected override Rect ComputeLabelArea(string label)
         {
-            base.GetObjectData(info, context);
+            return Rect.Empty;
         }
 
     }

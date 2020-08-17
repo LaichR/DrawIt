@@ -200,7 +200,7 @@ namespace Sketch.Controls
             return null;
         }
 
-        public Shape Shape
+        public UIElement Shape
         {
             get { return this; }
         }
@@ -272,6 +272,12 @@ namespace Sketch.Controls
             
             adornderlayer.Add(_myAdorner);
             _addornerAdded = true;
+        }
+
+        protected override void OnRender(DrawingContext drawingContext)
+        {
+            base.OnRender(drawingContext);
+            _model.RenderAdornments(drawingContext);
         }
 
         private void  UpdateGeometry()
@@ -377,10 +383,8 @@ namespace Sketch.Controls
             StrokeThickness = _lineWidth;
             Stroke = _lineBrush;
 
-            if (SelectionChanged != null)
-            {
-                SelectionChanged(this, IsSelected);
-            }
+            SelectionChanged?.Invoke(this, IsSelected);
+          
             InvalidateVisual();
             _parent.ShowIntersections();
 
@@ -529,11 +533,12 @@ namespace Sketch.Controls
         private static void OnGeometryChanged(DependencyObject source,
              DependencyPropertyChangedEventArgs e)
         {
-
+            
             var me = source as ConnectorUI;
             if (me != null && e.OldValue != e.NewValue)
             {
                 me._myGeometry = e.NewValue as Geometry;
+                me.RefModel?.UpdateGeometry();
             }
             if (me._myAdorner != null)
             {

@@ -116,7 +116,28 @@
     <Compile Include="Controls\ConnectorUI.cs" />
     <Compile Include="Controls\ConnectablePairSelector.cs" />
     <Compile Include="Controls\IntersectionFinder.cs" />
-    <Compile Include="Controls\BoundsComparer.cs" />
+    <Compile Include="Controls\GeometryBorder.cs" />
+    <Compile Include="Interface\ISketchPadControl.cs" />
+    <Compile Include="Models\DoNotConsiderForConnectorRoutingAttribute.cs" />
+    <Compile Include="Models\ModelVersion.cs" />
+    <Compile Include="Models\PersistentFieldAttribute.cs" />
+    <Compile Include="Models\Sketch.cs" />
+    <Compile Include="Models\SketchItemContainerSerializationSurrogate.cs" />
+    <Compile Include="PropertyEditor\RectangleWrapper.cs" />
+    <Compile Include="PropertyEditor\RectConverter.cs" />
+    <Compile Include="PropertyEditor\PropertyTemplateSelector.cs" />
+    <Compile Include="PropertyEditor\IntegerConverter.cs" />
+    <Compile Include="PropertyEditor\ITemplateProvider.cs" />
+    <Compile Include="PropertyEditor\PropertyEditor.xaml.cs">
+      <DependentUpon>PropertyEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Interface\IBoundsProvider.cs" />
+    <Compile Include="PropertyEditor\PropertyEditorModel.cs" />
+    <Compile Include="PropertyEditor\PropertyValueModel.cs" />
+    <Compile Include="PropertyEditor\RectViewer.xaml.cs">
+      <DependentUpon>RectViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Utilities\BoundsComparer.cs" />
     <Compile Include="Controls\LineSegmentDecorator.cs" />
     <Compile Include="Controls\Operations\OutlineUI.MoveOperation.cs" />
     <Compile Include="Controls\Operations\RewireConnectorOperation.cs" />
@@ -132,7 +153,6 @@
     <Compile Include="Controls\Operations\AddConnectorOperation.cs" />
     <Compile Include="Controls\Operations\AddBoundedtemOperation.cs" />
     <Compile Include="Controls\Operations\OutlineUI.ChangeSizeOperation.cs" />
-    <Compile Include="Controls\Operations\OutlineUI.EditLabelOperation.cs" />
     <Compile Include="Controls\Operations\Nop.cs" />
     <Compile Include="Interface\AllowableConnectorTarget.cs" />
     <Compile Include="Interface\AllowableConnectorAttribute.cs" />
@@ -144,7 +164,6 @@
     <Compile Include="Interface\ISketchItemModel.cs" />
     <Compile Include="Interface\ISketchItemFactory.cs" />
     <Compile Include="Interface\SketchItemInfoAttribute.cs" />
-    <Compile Include="ModelFactoryRegistry.cs" />
     <Compile Include="Models\ConnectableBaseFactory.cs" />
     <Compile Include="Models\CursorPositionHelper.cs" />
     <Compile Include="Models\ConnectorLabelModel.cs" />
@@ -163,8 +182,10 @@
     <Compile Include="Models\IConnectorStrategy.cs" />
     <Compile Include="Interface\ISketchItemContainer.cs" />
     <Compile Include="Interface\OutlineChangedEventArgs.cs" />
+    <Compile Include="Utilities\RectangleWrapper.cs" />
     <Compile Include="Models\SelfConnectorLineStrategy.cs" />
-    <Compile Include="SketchItemFactory.cs" />
+    <Compile Include="Models\SketchItemFactory.cs" />
+    <Compile Include="Utilities\RoutingAssistent.cs" />
     <Compile Include="Utilities\SketchItemDisplayHelper.cs" />
     <Compile Include="Models\StraightLineConnectorStrategy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -177,7 +198,7 @@
     <Compile Include="Types\AllowedRelativePositions.cs" />
     <Compile Include="Types\ComputeConnectorLine.cs" />
     <Compile Include="Interface\ConnectionType.cs" />
-    <Compile Include="Types\ConnectorDocking.cs" />
+    <Compile Include="Interface\ConnectorDocking.cs" />
     <Compile Include="Types\ConnectorLineStyle.cs" />
     <Compile Include="Types\EditMode.cs" />
     <Compile Include="Types\IEditOperation.cs" />
@@ -230,6 +251,14 @@
     <Page Include="Controls\ColorPicker\ColorPickerDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PropertyEditor\PropertyEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PropertyEditor\RectViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\generic.xaml">
       <Generator>MSBuild:Compile</Generator>

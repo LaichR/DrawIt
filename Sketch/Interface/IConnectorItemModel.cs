@@ -11,7 +11,8 @@ using System.Windows.Media;
 namespace Sketch.Interface
 {
     delegate IConnectorItemModel CreateConnectorDelegate(ConnectionType
-        connectionType, IBoundedItemModel from, IBoundedItemModel to);
+        connectionType, IBoundedItemModel from, IBoundedItemModel to,
+        ISketchItemContainer container);
 
     public interface IConnectorItemModel: ISketchItemModel
     {
@@ -24,6 +25,7 @@ namespace Sketch.Interface
         {
             get;
         }
+
 
     }
 }

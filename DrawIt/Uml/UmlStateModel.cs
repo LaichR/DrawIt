@@ -25,14 +25,12 @@ namespace DrawIt.Uml
         public UmlStateModel(Point p)
             : base(p, new Size( DefaultWidth, DefaultHeight)) 
         {
-            var location = new Point(p.X, p.Y);
-            var labelAreaLocation = new Point(p.X + 10, p.Y);
-            LabelArea = new Rect(labelAreaLocation, new Size(Bounds.Width-20, 25));
+            
+            
             IsSelected = true;
             AllowSizeChange = true;
             Label = "new state";
-            RotationAngle = 0.0;
-            UpdateGeometry();
+
         }
 
         protected UmlStateModel(SerializationInfo info, StreamingContext context) : base(info, context) 
@@ -47,9 +45,8 @@ namespace DrawIt.Uml
             myGeometry.Children.Clear();
 
 
-            var body = new Rect(Bounds.Left, Bounds.Top, Bounds.Width, Bounds.Height);
-            myGeometry.Children.Add(new LineGeometry(new Point(Bounds.Left, LabelArea.Bottom),
-                                                      new Point(Bounds.Right, LabelArea.Bottom)));
+            var body = new Rect(0, 0, Bounds.Width, Bounds.Height);
+            
             myGeometry.Children.Add(new RectangleGeometry(body, DefaultRoundingEdgeRadius, DefaultRoundingEdgeRadius));
             myGeometry.Transform = Rotation;
             
@@ -64,6 +61,11 @@ namespace DrawIt.Uml
                 outline.Transform = Rotation;
                 return outline;
             }
+        }
+
+        protected override Rect ComputeLabelArea(string label)
+        {
+            return Rect.Empty;
         }
 
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
 using Sketch.Types;
@@ -6,7 +7,7 @@ using Sketch.Models;
 using Sketch.Interface;
 using Sketch.Models.Geometries;
 using System.Runtime.Serialization;
-
+using System.Collections;
 
 namespace DrawIt.Uml
 {
@@ -15,10 +16,13 @@ namespace DrawIt.Uml
     [AllowableConnectorTarget(typeof(UmlFinalStateModel))]
     [AllowableConnectorTarget(typeof(UmlStateModel))]
     [AllowableConnectorTarget(typeof(UmlChoiceModel))]
+    [AllowableConnectorTarget(typeof(UmlActivityModel))]
+    [AllowableConnectorTarget(typeof(UmlActionConnector))]
     public class UmlTransitionModel: ConnectorModel
     {
-        public UmlTransitionModel( ConnectionType type, IBoundedItemModel from, IBoundedItemModel to)
-            :base(type, from, to)
+        public UmlTransitionModel( ConnectionType type, IBoundedItemModel from, IBoundedItemModel to,
+            ISketchItemContainer container)
+            :base(type, from, to, container)
         {}
 
 

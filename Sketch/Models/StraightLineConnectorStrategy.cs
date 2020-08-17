@@ -53,8 +53,8 @@ namespace Sketch.Models
                 //return new PathGeometry(new PathFigure[]{path});
             }
 
-            public void Commit(Types.ConnectorDocking movePointDocking, 
-                Types.ConnectorDocking otherPointDocking, 
+            public void Commit(ConnectorDocking movePointDocking, 
+                ConnectorDocking otherPointDocking, 
                 Point newPositionStartPoint, 
                 Point newPositionEndPoint, double newDistance)
             {
@@ -78,7 +78,7 @@ namespace Sketch.Models
 
             }
 
-            public void ComputeDockingDuringMove(Rect rect, Point p, ref Types.ConnectorDocking currentDocking, ref Point lastPos)
+            public void ComputeDockingDuringMove(Rect rect, Point p, ref ConnectorDocking currentDocking, ref Point lastPos)
             {
                 ConnectorUtilities.ComputeDockingDuringMove(rect, p, ref currentDocking, ref lastPos);
             }
@@ -164,8 +164,8 @@ namespace Sketch.Models
         {
             _myPath.Clear();
 
-            if (_model.StartPointDocking == Types.ConnectorDocking.Undefined &&
-                _model.EndPointDocking == Types.ConnectorDocking.Undefined)
+            if (_model.StartPointDocking == ConnectorDocking.Undefined &&
+                _model.EndPointDocking == ConnectorDocking.Undefined)
             {
                 var fromCenter = ConnectorUtilities.ComputeCenter(_model.From.Bounds);
                 var toCenter = ConnectorUtilities.ComputeCenter(_model.To.Bounds);

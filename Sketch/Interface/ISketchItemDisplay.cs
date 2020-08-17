@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Sketch.Types;
+
 
 namespace Sketch.Interface
 {
@@ -38,6 +40,8 @@ namespace Sketch.Interface
             get;
         }
 
+        ISketchItemFactory ItemFactory { get; }
+
         event EventHandler SelectedItemChanged;
 
         void HandleAddConnector(object sender, EventArgs e);
@@ -45,6 +49,8 @@ namespace Sketch.Interface
         void HandleKeyDown(KeyEventArgs keyEvent);
 
         void ClearSelection();
+
+        ISketchItemUI GetItemAtPoint(Point p);
 
         void SetSketchItemEnable(bool set);
 

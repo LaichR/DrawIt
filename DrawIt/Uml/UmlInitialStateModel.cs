@@ -15,27 +15,21 @@ namespace DrawIt.Uml
 {
     [Serializable]
     [AllowableConnector(typeof(UmlTransitionModel))]
-    public class UmlInitialStateModel : ContainerModel
+    public class UmlInitialStateModel : ConnectableBase
     {
         new const int DefaultWidth = 26;
         new const int DefaultHeight = 26;
 
 
-        EllipseGeometry _geometry;
+        //EllipseGeometry _geometry;
 
         public UmlInitialStateModel(Point p)
-            :base(p, new Size(DefaultHeight, DefaultWidth))
+            :base(p, new Size(DefaultHeight, DefaultWidth), "Initial-State", Colors.Black)
         {
-            var location = new Point(p.X, p.Y);
-            Bounds = new Rect(location, new Size(DefaultHeight, DefaultWidth));
             AllowEdit = false;
             AllowSizeChange = false;
             LabelArea = Rect.Empty;
             IsSelected = true;
-            Label = "Initial-State";
-            RotationAngle = 0.0;
-            FillColor = Colors.Black;
-            UpdateGeometry();
         }
 
         protected UmlInitialStateModel(SerializationInfo info, StreamingContext context) : 
@@ -48,29 +42,18 @@ namespace DrawIt.Uml
         {
             var g = Geometry as GeometryGroup;
             g.Children.Clear();
-            g.Children.Add(new EllipseGeometry(Bounds));
+            g.Children.Add(new EllipseGeometry(new Rect(0,0, Bounds.Width, Bounds.Height)));
         }
 
-        
+        //protected override void FieldDataRestored()
+        //{
+        //    base.FieldDataRestored();
+        //    _geometry = new EllipseGeometry(Bounds);
+        //}
 
-        public override RectangleGeometry Outline
+        protected override Rect ComputeBounds(Point pos, Size size, Rect labelArea)
         {
-            get
-            {
-                return new RectangleGeometry(Bounds);
-            }
+            return new Rect(pos, size);
         }
-
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-            _geometry = new EllipseGeometry(Bounds);
-        }
-
-        protected override void Initialize()
-        {
-            base.Initialize();
-        }
-
     }
 }

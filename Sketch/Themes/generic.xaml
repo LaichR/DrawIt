@@ -4,8 +4,36 @@
   xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options" 
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   mc:Ignorable="PresentationOptions"  
-  xmlns:customControls="clr-namespace:Sketch.Controls.ColorPicker">
-
+  xmlns:Ctrl="clr-namespace:Sketch.Controls"
+  xmlns:ColorPicker="clr-namespace:Sketch.Controls.ColorPicker"
+    xmlns:models="clr-namespace:Sketch.Models"
+  >
+    <Style x:Key="DecoratorTextStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="FontStyle" Value="Italic"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+    </Style>
+    <Style x:Key="LabelEditorStyle" TargetType="TextBox">
+        <Setter Property="Background" Value="{Binding Parent.Background}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Focusable" Value="{Binding Path=IsSelected}"/>
+        <Setter Property="Text" Value="{Binding Path=Label, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <!--<Setter Property="IsEnabled" Value="{Binding IsSelected}"/>-->
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Path=IsSelected}" Value="True">
+                <Setter Property="IsReadOnly" Value="False"/>
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="BorderBrush" Value="LightGray"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <DataTemplate DataType="{x:Type models:ConnectorLabelModel}">
+        <Ctrl:GeometryBorder BorderGeometry="{Binding Geometry}" Background="{Binding Fill}" BorderBrush="{Binding Fill}">
+        <TextBox Margin="5,5" Style="{StaticResource LabelEditorStyle }"
+                 Text="{Binding ConnectorLabel, UpdateSourceTrigger=PropertyChanged}"/>
+        </Ctrl:GeometryBorder>
+    </DataTemplate>
+    
   <DrawingBrush 
     x:Key="CheckerBrush"
     Viewport="0,0,10,10" ViewportUnits="Absolute" TileMode="Tile">
@@ -67,8 +95,8 @@
   </Style>
 
   <Style 
-     x:Key="{x:Type customControls:ColorThumb}" 
-     TargetType="{x:Type customControls:ColorThumb}">
+     x:Key="{x:Type ColorPicker:ColorThumb}" 
+     TargetType="{x:Type ColorPicker:ColorThumb}">
 
     <Setter Property="PointerOutlineBrush"
       Value="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" />
@@ -80,7 +108,7 @@
     <Setter Property="Height" Value="5"/>
     <Setter Property="Template">
       <Setter.Value>
-        <ControlTemplate TargetType="{x:Type customControls:ColorThumb}">
+        <ControlTemplate TargetType="{x:Type ColorPicker:ColorThumb}">
 
           <Border Background="{TemplateBinding Background}"
             BorderBrush="{TemplateBinding BorderBrush}"
@@ -250,8 +278,8 @@
 
 
 
-  <Style x:Key="{x:Type customControls:SpectrumSlider}"
-             TargetType="{x:Type customControls:SpectrumSlider}">
+  <Style x:Key="{x:Type ColorPicker:SpectrumSlider}"
+             TargetType="{x:Type ColorPicker:SpectrumSlider}">
     <Setter Property="Orientation"
             Value="Vertical"/>
     <Setter Property="Stylus.IsPressAndHoldEnabled"
@@ -272,7 +300,7 @@
 
     <Setter Property="Template">
       <Setter.Value>
-        <ControlTemplate TargetType="{x:Type customControls:SpectrumSlider}">
+        <ControlTemplate TargetType="{x:Type ColorPicker:SpectrumSlider}">
           <Border Background="{TemplateBinding Background}"
                   BorderBrush="{TemplateBinding BorderBrush}"
                   BorderThickness="{TemplateBinding BorderThickness}"
@@ -322,7 +350,7 @@
                     Command="Slider.IncreaseLarge"/>
                 </Track.IncreaseRepeatButton>
                 <Track.Thumb>
-                  <customControls:ColorThumb 
+                  <ColorPicker:ColorThumb 
                     x:Name="Thumb"
                     Height="20"
                     ThumbColor="{Binding SelectedColor, RelativeSource={RelativeSource TemplatedParent}}" />
@@ -355,11 +383,11 @@
 
   <!-- ColorPicker  Styles-->
 
-  <Style x:Key="{x:Type customControls:ColorPicker}"
-         TargetType="{x:Type customControls:ColorPicker}">
+  <Style x:Key="{x:Type ColorPicker:ColorPicker}"
+         TargetType="{x:Type ColorPicker:ColorPicker}">
     <Setter Property="Template">
       <Setter.Value>
-        <ControlTemplate TargetType="{x:Type customControls:ColorPicker}">
+        <ControlTemplate TargetType="{x:Type ColorPicker:ColorPicker}">
   
           <Border 
             Height="{TemplateBinding Height}"
@@ -458,7 +486,7 @@
                 
               </Border>
 
-              <customControls:SpectrumSlider 
+              <ColorPicker:SpectrumSlider 
                 x:Name="PART_ColorSlider"
                 Grid.Column="1" Grid.ColumnSpan="1" Grid.Row="1"
                 Value="0"

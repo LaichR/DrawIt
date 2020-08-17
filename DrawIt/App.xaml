@@ -2,8 +2,195 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:DrawIt"
+             xmlns:uml="clr-namespace:DrawIt.Uml"
+             xmlns:SketchCtrl="clr-namespace:Sketch.Controls;assembly=Sketch"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         
+        <Style x:Key="DecoratorTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="FontStyle" Value="Italic"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+        <Style x:Key="LabelEditorStyle" TargetType="TextBox">
+            <Setter Property="Background" Value="{Binding Parent.Background}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Focusable" Value="{Binding Path=IsSelected}"/>
+            <Setter Property="Text" Value="{Binding Path=Label, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <!--<Setter Property="IsEnabled" Value="{Binding IsSelected}"/>-->
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Path=IsSelected}" Value="True">
+                    <Setter Property="IsReadOnly" Value="False"/>
+                    <Setter Property="BorderThickness" Value="1" />
+                    <Setter Property="BorderBrush" Value="LightGray"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="BorderShadowStyle" TargetType="SketchCtrl:GeometryBorder">
+            <Style.Triggers>
+                <!--
+                <EventTrigger RoutedEvent="MouseEnter">
+                    
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation To="300" Duration="0:0:1.5" 
+                AccelerationRatio="0.10" DecelerationRatio="0.25" 
+                Storyboard.TargetProperty="(Canvas.)" />
+                           
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <EventTrigger RoutedEvent="MouseLeave">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Duration="0:0:1.5" 
+                AccelerationRatio="0.10" DecelerationRatio="0.25" 
+                Storyboard.TargetProperty="(Canvas.Width)" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                -->
+            </Style.Triggers>
+        </Style>
+        <DataTemplate DataType="{x:Type uml:UmlActionConnector}">
+            <SketchCtrl:GeometryBorder BorderGeometry="{Binding Geometry}" BorderBrush="{Binding Stroke}"
+                                       Background="{Binding Fill}" BorderThickness="{Binding StrokeThickness}">
+                <TextBox Text="{Binding Label, UpdateSourceTrigger=PropertyChanged}" 
+                         Style="{StaticResource LabelEditorStyle}"
+                         HorizontalAlignment="Center" VerticalAlignment="Center" 
+                         MaxLength="2" FontWeight="Bold">
+                    
+                </TextBox>
+            </SketchCtrl:GeometryBorder>
+        </DataTemplate>
+        
+        <DataTemplate DataType="{x:Type uml:UmlClassModel}">
+            <Border x:Name="Outline" BorderBrush="Black" BorderThickness="2"
+                    Background="{Binding Fill}" CornerRadius="1" Width="{Binding Bounds.Width}"
+                    Height="{Binding Bounds.Height}" Visibility="Visible">
+                <StackPanel>
+                    <TextBox Margin="20,5,20,5" Style="{StaticResource LabelEditorStyle}"/>
+                    <Line X1="0"  X2="{Binding Bounds.Width}" Y1="2" Y2="2"
+                          Stroke="Black" StrokeThickness="1"/>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+
+
+        <DataTemplate DataType="{x:Type uml:UmlPackageModel}">
+            <SketchCtrl:GeometryBorder x:Name="Outline"  BorderThickness="1" BorderBrush="{Binding Stroke}"
+                    Background="{Binding Fill}" BorderGeometry="{Binding Geometry}" Visibility="Visible">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="{Binding LabelArea.Height}"/>
+                        <RowDefinition Height="1"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBox Margin="5,1,5,1" Width="{Binding LabelArea.Width}" 
+                             Style="{StaticResource LabelEditorStyle}" HorizontalAlignment="Left"/>
+                    <Line Grid.Row="1" X1="0"  X2="{Binding Bounds.Width}" Y1="2" Y2="2"
+                          Stroke="Black" StrokeThickness="1"/>
+                    <Border Grid.Row="2" Background="{Binding 
+                        Path=VisualBrush,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=SketchCtrl:OutlineUI}}">
+                        
+                    </Border>
+                </Grid>
+            </SketchCtrl:GeometryBorder>
+
+        </DataTemplate>
+        
+        <DataTemplate DataType="{x:Type uml:UmlStateModel}">
+            <SketchCtrl:GeometryBorder x:Name="Outline"  BorderThickness="1" BorderBrush="{Binding Stroke}"
+                    Background="{Binding Fill}" BorderGeometry="{Binding Geometry}" Visibility="Visible"
+                    Style="{StaticResource BorderShadowStyle}">
+                <StackPanel>
+                    <TextBox Text="{Binding Label}" Margin="20,5,20,5" 
+                             Style="{StaticResource LabelEditorStyle}"/>
+                    <Line X1="0"  X2="{Binding Bounds.Width}" Y1="2" Y2="2"
+                          Stroke="Black" StrokeThickness="1"/>
+                </StackPanel>
+            </SketchCtrl:GeometryBorder>
+            
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type uml:UmlNoteModel}">
+            
+                <SketchCtrl:GeometryBorder BorderGeometry="{Binding Geometry}" 
+                                           Visibility="Visible" BorderBrush="Black" BorderThickness="1" Background="{Binding Fill}">
+
+                    <StackPanel Visibility="Visible">
+                    <TextBlock Text="&lt;&lt;decisioninput>>" Visibility="{Binding StereotypeVisibility}" Style="{StaticResource DecoratorTextStyle}" 
+                               Margin="5,5,0,0"/>
+                    <TextBox Text="{Binding Note, UpdateSourceTrigger=PropertyChanged}" 
+                             Style="{StaticResource LabelEditorStyle}" TextWrapping="Wrap" AcceptsReturn="True"
+                             Margin="5,12,5,5"/>
+                    </StackPanel>
+                </SketchCtrl:GeometryBorder>
+            
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type uml:UmlInitialStateModel}">
+
+            <SketchCtrl:GeometryBorder BorderGeometry="{Binding Geometry}" 
+                                           Visibility="Visible" BorderBrush="Black" Background="Black" BorderThickness="1">
+
+            </SketchCtrl:GeometryBorder>
+
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type uml:UmlFinalStateModel}">
+            <SketchCtrl:GeometryBorder BorderGeometry="{Binding Geometry}"
+                                       Visibility="Visible" BorderBrush="Black" BorderThickness="1" 
+                                       Background="Black"/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type uml:UmlChoiceModel}">
+            <SketchCtrl:GeometryBorder BorderGeometry="{Binding Geometry}"
+                                       Visibility="Visible" BorderBrush="Black" BorderThickness="1" Background="Snow    " IsEnabled="True">
+                
+            </SketchCtrl:GeometryBorder>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type uml:UmlActivityModel}">
+            <DataTemplate.Resources>
+
+            </DataTemplate.Resources>
+            <SketchCtrl:GeometryBorder BorderGeometry="{Binding Geometry}"
+                    Background="{Binding Fill}" ShowShadow="True"
+                    Visibility="Visible" BorderBrush="{Binding Stroke}" BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="4*"/>
+                        <ColumnDefinition Width="{Binding ImageAreaWidth}" />
+                    </Grid.ColumnDefinitions>
+                    
+                    <Button Grid.Column="1" Visibility="{Binding ImageAreaVisibility}" Height="20" Width="20"
+                            Focusable="{Binding IsSelected}"
+                            Background="{Binding Fill}" 
+                            BorderThickness="0"
+                            Command="{Binding Path=DataContext.ZoomIn, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=Window}}">
+                        <Image Source="Resources/CallActionIndicator.png"/>
+                    </Button>
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="15,0,15,0" Orientation="Vertical" >
+                        <StackPanel Orientation="Horizontal" Visibility="{Binding PreconditionVisibility}" Margin="0,2,0,0">
+                            <TextBlock Text="&lt;&lt;precondition>>" Style="{StaticResource DecoratorTextStyle}" Margin="0,0,5,0"/>
+                            <TextBlock Text="{Binding Precondition}" Style="{StaticResource DecoratorTextStyle}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Visibility="{Binding PostconditionVisibility}">
+                            <TextBlock Text="&lt;&lt;postcondition>>" Style="{StaticResource DecoratorTextStyle}" Margin="0,0,5,0"/>
+                            <TextBlock Text="{Binding Postcondition}" Style="{StaticResource DecoratorTextStyle}" />
+                        </StackPanel>
+                        <TextBox Style="{StaticResource LabelEditorStyle}" AcceptsReturn="True"/>
+                    </StackPanel>
+                </Grid>
+            </SketchCtrl:GeometryBorder>
+            <DataTemplate.Triggers>
+                
+            </DataTemplate.Triggers>
+            
+        </DataTemplate>
+        
+        
+
     </Application.Resources>
 </Application>

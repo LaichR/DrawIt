@@ -65,8 +65,8 @@ namespace Sketch.Utilities
             
             bmp.Render(canvas);
 
-            var adornders = AdornerLayer.GetAdornerLayer(canvas).GetAdorners(canvas).OfType<IntersectionFinder>();
-            if( adornders.Any())
+            var adornders = AdornerLayer.GetAdornerLayer(canvas).GetAdorners(canvas)?.OfType<IntersectionFinder>();
+            if(adornders != null && adornders.Any())
             {
                 bmp.Render(adornders.First());
             }
@@ -144,23 +144,35 @@ namespace Sketch.Utilities
             }
         }
 
-        public static void TakeSnapshot( Stream stream, IEnumerable<ISketchItemModel> outlines)
+        public static void TakeSnapshot( Stream stream, ISketchItemContainer container)
         {
+            var outlines = container.SketchItems;
+            var ss = new SurrogateSelector();
+            ss.AddSurrogate(typeof(SketchItemContainerProxy),
+                new StreamingContext(StreamingContextStates.All),
+                new SketchItemContainerSerializationSurrogate(container));
+
             IFormatter formatter = new BinaryFormatter();
+            formatter.SurrogateSelector = ss;
+
             List<ISketchItemModel> list = new List<ISketchItemModel>(outlines.Where(
                 (x)=>x.IsSerializable));
             formatter.Serialize(stream, list);
         }
 
-        public static void RestoreSnapshot(Stream stream, IList<ISketchItemModel> outlines )
+        public static void RestoreSnapshot(Stream stream, ISketchItemContainer container )
         {
+            IList<ISketchItemModel> outlines = container.SketchItems;
             outlines.Clear();
+            var ss = new SurrogateSelector();
+            ss.AddSurrogate(typeof(SketchItemContainerProxy),
+                new StreamingContext(StreamingContextStates.All),
+                new SketchItemContainerSerializationSurrogate(container));
+
             IFormatter formatter = new BinaryFormatter();
+            formatter.SurrogateSelector = ss;
             var list = (List<ISketchItemModel>)formatter.Deserialize(stream);
-
             RestoreChildren(outlines, list);
-
-
         }
 
         internal static void RestoreChildren(IList<ISketchItemModel> outlines, List<ISketchItemModel> children)

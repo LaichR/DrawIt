@@ -26,12 +26,12 @@ namespace Sketch.Interface
         event EventHandler<bool> SelectionChanged;
         event EventHandler<bool> IsMarkedChanged;
 
-        Rect LabelArea
-        {
-            get;
-        }
+        //Rect LabelArea
+        //{
+        //    get;
+        //}
 
-        Shape Shape
+        UIElement Shape
         {
             get;
         }

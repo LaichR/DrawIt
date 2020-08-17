@@ -12,7 +12,8 @@ namespace Sketch.Models
 {
     public interface IConnectorMoveHelper
     {
-        Geometry GetGeometry(GeometryGroup gg, LineType lineType, Point start, Point end, double distance);
+        Geometry GetGeometry(GeometryGroup gg, LineType lineType, Point start, 
+            Point end, double distance);
 
         void Commit(ConnectorDocking movePointDocking, ConnectorDocking otherPointDocking, 
             Point newPositionStartPoint, 

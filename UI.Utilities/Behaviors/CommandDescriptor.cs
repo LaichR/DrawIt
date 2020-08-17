@@ -17,7 +17,7 @@ namespace UI.Utilities.Behaviors
         System.Drawing.Bitmap _bitmap;
         System.Windows.Input.ICommand _cmd;
         System.Windows.Media.Brush _background;
-        List<ICommandDescriptor> _subItems = null;
+        readonly List<ICommandDescriptor> _subItems = null;
 
         public string Name
         {

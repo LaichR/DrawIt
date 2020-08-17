@@ -53,14 +53,17 @@ namespace Sketch.Models
             IBoundedItemModel from, IBoundedItemModel to, Point start, Point end)
         {
             List<ConnectorModel> sameEndpoints = new List<ConnectorModel>();
-            foreach( var x in siblings)
+            if (siblings != null)
             {
-                if((x.From == from && x.To == to) || (x.To == from && x.From == to)) // same connection, eventually reversed
+                foreach (var x in siblings)
                 {
-                    if( (x.ConnectorStart == start && x.ConnectorEnd == end) ||
-                        x.ConnectorStart == end && x.ConnectorEnd == start )
+                    if ((x.From == from && x.To == to) || (x.To == from && x.From == to)) // same connection, eventually reversed
                     {
-                        sameEndpoints.Add(x);
+                        if ((x.ConnectorStart == start && x.ConnectorEnd == end) ||
+                            x.ConnectorStart == end && x.ConnectorEnd == start)
+                        {
+                            sameEndpoints.Add(x);
+                        }
                     }
                 }
             }
