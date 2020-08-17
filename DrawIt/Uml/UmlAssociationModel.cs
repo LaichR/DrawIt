@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
-using Sketch.Types;
 using Sketch.Interface;
 using Sketch.Models;
 using Sketch.Models.Geometries;
@@ -17,8 +17,9 @@ namespace DrawIt.Uml
     public class UmlAssociationModel: ConnectorModel
     {
 
-        public UmlAssociationModel( ConnectionType type, IBoundedItemModel from, IBoundedItemModel to)
-            :base(type, from, to)
+        public UmlAssociationModel( ConnectionType type, IBoundedItemModel from, IBoundedItemModel to,
+            ISketchItemContainer container)
+            :base(type, from, to, container)
         {
             UpdateGeometry();
         }

@@ -27,42 +27,35 @@ namespace DrawIt.Uml
         public UmlClassModel(Point p)
             : base(p, new Size(DefaultWidth, DefaultHeight)) 
         {
-            var location = new Point(p.X, p.Y);
-            LabelArea = new Rect(location, new Size(Bounds.Width, 20));
-            IsSelected = true;
             AllowSizeChange = true;
             AllowEdit = true;
             Label = "new class";
             RotationAngle = 0.0;
-            UpdateGeometry();
+            //UpdateGeometry();
         }
+
+        protected override Rect ComputeLabelArea(string label)
+        {
+            var location = new Point(5, 5);
+            return new Rect(location, new Size(Bounds.Width, 20)); ;
+        }
+
 
         protected UmlClassModel(SerializationInfo info, StreamingContext context) : base(info, context) 
         {
             UpdateGeometry();
         }
 
-        //public override System.Windows.Media.Geometry Geometry
-        //{
-        //    get
-        //    {
-        //        var myGeometry = new GeometryGroup();
- 
-        //        var body = new Rect(Bounds.Left, Bounds.Top , Bounds.Width, Bounds.Height);
-        //        myGeometry.Children.Add(new LineGeometry(LabelArea.BottomLeft, LabelArea.BottomRight));
-        //        myGeometry.Children.Add(new RectangleGeometry(body, 2, 2));
-        //        myGeometry.Transform = Rotation;
-        //        return myGeometry;
-        //    }
-        //}
-
-        public override System.Windows.Media.RectangleGeometry Outline
+        public override System.Windows.Media.Geometry Geometry
         {
             get
             {
-                var outline = new System.Windows.Media.RectangleGeometry(Bounds);
-                outline.Transform = Rotation;
-                return outline;
+                var myGeometry = new GeometryGroup();
+
+                var body = new Rect(0, 0, Bounds.Width, Bounds.Height);
+                myGeometry.Children.Add(new RectangleGeometry(body, 2, 2));
+                myGeometry.Transform = Rotation;
+                return myGeometry;
             }
         }
 

@@ -45,19 +45,9 @@ namespace Sketch.Models
             return pf;
         }
 
-        //public static PathFigure GetPathFigureFromPoint(IEnumerable<Point> linePoints)
-        //{
-        //    var pf = new PathFigure();
-        //    System.Windows.Media.PathSegmentCollection ls = new System.Windows.Media.PathSegmentCollection();
-        //    var start = linePoints.First();
-        //    foreach (var p in linePoints.Skip(1))
-        //    {
-        //        ls.Add(new System.Windows.Media.BezierSegment(start,linePoints.ElementAt(1), linePoints.ElementAt(2),false));
-        //    }
-        //    pf.StartPoint = start;
-        //    pf.Segments = ls;
-        //    return pf;
-        //}
-
+        public static Geometry GetGeometryFromPoints(IEnumerable<Point> points)
+        {
+            return GetGeometryFromPath(GetPathFigureFromPoint(points));
+        }
     }
 }

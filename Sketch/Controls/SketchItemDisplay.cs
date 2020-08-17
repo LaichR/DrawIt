@@ -23,8 +23,6 @@ namespace Sketch.Controls
     public class SketchItemDisplay: Canvas, ISketchItemDisplay
     {
         
-        
-        
         LinkedList<byte[]> _snapshots = new LinkedList<byte[]>();
         
         ISketchItemUI _selectedUI = null;                    // currently selected item or null if no item is selected
@@ -43,7 +41,7 @@ namespace Sketch.Controls
         readonly ISketchItemContainer _container;
         readonly SketchItemDisplayLabel _myLabel;
 
-        public SketchItemDisplay(SketchPad parent, ISketchItemContainer container)
+        public SketchItemDisplay(SketchPad parent, ISketchItemContainer container, bool activateCanvas = true)
         {
             this.Height = parent.Height;
             this.Width = parent.Width;
@@ -55,15 +53,20 @@ namespace Sketch.Controls
             {
                 AddVisualChild(item);
             }
+
             _container.SketchItems.CollectionChanged += SketchItems_CollectionChanged;
-            Visibility = Visibility.Visible;
-            _myLabel = new SketchItemDisplayLabel(container, this);
-            BeginEdit(new AddConnectableItemOperation(this));
+            if (activateCanvas)
+            {
+                Visibility = Visibility.Visible;
+                _myLabel = new SketchItemDisplayLabel(container, this);
+                BeginEdit(new AddConnectableItemOperation(this));
+            }
         }
 
 
         public event EventHandler SelectedItemChanged;
 
+        public ISketchItemFactory ItemFactory => _parent.ItemFactory;
 
         public ISketchItemUI SelectedItem
         {
@@ -125,6 +128,17 @@ namespace Sketch.Controls
         }
 
 
+        public ISketchItemUI GetItemAtPoint(Point p)
+        {
+            var item = Canvas.InputHitTest(p) as DependencyObject;
+            while( item != null && !(item is ISketchItemUI))
+            {
+                item = VisualTreeHelper.GetParent(item);
+            }
+            ISketchItemUI sketchItem = item as ISketchItemUI;
+            return sketchItem;
+        }
+
         public void ShowIntersections()
         {
             if (_intersectionFinder != null)
@@ -137,7 +151,7 @@ namespace Sketch.Controls
         {
             using (var stream = new MemoryStream())
             { 
-                SketchItemDisplayHelper.TakeSnapshot(stream, SketchItems);
+                SketchItemDisplayHelper.TakeSnapshot(stream, this);
                 var buffer = stream.ToArray();
                 _snapshots.AddFirst(buffer);
             }
@@ -166,7 +180,7 @@ namespace Sketch.Controls
                 _snapshots.RemoveFirst();
                 using (var stream = new MemoryStream(buffer))
                 {
-                    SketchItemDisplayHelper.RestoreSnapshot(stream, SketchItems);
+                    SketchItemDisplayHelper.RestoreSnapshot(stream, this);
                 }
             }
         }
@@ -197,16 +211,15 @@ namespace Sketch.Controls
         {
             ISketchItemUI newActiveOutline = null;
 
-            if (model is ConnectableBase)
+            if (model is ConnectableBase connectable)
             {
-                var connectable = model as ConnectableBase;
-                newActiveOutline = new OutlineUI(this, connectable);
+                newActiveOutline = new OutlineUI(_parent, this, connectable);
                 // the outlines are always above the connectors
                 Canvas.SetZIndex(newActiveOutline.Shape, 1500);
             }
-            else
+            else if (model is ConnectorModel connectorModel ) 
             {
-                ((ConnectorModel)model).SetSiblings(SketchItems.OfType<ConnectorModel>().Where((x) => x != model));
+                //connectorModel.AssignContainer(this);   
                 var connector = new ConnectorUI(this, model as ConnectorModel);
                 newActiveOutline = connector;
                 Canvas.SetZIndex(newActiveOutline.Shape, 0);
@@ -280,7 +293,7 @@ namespace Sketch.Controls
 
         public void EndEdit()
         {
-            var factory = ModelFactoryRegistry.Instance.GetSketchItemFactory();
+            var factory = ItemFactory;
             if ( factory.SelectedForCreation == null||
                  factory.SelectedForCreation.GetInterface("IBoundedModelItem") == null)
             {
@@ -388,18 +401,6 @@ namespace Sketch.Controls
                 case Key.Delete:
                     TakeSnapshot();
                     DeleteSelectedItems();
-                    break;
-                case Key.F2:
-                    if (_selectedUI != null)
-                    {
-                        {
-                            var ui = _selectedUI.Shape as OutlineUI;
-                            if (ui != null)
-                            {
-                                ui.StartEdit();
-                            }
-                        }
-                    }
                     break;
                 case Key.Escape:
                     // we iterate over the _activeUi collection, since we are removing items from the _selectedUi collection 

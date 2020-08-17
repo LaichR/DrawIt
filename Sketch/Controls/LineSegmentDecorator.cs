@@ -83,8 +83,7 @@ namespace Sketch.Controls
         public static IEnumerable<LineSegmentDecorator> DecorateLineSegments(ConnectorUI ui, int id)
         {
             List<LineSegmentDecorator> lineSegments = new List<LineSegmentDecorator>();
-            var geometry = ui.Model.Geometry as GeometryGroup;
-            if (geometry != null)
+            if( ui.Model.Geometry is GeometryGroup geometry)
             {
                 var path = geometry.Children.First() as PathGeometry;
                 if (path != null && path.Figures.Count() > 0)

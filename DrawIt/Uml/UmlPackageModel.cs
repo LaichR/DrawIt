@@ -20,11 +20,10 @@ namespace DrawIt.Uml
     {
         new const int DefaultWidth = 150;
         new const int DefaultHeight = 95;
+        
         public UmlPackageModel( Point p )
             : base(p, new Size( DefaultWidth, DefaultHeight)) 
         {
-            var location = new Point(p.X + 5, p.Y);
-            LabelArea = new Rect(location, new Size(140, 20));
             IsSelected = true;
             AllowSizeChange = true;
             Label = "new package";
@@ -40,61 +39,55 @@ namespace DrawIt.Uml
                 var myGeometry = Geometry as GeometryGroup;
                 myGeometry.Children.Clear();
 
-                FormattedText t = new FormattedText(Label, System.Globalization.CultureInfo.CurrentCulture,
-                    System.Windows.FlowDirection.LeftToRight, new Typeface("Arial"), 12, Brushes.Blue,
-                    VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip);
-
-                var textGeometry = t.BuildGeometry(new Point(LabelArea.Left + 7, LabelArea.Top + 2));
-
-                //myGeometry.Children.Add(textGeometry);
-
                 List<Point> points = new List<Point>
                 {
                     new Point( LabelArea.Left -2, LabelArea.Top + LabelArea.Height  ),
                     new Point( LabelArea.Left, LabelArea.Top + LabelArea.Height - 2 ),
                     new Point( LabelArea.Left + 2, LabelArea.Top + 2 ),
                     new Point( LabelArea.Left+4, LabelArea.Top ),
-                    new Point( textGeometry.Bounds.Right + 2, LabelArea.Top ),
-                    new Point( textGeometry.Bounds.Right + 4, LabelArea.Top + 1 ),
-                    new Point( textGeometry.Bounds.Right + 7, LabelArea.Top + 5 ),
-                    new Point( textGeometry.Bounds.Right + 10, LabelArea.Top + LabelArea.Height - 2 ),
-                    new Point( textGeometry.Bounds.Right + 14, LabelArea.Bottom )
+                    new Point( LabelArea.Right + 2, LabelArea.Top ),
+                    new Point( LabelArea.Right + 4, LabelArea.Top + 1 ),
+                    new Point( LabelArea.Right + 7, LabelArea.Top + 5 ),
+                    new Point( LabelArea.Right + 10, LabelArea.Top + LabelArea.Height - 2 ),
+                    new Point( LabelArea.Right + 14, LabelArea.Bottom )
                 };
 
                 
-                PathGeometry labelPath = new PathGeometry(GetLabelBorder(points));
-                //var screenLocation = this.PointToScreen(location);
-
-                myGeometry.Children.Add(labelPath);
-                var body = new Rect(Bounds.Left, Bounds.Top + LabelArea.Height, Bounds.Width, Bounds.Height - LabelArea.Height);
+                myGeometry.Children.Add(GeometryHelper.GetGeometryFromPoints(points));
+                var body = new Rect(0, LabelArea.Height, Bounds.Width, Bounds.Height - LabelArea.Height);
                 myGeometry.Children.Add(new RectangleGeometry(body));
         }
 
-        public override System.Windows.Media.RectangleGeometry Outline
-        {
-            get
+        public override string Label 
+        { 
+            get => base.Label;
+            set
             {
-                return new System.Windows.Media.RectangleGeometry(Bounds);
+                base.Label = value;
+                AdjustBounds();
             }
         }
 
-        public static IEnumerable<PathFigure> GetLabelBorder( IEnumerable<Point> linePoints )
+        protected override Rect ComputeLabelArea(string label)
         {
-            var pf = new PathFigure();
-            System.Windows.Media.PathSegmentCollection ls = new System.Windows.Media.PathSegmentCollection();
-            var start = linePoints.First();
-            foreach (var p in linePoints.Skip(1))
-            {
-                ls.Add(new System.Windows.Media.LineSegment(p, true));
-            }
-            pf.StartPoint = start;
-            pf.Segments = ls;
-            return new List<PathFigure>{pf};
+            var textSize = this.ComputeFormattedTextSize(label,
+                ConnectableBase.DefaultFont,
+                ConnectableBase.DefaultFontSize, 5, 10);
+            textSize.Width = Math.Max(textSize.Width, 80);
+            var pos = new Point(5, 0);
+            return new Rect(pos, textSize);
         }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        void AdjustBounds()
         {
-            base.GetObjectData(info, context);
+            if (Bounds.Left != 0) // the bounds where not yet initialized
+            {
+                LabelArea = ComputeLabelArea(DisplayedLabel());
+                var w = Math.Max(Bounds.Width, LabelArea.Width + 20);
+                var h = Bounds.Height;
+                Bounds = ComputeBounds(Bounds.TopLeft, new Size(w, h), LabelArea);
+            }
         }
+
     }
 }

@@ -70,6 +70,7 @@
     <Compile Include="Controls\ShowError\ViewModel\ViewModel.cs" />
     <Compile Include="Configuration\ConfigurableEntityAttribute.cs" />
     <Compile Include="Environment\PredefinedFolders.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Interfaces\ICommandDescriptor.cs" />
     <Compile Include="Interfaces\IHierarchicalNode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

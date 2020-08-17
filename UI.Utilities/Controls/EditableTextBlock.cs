@@ -94,7 +94,8 @@ namespace UI.Utilities.Controls
             {
                 Background = (Brush)parent.GetValue(BackgroundProperty);
             }
-            BorderThickness = new Thickness(0);            
+            BorderThickness = new Thickness(0);  
+            
         }
 
         void EditModeOnStyle()

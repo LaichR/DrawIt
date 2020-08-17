@@ -15,11 +15,11 @@ namespace DrawIt.Uml
     [Serializable]
     public class UmlFinalStateModel : ConnectableBase
     {
-        new const double DefaultWidth = 26;
-        new const double DefaultHeight = 27;
-        const int OuterRadius = 12;
-        const int InnerRadius1 = 11;
-        const int InnerRadius2 = 8;
+        new const double DefaultWidth = 28;
+        new const double DefaultHeight = 28;
+        const int OuterRadius = 14;
+        const int InnerRadius1 = 13;
+        const int InnerRadius2 = 9;
 
        
         EllipseGeometry _inner;
@@ -31,7 +31,6 @@ namespace DrawIt.Uml
             AllowEdit = false;
             AllowSizeChange = false;
             LabelArea = Rect.Empty;
-            UpdateGeometry();
         }
 
         protected UmlFinalStateModel(SerializationInfo info, StreamingContext context) : 
@@ -42,12 +41,12 @@ namespace DrawIt.Uml
 
         public override void UpdateGeometry()
         {
-            var center = new Point((Bounds.Left + Bounds.Right)/2, 
-                (Bounds.Top + Bounds.Bottom)/2);
+            var center = new Point((Bounds.Width)/2, 
+                (Bounds.Height)/2);
 
-            var innerLocation1 = new Point(Bounds.TopLeft.X + 2, Bounds.TopLeft.Y + 2);
-            var innerLocation2 = new Point(Bounds.TopLeft.X + 5, Bounds.TopLeft.Y + 5);
-            var arcStartLocation = new Point(Bounds.TopLeft.X, (Bounds.TopLeft.Y + Bounds.BottomRight.Y) / 2);
+            var innerLocation1 = new Point(2, 2);
+            var innerLocation2 = new Point(5, 5);
+            
             _inner = new EllipseGeometry(center, InnerRadius2, InnerRadius2);
 
             _outer = new CombinedGeometry();
@@ -66,13 +65,6 @@ namespace DrawIt.Uml
             
         }
 
-        public override RectangleGeometry Outline
-        {
-            get
-            {
-                return new RectangleGeometry(Bounds);
-            }
-        }
 
         protected override Rect ComputeBounds(Point pos, Size size, Rect labelArea)
         {

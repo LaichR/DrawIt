@@ -27,7 +27,7 @@ namespace DrawIt
     /// </summary>
     public partial class MainWindow : Window
     {
-        ISketchItemFactory _sketchItemFactory;
+        
         ApplicationViewModel _model;
         Sketch.Controls.ColorPicker.ColorPalette _palette;
 
@@ -37,24 +37,15 @@ namespace DrawIt
             InitializeComponent();
 
 
-            _sketchItemFactory = new Uml.UmlShapeFactory();
-            Sketch.ModelFactoryRegistry.Instance.PushSketchItemFactory(_sketchItemFactory);
 
-            _sketchItemFactory.RegisterBoundedItemSelectedNotification( factory_OnSelectElement );
-            _sketchItemFactory.RegisterConnectorItemSelectedNotification( this.SketchPad.HandleAddConnector );
-
-            _model = new ApplicationViewModel(
-                (x) => SketchPad.SavePictureAs(x),
-                () => SketchPad.OpenChildElement(),
-                () => SketchPad.CloseChildElement()
-            ); 
+            _model = new ApplicationViewModel(); 
             DataContext = _model;
 
             this.SketchPad.DataContext = DataContext;
-            this.OutlineView.DataContext = DataContext;
+            //this.OutlineView.DataContext = DataContext;
             
             InitTools(_model.FileTools);
-            InitTools(_sketchItemFactory.Palette);
+            InitTools(_model.Sketch.SketchItemFactory.Palette);
             InitTools(_model.AlignmentTools);
             InitTools(_model.ZoomTools);
             InitColorTools();
@@ -62,11 +53,6 @@ namespace DrawIt
             
         }
 
-        void factory_OnSelectElement(object sender, EventArgs e)
-        {
-            _model.IsInsertMode = true;
-            
-        }
 
         void InitColorTools()
         {
@@ -74,7 +60,7 @@ namespace DrawIt
             tb.VerticalAlignment = System.Windows.VerticalAlignment.Top;
             
             _palette = new Sketch.Controls.ColorPicker.ColorPalette();
-            _palette.ConnectModel(_model);
+            _palette.ConnectModel(_model.Sketch);
             tb.Items.Add(_palette);
             
             ToolbarPanel.Children.Add(tb);
@@ -98,5 +84,11 @@ namespace DrawIt
             base.OnClosed(e);
         }
 
+        private void SketchPad_SelectedItemChanged(object sender, RoutedEventArgs e)
+        {
+            var selected = SketchPad.SelectedItem;
+            _model.SelectedItem = selected;
+            PropertyEditor.InspectedObject = selected;
+        }
     }
 }

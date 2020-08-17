@@ -13,6 +13,8 @@ using UI.Utilities;
 using Sketch.Interface;
 using System.Drawing.Text;
 using System.CodeDom;
+using Sketch.Types;
+using System.ComponentModel;
 
 namespace Sketch.Models
 {
@@ -22,6 +24,8 @@ namespace Sketch.Models
 
         public static readonly double DefaultWidth = 100;
         public static readonly double DefaultHeight = 100;
+        public static readonly double MinimalTextMarginX = 5;
+        public static readonly double MinimalTextMarginY = 2;
         public const double DefaultFontSize = 12;
         public static readonly Color DefaultColor = Colors.Snow;
         public static readonly Brush DefaultStroke = Brushes.Black;
@@ -49,7 +53,7 @@ namespace Sketch.Models
             IsSelected = true;
             Label = label;
             FillColor = color;
-            LabelArea = ComputeLabelArea(label, pos);
+            LabelArea = ComputeLabelArea(DisplayedLabel());
             _bounds = ComputeBounds(pos, size, LabelArea);
             
             Initialize();
@@ -75,7 +79,7 @@ namespace Sketch.Models
 
         public virtual IList<ICommandDescriptor> AllowableConnectors
         {
-            get => ModelFactoryRegistry.Instance.GetSketchItemFactory().GetAllowableConnctors(this.GetType());
+            get => SketchItemFactory.ActiveFactory.GetAllowableConnctors(this.GetType());
         }
 
         protected ConnectableBase(SerializationInfo info, StreamingContext context):base(info, context)
@@ -85,7 +89,12 @@ namespace Sketch.Models
         {
             _geometry.Children.Clear();
             _geometry.Children.Add(new RectangleGeometry(Bounds));
-            
+        }
+
+        public virtual ConnectorDocking AllowableDockings(bool incoming)
+        {
+            return ConnectorDocking.Bottom | ConnectorDocking.Left | 
+                ConnectorDocking.Right | ConnectorDocking.Top;
         }
 
         public override Geometry Geometry => _geometry;
@@ -95,7 +104,7 @@ namespace Sketch.Models
             // draw the lable
             if (LabelArea != Rect.Empty)
             {
-                RenderLable(drawingContext);
+                RenderLabel(DisplayedLabel(), drawingContext);
             }
         }
 
@@ -133,7 +142,8 @@ namespace Sketch.Models
             }
         }
 
-        public Rect Bounds
+        [Browsable(true)]
+        public virtual Rect Bounds
         {
             get
             {
@@ -186,15 +196,21 @@ namespace Sketch.Models
         //}
 
 
-        protected virtual void RenderLable(DrawingContext drawingContext)
+        protected virtual void RenderLabel(string displayed, DrawingContext drawingContext)
         {
             // draw the lable
-            FormattedText t = new FormattedText(Label, System.Globalization.CultureInfo.CurrentCulture,
+            FormattedText t = new FormattedText(displayed, System.Globalization.CultureInfo.CurrentCulture,
                 System.Windows.FlowDirection.LeftToRight, DefaultFont, _fontSize,
                 System.Windows.Media.Brushes.Black,
                 VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip);
-            var position = new System.Windows.Point(LabelArea.Left + 5, LabelArea.Top + 2);
+            var position = new System.Windows.Point(LabelArea.Left + MinimalTextMarginX, 
+                LabelArea.Top + MinimalTextMarginY);
             drawingContext.DrawText(t, position);
+        }
+
+        protected virtual string DisplayedLabel()
+        {
+            return Label;
         }
 
         public double RotationAngle
@@ -220,11 +236,7 @@ namespace Sketch.Models
             newBounds.Transform(translation.Value);
             if (LabelArea != Rect.Empty)
             {
-                double labelHeight = LabelArea.Height;
-                var newLabelArea = LabelArea;
-                newLabelArea.Transform(translation.Value);
-                newLabelArea.Height = labelHeight;
-                LabelArea = newLabelArea;
+                LabelArea = ComputeLabelArea(DisplayedLabel()); // the label area is relative to the 
             }
             
             Bounds = newBounds;
@@ -261,12 +273,12 @@ namespace Sketch.Models
 
         #region private helpers
 
-        protected virtual Rect ComputeLabelArea(string label, Point pos)
+        protected virtual Rect ComputeLabelArea(string label)
         {
             if (!string.IsNullOrEmpty(Label))
             {
                 return new Rect(
-                    new Point(pos.X + 5, pos.Y + 5),
+                    new Point(5, 5),
                     ComputeFormattedTextSize(label, DefaultFont, DefaultFontSize, 10, 10));
             }
             return Rect.Empty;
@@ -302,9 +314,9 @@ namespace Sketch.Models
 
         
 
-        protected override void RestoreData(SerializationInfo info, StreamingContext context)
+        protected override void RestoreFieldData(SerializationInfo info, StreamingContext context)
         {
-            base.RestoreData(info, context);
+            base.RestoreFieldData(info, context);
             _fillColor = new SerializableColor();
             _bounds = (Rect)info.GetValue("Bounds", typeof(Rect));
             _allowSizeChange = info.GetBoolean("AllowSizeChange");

@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using Sketch.Models;
+using Sketch.Interface;
 using Sketch.Types;
 
 namespace Sketch.Controls
@@ -56,7 +57,7 @@ namespace Sketch.Controls
 
                 _visualizer = new ConnectorMoveVisualizer(initialGeometry); //tbd
                 _visualizer.MouseMove += HandleMouseMove;
-                _isSelfTransition = ((int)_moveHelper.LineType >> 8) == (int)Types.ConnectorDocking.Self;
+                _isSelfTransition = ((int)_moveHelper.LineType >> 8) == (int)ConnectorDocking.Self;
                 if( _moveHelper.MoveType == MoveType.MoveStartPoint)
                 {
                     _mouseMove = MoveStartPoint;
@@ -197,7 +198,7 @@ namespace Sketch.Controls
                     if (_isSelfTransition)
                     {
                         tmpDocking = _movingPointDocking;
-                        lt = (Types.LineType)((int)Types.ConnectorDocking.Self << 8| (int)_movingPointDocking);
+                        lt = (Types.LineType)((int)ConnectorDocking.Self << 8| (int)_movingPointDocking);
                     }
                     else
                     {
@@ -313,7 +314,7 @@ namespace Sketch.Controls
                     if (_isSelfTransition)
                     {
                         tmpDocking = _movingPointDocking;
-                        lt = (Types.LineType)((int)Types.ConnectorDocking.Self << 8 | (int)_movingPointDocking);
+                        lt = (Types.LineType)((int)ConnectorDocking.Self << 8 | (int)_movingPointDocking);
                     }
                     else
                     {

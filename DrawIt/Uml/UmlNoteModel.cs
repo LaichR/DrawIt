@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Media;
 using Sketch.Models;
 using System.Runtime.Serialization;
+using System.ComponentModel;
 
 namespace DrawIt.Uml
 {
@@ -14,34 +15,36 @@ namespace DrawIt.Uml
         //IList<Bluebottle.Base.Interfaces.ICommandDescriptor> _tools;
 
         new public const double DefaultHeight = 50;
-        new public const double DefaultWidth = 100;
+        new public const double DefaultWidth = 150;
 
-
-        static readonly double TopMargin = 20;
-        static readonly double LeftMargin = 2.5;
-        static readonly double BottomMargin = 5; // this includes das "eselsohr" 
-
+       
+        static readonly double DogEarSize = 30;
+       
+        [PersistentField(ModelVersion.V_0_1,"Note")]
         string _note;
-        FormattedText _formattedNote = null;
-        PathFigure[] _notePath = new PathFigure[1];
+        [PersistentField(ModelVersion.V_0_1,"IsDecisionInput")]
+        bool _isDecistionInput;
+
+        
+        
+        readonly PathFigure[] _notePath = new PathFigure[1];
         
 
         public UmlNoteModel(Point p )
             :base(p, new Size(DefaultWidth, DefaultHeight), 
-                 "new note",
+                 "a note",
                  Colors.White)
         {
             AllowSizeChange = true;
+            AllowEdit = true;
             Note = "a note";
-            
-            
-            UpdateGeometry();
 
         }
 
         protected UmlNoteModel(SerializationInfo info, StreamingContext context)
             :base(info, context) 
         {
+            
             UpdateGeometry();
         }
 
@@ -53,30 +56,30 @@ namespace DrawIt.Uml
             }
         }
 
+        [Browsable(true)]
+        public bool IsDecisionInput
+        {
+            get => _isDecistionInput;
+            set
+            {
+                _isDecistionInput = value;
+                RaisePropertyChanged("StereotypeVisibility");
+            }
+        }
+
+        [System.ComponentModel.Browsable(false)]
+        public override string Label { get => base.Label; set => base.Label = value; }
+
+        [System.ComponentModel.Browsable(true)]
         public string Note
         {
             get { return _note; }
             set
             {
                 _note = value;
-                _formattedNote = new FormattedText(Note, System.Globalization.CultureInfo.CurrentCulture,
-                    System.Windows.FlowDirection.LeftToRight, new Typeface("Arial"), 12, Brushes.Blue,
-                    VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip);
-
-                _formattedNote.MaxTextWidth = Math.Max(50, Bounds.Width - 5);
-                Rect newBounds = Bounds;
-                newBounds.Height = _formattedNote.Extent + BottomMargin * 2 + TopMargin;
-                Bounds = newBounds;
-                newBounds.Location = new Point(Bounds.Left, Bounds.Top + TopMargin);
-                newBounds.Height = _formattedNote.Extent + BottomMargin * 2;
-                LabelArea = newBounds;
-            }
-        }
-
-        public override RectangleGeometry Outline
-        {
-            get {
-                return new RectangleGeometry(Bounds);
+                AdjustBounds();
+                
+                RaisePropertyChanged("Note");
             }
         }
 
@@ -85,66 +88,65 @@ namespace DrawIt.Uml
         //    get { return new List<UI.Utilities.Interfaces.ICommandDescriptor>(); }
         //}
 
+
+        public Visibility StereotypeVisibility
+        {
+            get => IsDecisionInput ? Visibility.Visible : Visibility.Hidden;
+        }
         public override void UpdateGeometry()
         {
 
             var myGeometry = Geometry as GeometryGroup;
             myGeometry.Children.Clear();
 
-            _formattedNote.MaxTextWidth = Math.Max(50, LabelArea.Width - 5);
 
+            var pathFigure = GeometryHelper.GetPathFigureFromPoint(new Point[]
+            {
+                        new Point(0,0),
+                        new Point( Bounds.Width - DogEarSize, 0),
+                        new Point( Bounds.Width - DogEarSize, DogEarSize),
+                        new Point( Bounds.Width, DogEarSize),
+                        new Point( Bounds.Width, Bounds.Height),
+                        new Point( 0, Bounds.Height)
+            });
 
+            pathFigure.IsClosed = true;
+            pathFigure.IsFilled = true;
 
-            //myGeometry.Children.Add(textGeometry);
-            _notePath[0] = GetPathFigureFromPoints(new Point[]
-                {
-                        Bounds.TopLeft,
-                        new Point( Bounds.Right - TopMargin, Bounds.Top),
-                        new Point( Bounds.Right - TopMargin, Bounds.Top + TopMargin),
-                        new Point( Bounds.Right, Bounds.Top + TopMargin),
-                        Bounds.BottomRight,
-                        Bounds.BottomLeft,
-                }
-                );
-
-            _notePath[0].IsClosed = true;
-            myGeometry.Children.Add(new PathGeometry(_notePath));
-            myGeometry.Children.Add(new LineGeometry(new Point(Bounds.Right - TopMargin, Bounds.Top),
-                new Point(Bounds.Right, Bounds.Top + TopMargin)));
+            myGeometry.Children.Add(GeometryHelper.GetGeometryFromPath(pathFigure));
+            myGeometry.Children.Add(new LineGeometry(new Point(Bounds.Width - DogEarSize, 0),
+                new Point(Bounds.Width, DogEarSize)));
 
             myGeometry.Transform = Rotation;
         }
 
-        public override void RenderAdornments(DrawingContext drawingContext)
-        {
-            var textGeometry = _formattedNote.BuildGeometry(new Point(LabelArea.Left + LeftMargin, LabelArea.Top + BottomMargin));
-            drawingContext.DrawGeometry( Brushes.Black, new Pen(Brushes.Black, 0.1),  textGeometry ); 
-        }
-
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-            info.AddValue("Note", Note);
-        }
-
-        static PathFigure GetPathFigureFromPoints( IEnumerable<Point> linePoints )
-        {
-            var pf = new PathFigure();
-            System.Windows.Media.PathSegmentCollection ls = new System.Windows.Media.PathSegmentCollection();
-            var start = linePoints.First();
-            foreach (var p in linePoints.Skip(1))
+        protected override Rect ComputeLabelArea(string label)
+        {   
+            var labelAreaLocation = new Point(5, DogEarSize );
+            var size = new Size(DefaultWidth - 20, DefaultHeight - DogEarSize -
+                ConnectableBase.MinimalTextMarginY*2);
+            if (!string.IsNullOrEmpty(label))
             {
-                ls.Add(new System.Windows.Media.LineSegment(p, true));
+                size = ComputeFormattedTextSize(label, ConnectableBase.DefaultFont, ConnectableBase.DefaultFontSize,
+                ConnectableBase.MinimalTextMarginX, ConnectableBase.MinimalTextMarginY);
             }
-            pf.StartPoint = start;
-            pf.Segments = ls;
-            return pf;
+            return new Rect(labelAreaLocation, size); // the entier shape may contain text!
         }
 
-        protected override void RestoreData(SerializationInfo info, StreamingContext context)
+        protected override string DisplayedLabel()
         {
-            base.RestoreData(info, context);
-            Note = info.GetString("Note");
+            return Note;
+        }
+
+        void AdjustBounds()
+        {
+            if (Bounds.Left != 0) // the bounds where not yet initialized
+            {
+                LabelArea = ComputeLabelArea(DisplayedLabel());
+                var w = Math.Max(DefaultWidth, LabelArea.Width + 20);
+                var h = Math.Max(Bounds.Height, LabelArea.Height + DogEarSize + 20);
+                Bounds = ComputeBounds(Bounds.TopLeft, new Size(w, h), LabelArea);
+            }
         }
     }
 }

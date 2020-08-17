@@ -9,6 +9,10 @@ using System.Windows.Controls;
 using Prism.Commands;
 using Sketch.Models;
 using Sketch.Interface;
+using Sketch.Utilities;
+using Sketch.Types;
+using System.Windows.Media;
+using System.Reflection;
 
 namespace Sketch.Controls
 {
@@ -25,8 +29,10 @@ namespace Sketch.Controls
         {
             _from = from;
             _pad = pad;
+            
             var start = ConnectorUtilities.ComputeCenter(from.Bounds);
             _selector = new ConnectablePairSelector(start, p);
+            
             _pad.Canvas.Children.Add(_selector);
             _selector.Visibility = Visibility.Visible;
             _pad.SetSketchItemEnable(false);
@@ -55,17 +61,20 @@ namespace Sketch.Controls
         {
             e.Handled = true;
             Point p = e.GetPosition(_pad.Canvas);
-            var factory = ModelFactoryRegistry.Instance.GetSketchItemFactory();
-            var inputElem = _pad.Canvas.InputHitTest(e.GetPosition(_pad.Canvas)) as ISketchItemUI;
-            if (inputElem != null)
+            var factory = _pad.ItemFactory;
+            
+            ISketchItemUI sketchItemUI = _pad.GetItemAtPoint(e.GetPosition(_pad.Canvas));
+            
+            if (sketchItemUI != null)
             {
-                if (inputElem.Model is ConnectableBase)
+                
+                if (sketchItemUI.Model is ConnectableBase)
                 {
-                    var to = inputElem.Model as ConnectableBase;
+                    var to = sketchItemUI.Model as ConnectableBase;
 
                     var connectorModel = factory.CreateConnector(
                         factory.SelectedForCreation,
-                        ConnectionType.AutoRouting, _from, to);
+                        ConnectionType.AutoRouting, _from, to, _pad );
                     _pad.SketchItems.Add(connectorModel);
                 }
                 _pad.EndEdit();
@@ -86,13 +95,45 @@ namespace Sketch.Controls
                         ToolTip = fac.ToolTip,
                         Command = new DelegateCommand(() =>
                            {
+                               double dx = 0; double dy = 0;
+                               var angle = Vector.AngleBetween(new Vector(1,0),
+                                   new Vector(_selector.Start.X-p.X, _selector.Start.Y-p.Y));
+
+                               if (angle < 0) angle += 360.0;
+
                                var connectable = fac.CreateConnectableItem(p);
+                               
+                               if( angle >= 0 && angle < 45)
+                               {
+                                   dy = -GetDefaultHeight(connectable) / 2;
+                                   dx = -GetDefaultWidth(connectable);
+                               }
+                               else if (angle  >= 45 && angle < 135)
+                               {
+                                   dx = -GetDefaultWidth(connectable)/2;
+                                   dy = -GetDefaultHeight(connectable);
+                               }
+                               else if( angle >= 135 && angle < 225 )
+                               {
+                                   dy = -GetDefaultHeight(connectable) / 2;
+                                   
+                               }
+                               else
+                               {
+                                   
+                                   dx = -GetDefaultWidth(connectable) / 2;
+                               }
+
+                               connectable.Move(new TranslateTransform(dx, dy));
                                if (connectable != null)
                                {
                                    _pad.SketchItems.Add(connectable);
-                                   _pad.SketchItems.Add(factory.CreateConnector(
+                                   var connector = factory.CreateConnector(
                                        selectedForCreation,
-                                       ConnectionType.AutoRouting, _from, connectable));
+                                       ConnectionType.AutoRouting, _from, connectable,
+                                       _pad );
+                                   _pad.SketchItems.Add(connector);
+                                   
                                    _pad.EndEdit();
                                }
                            })
@@ -127,6 +168,31 @@ namespace Sketch.Controls
                 _pad.Canvas.ContextMenu = _oldContextMenue;
             }
         }
+
+        static double GetDefaultWidth(object obj)
+        {
+            var t = obj.GetType();
+            var f = t.GetField("DefaultWidth", System.Reflection.BindingFlags.Public |
+                System.Reflection.BindingFlags.NonPublic|BindingFlags.Static);
+            if( f != null )
+            {
+                return Convert.ToDouble(f.GetValue(null));
+            }
+            return ConnectableBase.DefaultWidth;
+        }
+
+        static double GetDefaultHeight(object obj)
+        {
+            var t = obj.GetType();
+            var f = t.GetField("DefaultHeight", System.Reflection.BindingFlags.Public |
+                System.Reflection.BindingFlags.NonPublic | BindingFlags.Static);
+            if (f != null)
+            {
+                return Convert.ToDouble(f.GetValue(null));
+            }
+            return ConnectableBase.DefaultWidth;
+        }
+
     }
     
 }

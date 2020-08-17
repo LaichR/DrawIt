@@ -18,40 +18,48 @@ namespace Sketch.Controls
             Pen _pen = new Pen(Brushes.Black, 30);
             RelativePosition _direction;
             Rect _origialRect;
+            Rect _originalUiPos;
             Transform _resizeTransform;
             Vector _horizontalLine = new Vector(100, 0);
             bool _done = false;
 
-            public ChangeSizeOperation( OutlineUI parent_, Point p )
+            public ChangeSizeOperation( OutlineUI parent_, System.Windows.Input.MouseButtonEventArgs e )
             {
-                _start = p;
+                var p = e.GetPosition(parent_._parent.Canvas);
+                var relP = e.GetPosition(parent_);
+                _start.X = RoundToGrid(p.X);
+                _start.Y = RoundToGrid(p.Y);
+
                 _ui = parent_;
                 _origialRect = _ui.Bounds;
-                List<LineGeometry> lgs = new List<LineGeometry>
-                {
-                    new LineGeometry( _origialRect.TopLeft, _origialRect.TopRight ),
-                    new LineGeometry( _origialRect.TopRight, _origialRect.BottomRight),
-                    new LineGeometry( _origialRect.BottomRight, _origialRect.BottomLeft),
-                    new LineGeometry( _origialRect.BottomLeft, _origialRect.TopLeft)
-                };
+                _originalUiPos = _ui._adorner.Bounds;
+                //List<LineGeometry> lgs = new List<LineGeometry>
+                //{
+                //    new LineGeometry( _origialRect.TopLeft, _origialRect.TopRight ),
+                //    new LineGeometry( _origialRect.TopRight, _origialRect.BottomRight),
+                //    new LineGeometry( _origialRect.BottomRight, _origialRect.BottomLeft),
+                //    new LineGeometry( _origialRect.BottomLeft, _origialRect.TopLeft)
+                //};
 
-                foreach( var l in lgs)
-                {
-                    l.Transform = _ui.DefiningGeometry.Transform;
-                }
+                //foreach( var l in lgs)
+                //{
+                //    l.Transform = _ui.DefiningGeometry.Transform;
+                //}
 
-                int direction = 0;
-                for (int i = 0; i < lgs.Count; ++i)
-                {
-                    if (lgs[i].StrokeContains(_pen, _start))
-                    {
-                        direction |= (1 << i);
-                    }
-                }
+                //int direction = 0;
+                //for (int i = 0; i < lgs.Count; ++i)
+                //{
+                //    if (lgs[i].StrokeContains(_pen, p))
+                //    {
+                //        direction |= (1 << i);
+                //    }
+                //}
 
                 _ui.TriggerSnapshot();
                 _ui._adorner.SetActive(true);
-                _direction = (RelativePosition)direction;// _ui._myShadow.HitShadowBorder(_start);
+                //_direction = (RelativePosition)direction;// _ui._myShadow.HitShadowBorder(_start);
+                _direction = _ui._adorner.HitShadowBorder(relP);
+                
                 _ui.MouseUp += HandleMouseUp;
                 _ui.MouseMove += HandleMouseMove;
                 _ui.CaptureMouse();
@@ -60,6 +68,7 @@ namespace Sketch.Controls
                 {
                     StopOperation(false);
                 }
+                
             }
 
             void HandleMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
@@ -81,19 +90,26 @@ namespace Sketch.Controls
             {
                 if (!_done)
                 {
+                    System.Windows.Input.Mouse.OverrideCursor = null;
                     _done = true;
                     _ui.ReleaseMouseCapture();
                     _ui.MouseUp -= HandleMouseUp;
                     _ui.MouseMove -= HandleMouseMove;
+                    
                     _ui.ReleaseMouseCapture();
                     _ui._adorner.SetActive(false);
                     _ui.RegisterHandler(null);
-                    if (commit && _resizeTransform != null)
+                    
+
+                    if (commit )
                     {
-                        _ui.Model.Move(_resizeTransform);
-                        _ui._adorner.UpdateGeometry();
-                        _ui._parent.EditMode = EditMode.Select;
-                        
+                        _resizeTransform = ComputeModelResizeTransform();
+                        if (_resizeTransform != null)
+                        {
+                            _ui.Model.Move(_resizeTransform);
+                            _ui._adorner.UpdateGeometry();
+                            _ui._parent.EditMode = EditMode.Select;
+                        }
                     }
                     else
                     {
@@ -109,16 +125,32 @@ namespace Sketch.Controls
 
  
 
-
+            Transform ComputeModelResizeTransform()
+            {
+                var r = _ui._adorner.Bounds;
+                if (r == _originalUiPos) return null;
+                var delta = r.Location - _originalUiPos.Location;
+                var scaleX = r.Width/_originalUiPos.Width;
+                var scaleY = r.Height / _originalUiPos.Height;
+                var scaleTransform = new ScaleTransform(scaleX, scaleY);
+                var scaledOriginal = scaleTransform.TransformBounds(_origialRect);
+                var scalTranslation = scaledOriginal.Location - _origialRect.Location;
+                var tg = new TransformGroup();
+                tg.Children.Add(scaleTransform);
+                tg.Children.Add(new TranslateTransform(_origialRect.Left*(1.0-scaleX) + delta.X, _origialRect.Top * (1.0 - scaleY) + delta.Y));
+                //
+                
+                return tg;
+            }
 
 
             Transform ComputeResizeTransformation(Point p)
             {
-                p.X = Math.Round(p.X / SketchPad.GridSize) * SketchPad.GridSize;
-                p.Y = Math.Round(p.Y / SketchPad.GridSize) * SketchPad.GridSize;
+                p.X = RoundToGrid(p.X);
+                p.Y = RoundToGrid(p.Y);
 
                 var rect = _origialRect;
-                var rot = _ui._geometry.Transform as RotateTransform;
+                var rot = _ui._model.Geometry.Transform as RotateTransform;
                 var angle = 0.0;
                 if( rot != null)
                 {
@@ -140,7 +172,7 @@ namespace Sketch.Controls
                             //var transY = _origialRect.Top - rect.Top - deltaY; 
                             var tg = new TransformGroup();
                             tg.Children.Add(sf);
-                            tg.Children.Add(new TranslateTransform(0, transY));
+                            tg.Children.Add(new TranslateTransform(0, -delta.Y));
                             
                             return tg;
                         }
@@ -154,7 +186,9 @@ namespace Sketch.Controls
                             var trans = _origialRect.TopLeft - rect.TopLeft;
                             var tg = new TransformGroup();
                             tg.Children.Add(sf);
-                            tg.Children.Add(new TranslateTransform(trans.X, trans.Y - delta.Y));
+                            tg.Children.Add(new TranslateTransform(0, -delta.Y));
+                            
+                            
                             return tg;
                         }
                     case RelativePosition.E:
@@ -163,11 +197,11 @@ namespace Sketch.Controls
                             
                             var scaleX = (delta.X + _origialRect.Width) / _origialRect.Width;
                             var sf = new ScaleTransform(scaleX, 1);
-                            rect.Transform(sf.Value);
-                            var trans = _origialRect.TopLeft - rect.TopLeft;
+                            //rect.Transform(sf.Value);
+                            //var trans = _origialRect.TopLeft - rect.TopLeft;
                             var tg = new TransformGroup();
                             tg.Children.Add(sf);
-                            tg.Children.Add(new TranslateTransform(trans.X, 0));
+                            //tg.Children.Add(new TranslateTransform(trans.X, 0));
                             return tg;
 
                         }
@@ -177,11 +211,11 @@ namespace Sketch.Controls
                             var scaleY = (delta.Y + _origialRect.Height) / _origialRect.Height;
                             var scaleX = (delta.X + _origialRect.Width) / _origialRect.Width;
                             var sf = new ScaleTransform(scaleX, scaleY);
-                            rect.Transform(sf.Value);
-                            var trans = _origialRect.TopLeft - rect.TopLeft;
+                            //rect.Transform(sf.Value);
+                            //var trans = _origialRect.TopLeft - rect.TopLeft;
                             var tg = new TransformGroup();
                             tg.Children.Add(sf);
-                            tg.Children.Add(new TranslateTransform(trans.X, trans.Y));
+                            //tg.Children.Add(new TranslateTransform(trans.X, trans.Y));
                             return tg;
                         }
                     case RelativePosition.S:
@@ -189,11 +223,11 @@ namespace Sketch.Controls
                             var delta = p - _start;
                             var scaleY = (delta.Y + _origialRect.Height) / _origialRect.Height;
                             var sf = new ScaleTransform(1, scaleY);
-                            rect.Transform(sf.Value);
-                            var trans = _origialRect.TopLeft - rect.TopLeft;
+                            //rect.Transform(sf.Value);
+                            //var trans = _origialRect.TopLeft - rect.TopLeft;
                             var tg = new TransformGroup();
                             tg.Children.Add(sf);
-                            tg.Children.Add(new TranslateTransform(0, trans.Y));
+                            //tg.Children.Add(new TranslateTransform(0, trans.Y));
                             return tg;
                         }
                     case RelativePosition.SW:
@@ -202,11 +236,11 @@ namespace Sketch.Controls
                             var scaleY = (delta.Y + _origialRect.Height) / _origialRect.Height;
                             var scaleX = (-delta.X + _origialRect.Width) / _origialRect.Width;
                             var sf = new ScaleTransform(scaleX, scaleY);
-                            rect.Transform(sf.Value);
-                            var trans = _origialRect.TopLeft - rect.TopLeft;
+                            //rect.Transform(sf.Value);
+                            //var trans = _origialRect.TopLeft - rect.TopLeft;
                             var tg = new TransformGroup();
                             tg.Children.Add(sf);
-                            tg.Children.Add(new TranslateTransform(trans.X + delta.X, trans.Y));
+                            tg.Children.Add(new TranslateTransform(delta.X, 0));
                             return tg;
                         }
                     case RelativePosition.W:
@@ -214,11 +248,11 @@ namespace Sketch.Controls
                             var delta = p - _start;
                             var scaleX = (-delta.X + _origialRect.Width) / _origialRect.Width;
                             var sf = new ScaleTransform(scaleX, 1);
-                            rect.Transform(sf.Value);
-                            var trans = _origialRect.TopLeft - rect.TopLeft;
+                            //rect.Transform(sf.Value);
+                            //var trans = _origialRect.TopLeft - rect.TopLeft;
                             var tg = new TransformGroup();
                             tg.Children.Add(sf);
-                            tg.Children.Add(new TranslateTransform(trans.X + delta.X, 0));
+                            tg.Children.Add(new TranslateTransform(delta.X, 0));
                             return tg;
                         }
                     case RelativePosition.NW:
@@ -228,16 +262,22 @@ namespace Sketch.Controls
                             var scaleX = (-delta.X + _origialRect.Width) / _origialRect.Width;
                             var sf = new ScaleTransform(scaleX, scaleY);
                             rect.Transform(sf.Value);
-                            var trans = _origialRect.TopLeft - rect.TopLeft;
+                            //var trans = _origialRect.TopLeft - rect.TopLeft;
+                           
                             var tg = new TransformGroup();
                             tg.Children.Add(sf);
-                            tg.Children.Add(new TranslateTransform(trans.X + delta.X, trans.Y + delta.Y));
+                            tg.Children.Add(new TranslateTransform(delta.X, delta.Y));
                             return tg;
                         }
                     default:
                         return null;
                 }
                 //return null;
+            }
+
+            double RoundToGrid(double val)
+            {
+                return Math.Round(val / SketchPad.GridSize) * SketchPad.GridSize;
             }
         }
     }

@@ -38,9 +38,7 @@ namespace UI.Utilities.Controls
                         foreach (var item in _container.Items)
                         {
                             var dp = generator.GenerateNext();
-                            
-                            generator.PrepareItemContainer(dp);
-                            
+                            generator.PrepareItemContainer(dp);    
                         }
                     }
                 }

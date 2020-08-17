@@ -21,7 +21,7 @@ namespace Sketch.Controls
         static readonly DashStyle _activeDashStile = new DashStyle(new double[] { 2.0, 2.5 }, 0.0);
         static readonly double _activeStroke = 1.0;
         static readonly double _defaultStroke = 3.0;
-        static readonly Pen _hitTestPen = new Pen(Brushes.White, 10.0);
+        static readonly Pen _hitTestPen = new Pen(Brushes.White, 13.0);
 
         readonly ConnectableBase _realBody;
         RectangleGeometry _shadowGeometry;
@@ -48,11 +48,18 @@ namespace Sketch.Controls
             _parent = parent;
             _realBody = _adorned.Model as ConnectableBase;
             _shadowGeometry = _realBody.Outline.Clone();
+            _shadowGeometry.Rect = 
+               new Rect(0,0,adorned.Bounds.Width, adorned.Bounds.Height); //_realBody.Outline.Clone();
             _myBrush = _selectedOutlineBrush;
             ComputeSensitiveBorder();
             _myPen = new Pen(_myBrush, _defaultStroke);
             _defaultDashstile = _myPen.DashStyle;
             this.Visibility = System.Windows.Visibility.Visible;
+        }
+
+        internal Rect Bounds
+        {
+            get => _shadowGeometry.Bounds;
         }
 
         internal void SetActive(bool active)
@@ -87,8 +94,14 @@ namespace Sketch.Controls
 
                 tg.Children.Add(_realBody.Rotation);
                 tg.Children.Add(transform);
+                
                 _shadowGeometry.Transform = tg;
-                _parent.Canvas.BringIntoView(_shadowGeometry.Bounds);
+                var left = Canvas.GetLeft(_adorned);
+                var top = Canvas.GetTop(_adorned);
+                var viewRect = _shadowGeometry.Bounds;
+                viewRect.X += left;
+                viewRect.Y += top;
+                _parent.Canvas.BringIntoView(viewRect);
                 InvalidateVisual();
             }
                
@@ -115,46 +128,50 @@ namespace Sketch.Controls
 
         protected override void OnMouseMove(System.Windows.Input.MouseEventArgs e)
         {
-            Point p = e.GetPosition(this._parent.Canvas);
-            p.X = Math.Round(p.X / SketchPad.GridSize) * SketchPad.GridSize;
-            p.Y = Math.Round(p.Y / SketchPad.GridSize) * SketchPad.GridSize;
+            Point p = e.GetPosition(this._adorned);
+            //p.X = Math.Round(p.X / SketchPad.GridSize) * SketchPad.GridSize;
+            //p.Y = Math.Round(p.Y / SketchPad.GridSize) * SketchPad.GridSize;
 
-            if( _adorned.LabelArea.Contains(p) && _adorned.Model.AllowEdit )
+            //if( _adorned.LabelArea.Contains(p) && _adorned.Model.AllowEdit )
+            //{
+            //    Mouse.OverrideCursor = Cursors.Hand;
+            //}
+            //else
+            //{
+            if (_allowResize)
             {
-                Mouse.OverrideCursor = Cursors.Hand;
+                var dir = HitShadowBorder(p);
+                switch (dir)
+                {
+                    case RelativePosition.N:
+                    case RelativePosition.S:
+                        Mouse.OverrideCursor = Cursors.SizeNS;
+                        break;
+                    case RelativePosition.E:
+                    case RelativePosition.W:
+                        Mouse.OverrideCursor = Cursors.SizeWE;
+                        break;
+                    case RelativePosition.NW:
+                    case RelativePosition.SE:
+                        Mouse.OverrideCursor = Cursors.SizeNWSE;
+                        break;
+                    case RelativePosition.SW:
+                    case RelativePosition.NE:
+                        Mouse.OverrideCursor = Cursors.SizeNESW;
+                        break;
+                    default:
+                        if (!_isActive)
+                        {
+                            Mouse.OverrideCursor = null;
+                        }
+                        break;
+                }
             }
             else
             {
-                if (_allowResize)
-                {
-                    var dir = HitShadowBorder(p);
-                    switch (dir)
-                    {
-                        case RelativePosition.N:
-                        case RelativePosition.S:
-                            Mouse.OverrideCursor = Cursors.SizeNS;
-                            break;
-                        case RelativePosition.E:
-                        case RelativePosition.W:
-                            Mouse.OverrideCursor = Cursors.SizeWE;
-                            break;
-                        case RelativePosition.NW:
-                        case RelativePosition.SE:
-                            Mouse.OverrideCursor = Cursors.SizeNWSE;
-                            break;
-                        case RelativePosition.SW:
-                        case RelativePosition.NE:
-                            Mouse.OverrideCursor = Cursors.SizeNESW;
-                            break;
-                        default:
-                            if (!_isActive)
-                            {
-                                Mouse.OverrideCursor = null;
-                            }
-                            break;
-                    }
-                }
+                Mouse.OverrideCursor = null;
             }
+            //}
             e.Handled = true;
         }
 
@@ -176,13 +193,16 @@ namespace Sketch.Controls
         internal void UpdateGeometry()
         {
             _shadowGeometry = _realBody.Outline;
+            var r = _realBody.Bounds;
+            r.X = 0; r.Y = 0;
+            _shadowGeometry.Rect = r; 
             ComputeSensitiveBorder();
             InvalidateVisual();
         }
 
         void ComputeSensitiveBorder()
         {
-            double halfWidth =  _hitTestPen.Thickness/2;
+            double halfWidth =  5.0;
             Rect r = _shadowGeometry.Bounds;
             _sensitiveBorder.Clear();
             var leftTop = new Point(r.Left - halfWidth, r.Top - halfWidth);

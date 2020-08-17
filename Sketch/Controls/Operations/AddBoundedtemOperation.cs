@@ -41,12 +41,12 @@ namespace Sketch.Controls
 
             p.X = (p.X / SketchPad.GridSize) * SketchPad.GridSize;
             p.Y = (p.Y / SketchPad.GridSize) * SketchPad.GridSize;
-            var factory = ModelFactoryRegistry.Instance.GetSketchItemFactory();
+            var factory = _pad.ItemFactory;
             if (factory.SelectedForCreation != null &&
                 factory.SelectedForCreation.GetInterface(
                     typeof(IBoundedItemModel).Name) != null)
             {
-                var cm = ModelFactoryRegistry.Instance.GetSketchItemFactory().CreateConnectableSketchItem(factory.SelectedForCreation,
+                var cm = factory.CreateConnectableSketchItem(factory.SelectedForCreation,
                     p);
                 if (cm != null)
                 {

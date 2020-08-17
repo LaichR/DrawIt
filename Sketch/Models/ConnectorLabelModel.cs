@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,13 +15,14 @@ namespace Sketch.Models
     /// A label can be attached to the  starting point or the end point of a connector
     /// </summary>
     /// 
+    [DoNotConsiderForConnectorRouting]
     public class ConnectorLabelModel : ConnectableBase
     {
         bool _geometryUpdating = false;
         ConnectorModel _connector;
         bool _isStartpointLabel;
         System.Windows.Point _labelPosition;
-        RectangleGeometry _outline;
+        
         LineGeometry _linkToConnector;
         FormattedText _formattedText;
         
@@ -27,7 +30,7 @@ namespace Sketch.Models
 
         public ConnectorLabelModel(ConnectorModel connector, bool isStartPointLabel, Point labelPosition)
             :base(labelPosition, 
-                 ComputeBounds( connector.Label), 
+                 ComputeSizeOfBounds(connector.Label), 
                  connector.Label, Colors.Snow )
         {
             _connector = connector;
@@ -36,7 +39,6 @@ namespace Sketch.Models
             _isStartpointLabel = isStartPointLabel;
             AllowSizeChange = false;
             StrokeThickness = 0.2;
-            _formattedText = ComputeFormattedText(_connector.Label);
             UpdateGeometry();
         }
 
@@ -47,14 +49,16 @@ namespace Sketch.Models
 
         void _connector_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if( e.PropertyName == "Name" )
+            if( e.PropertyName == nameof(Label) || e.PropertyName == nameof(Geometry) )
             {
-                UpdateGeometry();
+                AdjustBounds();
+                RaisePropertyChanged(nameof(ConnectorLabel));   
             }
         }
 
         public override string LabelPropertyName => "ConnectorLabel";
 
+        [Browsable(true)]
         public string ConnectorLabel
         {
             get
@@ -64,20 +68,30 @@ namespace Sketch.Models
             set
             {
                 _connector.Label = value;
-                _formattedText = ComputeFormattedText(value);
-                UpdateGeometry();
+                AdjustBounds();
+                RaisePropertyChanged();
             }
         }
 
-        //public Brush Fill
-        //{
-        //    get
-        //    {
-        //        return Brushes.Snow;
-        //    }
-        //}
+        [Browsable(false)]
+        public override string Label { get => base.Label; set => base.Label = value; }
 
-       
+        void AdjustBounds()
+        {
+            if (Bounds.Left != 0) // the bounds where not yet initialized
+            {
+                LabelArea = ComputeLabelArea(DisplayedLabel());
+                var w = Math.Max(25, LabelArea.Width + 20);
+                var h = Bounds.Height;
+                Bounds = ComputeBounds(Bounds.TopLeft, new Size(w, h), LabelArea);
+            }
+        }
+
+        protected override string DisplayedLabel()
+        {
+            return _connector == null ? Label: ConnectorLabel;
+        }
+
 
         public DoubleCollection StrokeDashArray
         {
@@ -87,40 +101,35 @@ namespace Sketch.Models
             }
         }
 
-        public override Rect LabelArea
-        {
-            get
-            {
-                return _connector.LabelArea;
-            }
-            set
-            {
-                _connector.LabelArea = value;
-                Bounds = value;
-            }
-        }
+
 
         public override void RenderAdornments(DrawingContext drawingContext)
         {
-            drawingContext.DrawText(_formattedText, ComputeTextPosition(_labelPosition));
+            //drawingContext.DrawText(_formattedText, ComputeTextPosition(new Point(0,0)));
             drawingContext.Pop();
+
             drawingContext.DrawGeometry(Brushes.LightGray,
                 new Pen(Brushes.DarkGray, 0.5), _linkToConnector);
-            drawingContext.PushClip(_outline);
-        }
-
-        public override System.Windows.Media.RectangleGeometry Outline
-        {
-            get { return new RectangleGeometry(Bounds); }
+            drawingContext.PushClip(Outline);
         }
 
         public override void Move(Transform translation)
         {
-            _labelPosition = translation.Transform(_labelPosition);
-            var newSize = ComputeBounds(_connector.Label);
-            // this assignement trigger the update process of the UI
-            LabelArea = new Rect(_labelPosition, newSize );
+            base.Move(translation);
+            _labelPosition = Bounds.TopLeft;
+            
             UpdateGeometry();
+        }
+
+        public override Rect Bounds
+        {
+            get => base.Bounds;
+
+            set
+            {
+                base.Bounds = value;
+                _connector.LabelArea = Bounds;
+            }
         }
 
         //public override IList<UI.Utilities.Interfaces.ICommandDescriptor> Tools
@@ -133,21 +142,25 @@ namespace Sketch.Models
             if (!_geometryUpdating && _connector !=null)
             {
                 _geometryUpdating = true; // since 
-                
 
-                var size = ComputeBounds(_connector.Label);
-                LabelArea = new Rect(_labelPosition, size );
+                var r = new Rect(0, 0, Bounds.Width, Bounds.Height);
+
                 
-                _outline = new RectangleGeometry(LabelArea);
                 var g = base.Geometry as GeometryGroup;
                 g.Children.Clear();
-                var endPoint = ConnectorUtilities.Intersect(LabelArea,
-                               ConnectorUtilities.ComputeCenter(LabelArea), ConnectorReferencePoint);
+                var endPoint = ConnectorUtilities.Intersect(Bounds,
+                               ConnectorUtilities.ComputeCenter(Bounds), ConnectorReferencePoint);
+
                 _linkToConnector = new LineGeometry(endPoint, ConnectorReferencePoint);
-                
-                g.Children.Add(_outline);
+                _linkToConnector.Transform = new TranslateTransform()
+                {
+                    X = -Bounds.Left,
+                    Y = -Bounds.Top
+                };
+                g.Children.Add(new RectangleGeometry(r));
                 
                 _geometryUpdating = false;
+                RaisePropertyChanged(nameof(Bounds));
             }
         }
 
@@ -172,7 +185,7 @@ namespace Sketch.Models
                     VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip);
         }
 
-        static Size ComputeBounds(  string label)
+        static Size ComputeSizeOfBounds(  string label)
         {
             var formattedText = ComputeFormattedText(label);
             return new Size(formattedText.Width + 20, formattedText.Height + 16);

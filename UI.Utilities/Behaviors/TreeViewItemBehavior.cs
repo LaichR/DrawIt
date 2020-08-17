@@ -26,9 +26,8 @@ namespace UI.Utilities.Behaviors
 
         static void OnBringIntoViewWhenSelectedChanged(DependencyObject depObj, DependencyPropertyChangedEventArgs e)
         {
-          TreeViewItem item = depObj as TreeViewItem;
-          if (item == null)
-            return;
+            if (!(depObj is TreeViewItem item)) return;
+     
 
           if (e.NewValue is bool == false)
             return;

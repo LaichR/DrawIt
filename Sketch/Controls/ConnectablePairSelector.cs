@@ -32,6 +32,11 @@ namespace Sketch.Controls
             ComputePath(tmp);
         }
 
+        public Point Start
+        {
+            get => _start;
+        }
+
         public void ComputePath( Point p)
         {
             List<System.Windows.Media.PathFigure> path = new List<System.Windows.Media.PathFigure>();

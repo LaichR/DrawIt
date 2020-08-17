@@ -55,7 +55,8 @@ namespace Sketch.Controls
         void HandleMouseDown(object sender, MouseButtonEventArgs e)
         {
             e.Handled = true;
-            var inputElem = _pad.Canvas.InputHitTest(e.GetPosition(_pad.Canvas)) as ISketchItemUI;
+            
+            var inputElem = _pad.GetItemAtPoint(e.GetPosition(_pad.Canvas)) as ISketchItemUI;
             if (inputElem != null)
             {
                 if (inputElem.Model is ConnectableBase)

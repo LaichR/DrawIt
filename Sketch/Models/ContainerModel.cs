@@ -16,14 +16,17 @@ namespace Sketch.Models
     [Serializable]
     public class ContainerModel: ConnectableBase, ISketchItemContainer
     {
-        
+        [PersistentField(ModelVersion.V_0_1,"Children")]
+        byte[] _childDataBuffer;
         ObservableCollection<ISketchItemModel> _children = new ObservableCollection<ISketchItemModel>();
         
         public ContainerModel(Point location, Size size )
             :base(location, size, "new container", ConnectableBase.DefaultColor)
         {
-            LabelArea = new Rect(location, new Size(size.Width, 20));
+            _children.CollectionChanged += SketchItemsChanged;
         }
+
+
 
         protected ContainerModel(SerializationInfo info, StreamingContext context)
             :base(info, context) 
@@ -35,57 +38,29 @@ namespace Sketch.Models
             set { SetProperty<ObservableCollection<ISketchItemModel>>(ref _children, value); }
         }
 
-        
 
-        public override RectangleGeometry Outline
+        protected override void PrepareFieldBackup()
         {
-            get
-            {
-                //var boundingRect = new RectangleGeometry(
-                //    new System.Windows.Rect(Bounds.TopLeft, Bounds.BottomRight), Bounds.Height / 4, Bounds.Height / 4);
-                var boundingRect = new RectangleGeometry(Bounds);
-                //boundingRect.Transform = new RotateTransform(90);
-                return boundingRect;
-            }
-        }
-
-        public override void UpdateGeometry()
-        {
-            base.UpdateGeometry();
-            var g = Geometry as GeometryGroup;
-            var leftTop = LabelArea.TopLeft;
-            g.Children.Add(new LineGeometry(new System.Windows.Point(leftTop.X, leftTop.Y + LabelArea.Height),
-                    new System.Windows.Point(leftTop.X + LabelArea.Width, leftTop.Y + LabelArea.Height)));
-        }
-
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
+            base.PrepareFieldBackup();
             List<ModelBase> children = new List<ModelBase>(SketchItems.OfType<ModelBase>());
             using (var stream = new System.IO.MemoryStream())
             {
-                SketchItemDisplayHelper.TakeSnapshot(stream, SketchItems);
-                var buffer = stream.ToArray();
-                info.AddValue("Children", buffer, typeof(byte[]));
+                SketchItemDisplayHelper.TakeSnapshot(stream, this);
+                _childDataBuffer = stream.ToArray();
             }
         }
 
-        protected override void RestoreData(SerializationInfo info, StreamingContext context)
+        protected override void FieldDataRestored()
         {
-            base.RestoreData(info, context);
-            try
+            base.FieldDataRestored();
+            using (var stream = new System.IO.MemoryStream(_childDataBuffer))
             {
-                var buffer = (byte[])info.GetValue("Children", typeof(byte[]));
-                using (var stream = new System.IO.MemoryStream(buffer))
-                {
-                    var children = new List<ISketchItemModel>();
-                    SketchItemDisplayHelper.RestoreSnapshot(stream, children);
-                    List<ISketchItemModel> sketchItemList = new List<ISketchItemModel>(children);
-                    SketchItemDisplayHelper.RestoreChildren(SketchItems, children);
-                }
+                SketchItemDisplayHelper.RestoreSnapshot(stream, this);
             }
-            catch { }
         }
+
+        protected virtual void SketchItemsChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        { }
 
     }
 }

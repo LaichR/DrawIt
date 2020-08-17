@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Sketch.Interface;
 
 namespace Sketch.Types
 {
@@ -33,9 +34,6 @@ namespace Sketch.Types
         BottomTop = (int)ConnectorDocking.Bottom << 8 | ConnectorDocking.Top,
         BottomLeft = (int)ConnectorDocking.Bottom << 8 | ConnectorDocking.Left,
         BottomRight = (int)ConnectorDocking.Bottom << 8 | ConnectorDocking.Right,
-
-
-        
 
     }
 }

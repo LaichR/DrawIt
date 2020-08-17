@@ -16,9 +16,8 @@ namespace UI.Utilities
         public object Convert(object value, Type targetType, object parameter,
                 System.Globalization.CultureInfo culture)
         {
-            Bitmap bitmap = value as Bitmap;
-            if (bitmap != null)
-            {
+            if( value is Bitmap bitmap)
+            { 
                 return new BitmapImage { Source = ToBitmapSource.Bitmap2BitmapSource(bitmap) };
             }
             return null;

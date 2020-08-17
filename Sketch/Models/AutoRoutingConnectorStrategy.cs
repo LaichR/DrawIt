@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using Sketch.Types;
+using Sketch.Utilities;
 using Sketch.Interface;
 
 namespace Sketch.Models
@@ -163,6 +164,10 @@ namespace Sketch.Models
         Point _start;
         Point _end;
         List<System.Windows.Media.PathFigure> _myPath = new List<System.Windows.Media.PathFigure>();
+        readonly RoutingAssistent _routingAssistent = new RoutingAssistent();
+        //LinkedAvlTree<BoundsComparer> _horizontallySortedBounds;
+        //LinkedAvlTree<BoundsComparer> _verticallySortedBounds;
+
         MovingState _movingState;
         double _startAngle;
         double _endAngle;
@@ -195,47 +200,53 @@ namespace Sketch.Models
         public IEnumerable<System.Windows.Media.PathFigure> ConnectorPath
         {
             get {
+                InitalizeBoundSearchStructures();
 
                 _myPath.Clear();
-                if( (_model.From == null)|| (_model.To == null))
+                if ((_model.From == null) || (_model.To == null))
                 {
                     return _myPath;
                 }
                 var fromCenter = ConnectorUtilities.ComputeCenter(_model.From.Bounds);
                 var toCenter = ConnectorUtilities.ComputeCenter(_model.To.Bounds);
 
-                if (_model.StartPointDocking == ConnectorDocking.Undefined)
+                do
                 {
-                    
-                    _start = ConnectorUtilities.Intersect(_model.From.Bounds, fromCenter, toCenter);
-                    _model.StartPointRelativePosition = 0.5;
-                    _model.StartPointDocking = ConnectorUtilities.ComputeDocking(_model.From.Bounds, 
-                                                    _model.StartPointRelativePosition, ref _start);
+                    if (_model.StartPointDocking == ConnectorDocking.Undefined)
+                    {
 
-                }
-                else
-                {
-                    _start = ConnectorUtilities.ComputePoint(_model.From.Bounds,
-                                                _model.StartPointDocking, _model.StartPointRelativePosition);
-                }
+                        _start = ConnectorUtilities.Intersect(_model.From.Bounds, fromCenter, toCenter);
+                        _model.StartPointRelativePosition = 0.5;
+                        _model.StartPointDocking = ConnectorUtilities.ComputeDocking(_model.From.Bounds,
+                                                        _model.StartPointRelativePosition, ref _start);
 
-                if (_model.EndPointDocking == ConnectorDocking.Undefined)
-                {
-                    _end = ConnectorUtilities.Intersect(_model.To.Bounds, toCenter, fromCenter);
+                    }
+                    else
+                    {
+                        _start = ConnectorUtilities.ComputePoint(_model.From.Bounds,
+                                                    _model.StartPointDocking, _model.StartPointRelativePosition);
+                    }
 
-                    _model.EndPointRelativePosition = 0.5;
-                    _model.EndPointDocking = ConnectorUtilities.ComputeDocking(_model.To.Bounds,
-                                                _model.EndPointRelativePosition, ref _end);
-                }
-                else
-                {
-                    _end = ConnectorUtilities.ComputePoint(_model.To.Bounds,
-                                                _model.EndPointDocking, _model.EndPointRelativePosition);
-                }
+                    if (_model.EndPointDocking == ConnectorDocking.Undefined)
+                    {
+                        _end = ConnectorUtilities.Intersect(_model.To.Bounds, toCenter, fromCenter);
 
+                        _model.EndPointRelativePosition = 0.5;
+                        _model.EndPointDocking = ConnectorUtilities.ComputeDocking(_model.To.Bounds,
+                                                    _model.EndPointRelativePosition, ref _end);
+                    }
+                    else
+                    {
+                        _end = ConnectorUtilities.ComputePoint(_model.To.Bounds,
+                                                    _model.EndPointDocking, _model.EndPointRelativePosition);
+                    }
+
+                } while (!CheckDocking());
+
+                var lineType = (LineType)((int)_model.StartPointDocking << 8 | (int)_model.EndPointDocking);
                 // avoid two overlaying connections with same end points
                 var connectorWithSameEndpoints = ConnectorUtilities.GetConnectorsWithSameEndpoints(
-                    _model.Siblings, _model.From, _model.To, _start, _end);
+                    _model.SiblingConnections, _model.From, _model.To, _start, _end);
                 if (connectorWithSameEndpoints.Any())
                 {
                     _model.StartPointRelativePosition = Math.Min(1.0, connectorWithSameEndpoints.Select<ConnectorModel, double>((x) => x.StartPointRelativePosition)
@@ -249,31 +260,27 @@ namespace Sketch.Models
                                                 _model.EndPointDocking, _model.EndPointRelativePosition);
                 }
 
+                var linePoints = _routingAssistent.GetLinePoints(lineType,
+                                _start, _end, _model.MiddlePointRelativePosition);
 
-                var lineType = (LineType)((int)_model.StartPointDocking << 8 | (int)_model.EndPointDocking);
-                ComputeLinePointsDelegate getLinePoints = null;
-                if( ComputeConnectorLine.Table.TryGetValue( lineType, out getLinePoints) )
+                var inVector = new Vector {
+                    X = linePoints.ElementAt(1).X - linePoints.ElementAt(0).X,
+                    Y = linePoints.ElementAt(1).Y - linePoints.ElementAt(0).Y
+                };
+
+                _startAngle = ConnectorUtilities.ComputeAngle(_model.StartPointDocking, inVector);
+                var outVector = new Vector
                 {
-                    var linePoints = getLinePoints(_start, _end, _model.MiddlePointRelativePosition );
-                    var inVector = new Vector{
-                        X = linePoints.ElementAt(1).X - linePoints.ElementAt(0).X,
-                        Y = linePoints.ElementAt(1).Y - linePoints.ElementAt(0).Y
-                    };
-                    _startAngle = ConnectorUtilities.ComputeAngle(_model.StartPointDocking, inVector);
-                    var outVector = new Vector
-                    {
-                        X = linePoints.Last().X - linePoints.ElementAt(linePoints.Count() - 2).X,
-                        Y = linePoints.Last().Y - linePoints.ElementAt(linePoints.Count() - 2).Y
-                    };
-                    _endAngle = ConnectorUtilities.ComputeAngle(_model.EndPointDocking, outVector);
-                    var pf = ConnectorUtilities.GetPathFigureFromPoints(linePoints);
-                    pf.IsFilled = false;
-                    pf.IsClosed = false;
-                    _myPath.Add(pf);
-                    
-                    return _myPath;
-                }
-                throw new NotSupportedException("connector cannot be drawn");
+                    X = linePoints.Last().X - linePoints.ElementAt(linePoints.Count() - 2).X,
+                    Y = linePoints.Last().Y - linePoints.ElementAt(linePoints.Count() - 2).Y
+                };
+                _endAngle = ConnectorUtilities.ComputeAngle(_model.EndPointDocking, outVector);
+                var pf = ConnectorUtilities.GetPathFigureFromPoints(linePoints);
+                pf.IsFilled = false;
+                pf.IsClosed = false;
+                _myPath.Add(pf);
+
+                return _myPath;
             }
         }
 
@@ -284,8 +291,81 @@ namespace Sketch.Models
         }
 
 
+        void InitalizeBoundSearchStructures()
+        {
+            this._routingAssistent.InitalizeBoundSearchStructures(
+                _model.Connectables?.Where(
+                    (x) => x != _model.From && 
+                    x != _model.To && !(x.GetCustomAttribute<DoNotConsiderForConnectorRoutingAttribute>() != null)));
+        }
 
+        bool ExistsIntersectingBounds(Rect r)
+        {
+            return _routingAssistent.ExistsIntersectingBounds(r);
+        }
 
+        bool CheckDocking()
+        {
+            bool ret = true;
+            var lineType = (LineType)((int)_model.StartPointDocking << 8 | (int)_model.EndPointDocking);
+            var mid = new Point((_start.X / 2 + _end.X / 2), (_start.Y / 2 + _end.Y / 2));
+            var r1 = MakeRect(_start, mid);
+            var r2 = MakeRect(mid, _end);
+            switch (lineType)
+            {
+
+                case LineType.BottomTop:
+                case LineType.TopBottom:
+                    r1.X -= 3;
+                    r1.Width = 6;
+                    r2.Width = 6;
+                    r2.X = _end.X-3;
+                    break;
+                
+                case LineType.LeftRight:
+                case LineType.RightLeft:
+                    r1.Y -= 3; r1.Height = 6;
+                    r2.Y = _end.Y - 3; r2.Height = 6;
+                    break;
+                default:
+                    break;
+            }
+        
+            ret = !ExistsIntersectingBounds(r1) && !ExistsIntersectingBounds(r2);
+            if (!ret)
+            {
+                switch (lineType)
+                {
+                    case LineType.BottomTop:
+                        _model.StartPointDocking = ConnectorDocking.Left;
+                        _model.EndPointDocking = ConnectorDocking.Left;
+                        break;        
+                    case LineType.TopBottom:
+                        _model.StartPointDocking = ConnectorDocking.Right;
+                        _model.EndPointDocking = ConnectorDocking.Right;
+                        break;
+                    case LineType.LeftRight:
+                        _model.StartPointDocking = ConnectorDocking.Top;
+                        _model.EndPointDocking = ConnectorDocking.Top;
+                        break;
+                    case LineType.RightLeft:
+                        _model.StartPointDocking = ConnectorDocking.Bottom;
+                        _model.EndPointDocking = ConnectorDocking.Bottom;
+                        break;
+                    default:
+                        ret = true;
+                        break;
+                }
+            }
+            return ret;
+        }
+
+        static Rect MakeRect(Point p1, Point p2)
+        {
+            Point p = new Point(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y));
+            Size s = new Size(Math.Abs(p1.X - p2.X), Math.Abs(p1.Y - p2.Y));
+            return new Rect(p, s);
+        }
 
 
     }

@@ -11,19 +11,23 @@ using System.Runtime.Serialization;
 
 namespace DrawIt.Uml
 {
+    [Serializable]
+    [AllowableConnector(typeof(UmlTransitionModel))]
     public class UmlActionConnector : ConnectableBase
     {
-        new public const double DefaultHeight = 28;
-        new public const double DefaultWidth = 28;
+        new public const double DefaultHeight = 30;
+        new public const double DefaultWidth = 30;
 
         FormattedText _formattedLabel;
+        Point _textPosition = new Point();
 
         public UmlActionConnector(Point p)
             : base(p, new Size(DefaultHeight, DefaultWidth), "A",
-                 Colors.Black)
+                 Colors.White)
         {
             AllowEdit = true;
             AllowSizeChange = false;
+            StrokeThickness = 3;
             UpdateGeometry();
         }
 
@@ -41,15 +45,18 @@ namespace DrawIt.Uml
                 _formattedLabel = ComputeFormattedText(Label,
                     ConnectableBase.DefaultFont,
                     ConnectableBase.DefaultFontSize);
+                _textPosition.Y = (Bounds.Height) / 2.0 - _formattedLabel.Height / 2.0;
+                _textPosition.X = (LabelArea.Width) / 2.0 - _formattedLabel.Width / 2.0;
                 UpdateGeometry();
             }
         }
 
-        public override void RenderAdornments(DrawingContext drawingContext)
-        {
-            drawingContext.DrawText(_formattedLabel,
-                LabelArea.TopLeft);
-        }
+        //public override void RenderAdornments(DrawingContext drawingContext)
+        //{
+            
+        //    drawingContext.DrawText(_formattedLabel, _textPosition
+        //        );
+        //}
 
         public override void UpdateGeometry()
         {
@@ -57,17 +64,14 @@ namespace DrawIt.Uml
             var g = Geometry as GeometryGroup;
 
             g.Children.Clear();
-            g.Children.Add(new RectangleGeometry(
-                Bounds, DefaultHeight/2, DefaultHeight/2));
+            var r = new Rect(0, 0, Bounds.Width, Bounds.Height);
+            //r.X += 1; r.Y += 1; 
+            //if( r.Width > 0 ) r.Width -= 2; 
+            //if( r.Height > 0 ) r.Height -= 2;
+            g.Children.Add(new RectangleGeometry( 
+                r, (r.Width)/2 + 1.0, r.Width/ 2 + 1.0));
         }
 
-        public override RectangleGeometry Outline
-        {
-            get
-            {
-                return new RectangleGeometry(Bounds);
-            }
-        }
 
         protected override void Initialize()
         {
@@ -76,6 +80,8 @@ namespace DrawIt.Uml
                 Label, 
                 ConnectableBase.DefaultFont,
                 ConnectableBase.DefaultFontSize);
+            _textPosition.Y = (Bounds.Top + Bounds.Bottom) / 2.0 - _formattedLabel.Height / 2;
+            _textPosition.X = (LabelArea.Left + LabelArea.Right) / 2.0 - _formattedLabel.Width / 2.0;
         }
 
     }
