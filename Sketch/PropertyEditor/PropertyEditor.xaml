@@ -4,16 +4,21 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Sketch.PropertyEditor"
+             xmlns:ColPic="clr-namespace:Sketch.Controls.ColorPicker"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Control.Resources>
         <local:IntegerConverter x:Key="IntegerConverter"/>
+        <local:DoubleConverter x:Key="DoubleConverter"/>
         <local:RectConverter x:Key="RectangleConverter"/>
-        <local:PropertyTemplateSelector x:Key="TemplateSelector"/>
+        <local:ColorConverter x:Key="ColorConverter"/>
+        <local:PropertyEditTemplateSelector x:Key="EditTemplateSelector"/>
+        <local:PropertyDisplayTemplateSelector x:Key="DisplayTemplateSelector"/>
+        
     </Control.Resources>
     <Grid Background="WhiteSmoke">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
@@ -53,15 +58,33 @@
                 <DataTemplate x:Key="StringValueTemplate">
                     <TextBox Text="{Binding Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" TextWrapping="Wrap"/>
                 </DataTemplate>
+                <DataTemplate x:Key="StringDisplayTemplate">
+                    <TextBlock Text="{Binding Path=Value}"  TextWrapping="Wrap"/>
+                </DataTemplate>
                 <DataTemplate x:Key="IntegerValueTemplate">
                     <TextBox Text="{Binding Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, 
                         Converter={StaticResource IntegerConverter}}" />
                 </DataTemplate>
+                <DataTemplate x:Key="DoubleValueTemplate">
+                    <TextBox Text="{Binding Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, 
+                        Converter={StaticResource DoubleConverter}}" />
+                </DataTemplate>
                 <DataTemplate x:Key="BoolValueTemplate">
                     <CheckBox IsChecked="{Binding Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 </DataTemplate>
-                <DataTemplate x:Key="SimpleCollectionTemplateSimpleCollectionTemplate">
-                    <ComboBox ItemsSource="{Binding ValueNames}" SelectedValue="{Binding Path=Value}"/>
+                <DataTemplate x:Key="SimpleCollectionTemplate">
+                    <ComboBox ItemsSource="{Binding ValueNames}" SelectedValue="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
+                </DataTemplate>
+                <DataTemplate x:Key="ColorDisplayTemplate">
+                    <Border Background="{Binding Value,
+                        Converter={StaticResource ColorConverter}}"/>
+                </DataTemplate>
+                <DataTemplate x:Key="ColorPickerTemplate">
+                    <StackPanel>
+                    <ColPic:ColorPicker SelectedColor="{Binding Value, 
+                        Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        />
+                    </StackPanel>
                 </DataTemplate>
             </DataGrid.Resources>
             <DataGrid.Columns>
@@ -84,8 +107,8 @@
                 </DataGridTextColumn>
                 <DataGridTemplateColumn Header="Property Value"  Width="*"
                                         CellStyle="{StaticResource PropertyValueStyle}"
-                                        CellTemplateSelector="{StaticResource TemplateSelector}"
-                                        CellEditingTemplateSelector="{StaticResource TemplateSelector}" />
+                                        CellTemplateSelector="{StaticResource DisplayTemplateSelector}"
+                                        CellEditingTemplateSelector="{StaticResource EditTemplateSelector}" />
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

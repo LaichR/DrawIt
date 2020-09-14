@@ -21,7 +21,6 @@ namespace Sketch.Models
         
         FontFamily _labelFont;
 
-        [PersistentField(ModelVersion.V_1_1, "Version")]
         ModelVersion _version = ModelVersion.V_1_1;
 
         [PersistentField(ModelVersion.V_0_1,"Label",true)]
@@ -159,28 +158,38 @@ namespace Sketch.Models
         protected virtual void RestoreFieldData(SerializationInfo info, StreamingContext context)
         {
             List<string> persistentNames = new List<string>();
+            // see if there is a version in the stream
             try
             {
                 _version = (ModelVersion)info.GetValue("Version", typeof(ModelVersion));
+                
             }
-            catch { }
+            catch 
+            {
+                _version = ModelVersion.V_0_1; // in case there is no version, set it to an old one!
+            }
+
             var currentType = this.GetType();
             var fields = GetAllPersistentFields();
             foreach ( var f in fields )
             {
+                // the version is restored at this point
                 var persistent = f.GetCustomAttributes(true).OfType<PersistentFieldAttribute>();
-                
-                var persistentSpec = persistent.First();
-                if( persistentSpec.AvalailableSince <= _version)
+
+                if (persistent.Any())
                 {
-                    var val = info.GetValue(persistentSpec.Name, f.FieldType);
-                    f.SetValue(this, val);
-                    persistentNames.Add(persistentSpec.Name);
-                }
-                else if(persistentSpec.Name != "Version")
-                {
-                    Assert.True(persistentSpec.HasDefault, "The field {0} cannot be restored from the current stream",
-                        persistentSpec.Name);
+                    var persistentSpec = persistent.First();
+                    if (persistentSpec.AvalailableSince <= _version)
+                    {
+                        var val = info.GetValue(persistentSpec.Name, f.FieldType);
+                        f.SetValue(this, val);
+                        persistentNames.Add(persistentSpec.Name);
+                    }
+                    else 
+                    {
+                        Assert.True(persistentSpec.HasDefault, "The field {0} cannot be restored from the current stream",
+                            persistentSpec.Name);
+                    }
                 }
                 
             }

@@ -8,7 +8,7 @@ using System.Windows.Controls;
 
 namespace Sketch.PropertyEditor
 {
-    public class PropertyTemplateSelector: DataTemplateSelector
+    public class PropertyEditTemplateSelector: DataTemplateSelector
     {
 
         static readonly Dictionary<Type, string> _typeToTemplateMapping = new Dictionary<Type, string>()
@@ -19,7 +19,9 @@ namespace Sketch.PropertyEditor
             {typeof(long), "IntegerValueTemplate" },
             {typeof(bool), "BoolValueTemplate" },
             {typeof(Rect), "RectValueTemplate" },
-            {typeof(Enum), "" }
+            {typeof(double), "DoubleValueTemplate" },
+            {typeof(Enum), "SimpleCollectionTemplate" },
+            {typeof(System.Windows.Media.Color), "ColorPickerTemplate" }
         };
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
@@ -31,9 +33,13 @@ namespace Sketch.PropertyEditor
                 {
                     return element.FindResource(key) as DataTemplate;
                 }
-                if (item.GetType().IsEnum)
+                if (model.PropertyType == typeof(FontWeight))
                 {
-
+                    return element.FindResource("SimpleCollectionTemplate") as DataTemplate;
+                }
+                if (model.PropertyType.IsEnum)
+                {
+                    return element.FindResource("SimpleCollectionTemplate") as DataTemplate;
                 }
             }
             return base.SelectTemplate(item, container);

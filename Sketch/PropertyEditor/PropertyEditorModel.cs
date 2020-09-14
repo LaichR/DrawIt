@@ -17,8 +17,8 @@ namespace Sketch.PropertyEditor
     {
         ObservableCollection<PropertyValueModel> _properties = new ObservableCollection<PropertyValueModel>();
 
-        DataTemplateSelector _cellTemplateSelector = new PropertyTemplateSelector();
-        DataTemplateSelector _cellEditingTemplateSelector = new PropertyTemplateSelector();
+        DataTemplateSelector _cellTemplateSelector = new PropertyEditTemplateSelector();
+        DataTemplateSelector _cellEditingTemplateSelector = new PropertyEditTemplateSelector();
 
         const string NoObjSelectedLabel = "No Object Selected";
 

@@ -51,6 +51,7 @@ namespace Sketch.Models
 
         [PersistentField(ModelVersion.V_0_1, "IsLabelShown")]
         bool _isLabelShown = false;
+        
 
         [PersistentField(ModelVersion.V_0_1, "Container")]
         SketchItemContainerProxy _containerProxy;
@@ -123,7 +124,7 @@ namespace Sketch.Models
         }
 
         protected ConnectorModel(SerializationInfo info, StreamingContext context)
-            : base(info, context){ }
+            : base(info, context){} // initialize is called in Model Base
 
         public override ISketchItemModel RefModel
         {
@@ -367,11 +368,14 @@ namespace Sketch.Models
 
         public void ShowLabelConnectorStart( Point p)
         {
-            var labelModel = new ConnectorLabelModel(this, true, p);
-            ConnectorStartLabel = labelModel;
-            _cmdHideLabel.RaiseCanExecuteChanged();
-            _cmdShowLabel.RaiseCanExecuteChanged();
-            _isLabelShown = true;
+            if (ConnectorStartLabel == null)
+            {
+                var labelModel = new ConnectorLabelModel(this, true, p);
+                ConnectorStartLabel = labelModel;
+                _cmdHideLabel.RaiseCanExecuteChanged();
+                _cmdShowLabel.RaiseCanExecuteChanged();
+                _isLabelShown = true;
+            }
         }
 
         public void RestoreConnectionEnd()

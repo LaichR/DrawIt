@@ -108,6 +108,7 @@ namespace Sketch.Models
             }
         }
 
+        [Browsable(true)]
         public Color FillColor
         {
             get
@@ -118,6 +119,7 @@ namespace Sketch.Models
             {
                 _fillColor.Color = value;
                 RaisePropertyChanged("Fill");
+                RaisePropertyChanged("FillColor");
             }
         }
 
@@ -172,6 +174,7 @@ namespace Sketch.Models
                         FlowDirection flowDirection = System.Windows.FlowDirection.LeftToRight
             )
         {
+            size = Math.Max(8, size);
             return new FormattedText(label, System.Globalization.CultureInfo.CurrentCulture,
                     flowDirection, typeface, size, Stroke,
                     VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip);
@@ -182,8 +185,9 @@ namespace Sketch.Models
                         double marginX, double marginY)
         {
             var formattedText = ComputeFormattedText(label, typeface, size);
-            return new Size(formattedText.Width + marginX,
-                formattedText.Height + marginY);
+            var textSize = new Size(formattedText.WidthIncludingTrailingWhitespace + marginX,
+                formattedText.Height + formattedText.LineHeight + marginY);
+            return textSize;
         }
 
 

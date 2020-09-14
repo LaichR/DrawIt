@@ -49,7 +49,8 @@ namespace Sketch.Controls
             _container = container;
             Focusable = true;
             Background = Brushes.White;
-            foreach( var item in _container.SketchItems)
+            var items = new List<ISketchItemModel>(_container.SketchItems);
+            foreach( var item in items)
             {
                 AddVisualChild(item);
             }
@@ -59,7 +60,7 @@ namespace Sketch.Controls
             {
                 Visibility = Visibility.Visible;
                 _myLabel = new SketchItemDisplayLabel(container, this);
-                BeginEdit(new AddConnectableItemOperation(this));
+                BeginEdit(new SelectUisOperation(this));
             }
         }
 
@@ -318,6 +319,10 @@ namespace Sketch.Controls
             {
                 _intersectionFinder = new IntersectionFinder(this);
                 AdornerLayer.GetAdornerLayer(this).Add(_intersectionFinder);
+            }
+            else 
+            {
+                _intersectionFinder = null;
             }
         }
 

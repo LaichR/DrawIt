@@ -118,14 +118,19 @@
     <Compile Include="Controls\IntersectionFinder.cs" />
     <Compile Include="Controls\GeometryBorder.cs" />
     <Compile Include="Interface\ISketchPadControl.cs" />
+    <Compile Include="Models\BasicItems\FreeTextModel.cs" />
+    <Compile Include="Models\BasicItems\StrightLineConnector.cs" />
     <Compile Include="Models\DoNotConsiderForConnectorRoutingAttribute.cs" />
     <Compile Include="Models\ModelVersion.cs" />
     <Compile Include="Models\PersistentFieldAttribute.cs" />
     <Compile Include="Models\Sketch.cs" />
     <Compile Include="Models\SketchItemContainerSerializationSurrogate.cs" />
+    <Compile Include="PropertyEditor\ColorConverter.cs" />
+    <Compile Include="PropertyEditor\DoubleConverter.cs" />
+    <Compile Include="PropertyEditor\PropertyDisplayTemplateSelector.cs" />
     <Compile Include="PropertyEditor\RectangleWrapper.cs" />
     <Compile Include="PropertyEditor\RectConverter.cs" />
-    <Compile Include="PropertyEditor\PropertyTemplateSelector.cs" />
+    <Compile Include="PropertyEditor\PropertyEditTemplateSelector.cs" />
     <Compile Include="PropertyEditor\IntegerConverter.cs" />
     <Compile Include="PropertyEditor\ITemplateProvider.cs" />
     <Compile Include="PropertyEditor\PropertyEditor.xaml.cs">
@@ -241,6 +246,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\align_center.png" />
+    <None Include="Resources\free_text.png" />
     <Content Include="Resources\paint_roller.png" />
   </ItemGroup>
   <ItemGroup>
