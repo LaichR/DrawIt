@@ -8,9 +8,9 @@ using System.Windows.Data;
 
 namespace Sketch.PropertyEditor
 {
-    public class IntegerConverter : IValueConverter
+    public class DoubleConverter : IValueConverter
     {
-        public IntegerConverter() { }
+        public DoubleConverter() { }
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -23,13 +23,14 @@ namespace Sketch.PropertyEditor
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null) return 0;
+            if (value == null) return 0.0;
             if (value is string strValue)
             {
                 if (string.IsNullOrEmpty(strValue)) return 0.0;
-                return int.Parse(strValue);
+
+                return double.Parse(strValue);
             }
-            throw new NotSupportedException("conversion not supporeted");   
+            throw new NotSupportedException("conversion not supporeted");
         }
     }
 }

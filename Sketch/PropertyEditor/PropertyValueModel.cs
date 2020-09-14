@@ -14,8 +14,10 @@ namespace Sketch.PropertyEditor
     {
         readonly PropertyInfo _propertyInfo;
         readonly object _parent;
+        readonly string[] _valueNames;
         readonly ITemplateProvider _templateProvider;
         string _displayName;
+        
         bool _getValue = false;
         RectangleWrapper _rectangleWrapper;
         public PropertyValueModel(ITemplateProvider templateProvider, object parent, PropertyInfo propertyInfo)
@@ -33,9 +35,13 @@ namespace Sketch.PropertyEditor
                 _rectangleWrapper = new RectangleWrapper((Rect)_propertyInfo.GetValue(_parent));
                 _rectangleWrapper.PropertyChanged += Wrapper_PropertyChanged;
             }
-            if( parent.GetType().IsEnum)
+            else if(_propertyInfo.PropertyType == typeof(FontWeight))
             {
-
+                _valueNames = typeof(FontWeights).GetProperties(BindingFlags.Static|BindingFlags.Public).Select<PropertyInfo, string>((x) => x.Name).ToArray();
+            }
+            else if(_propertyInfo.PropertyType.IsEnum)
+            {
+                _valueNames = Enum.GetNames(_propertyInfo.PropertyType);
             }
         }
 
@@ -58,7 +64,8 @@ namespace Sketch.PropertyEditor
 
         public Type PropertyType => _propertyInfo.PropertyType;
 
-   
+
+        public string[] ValueNames => _valueNames;
 
         public object Value
         {
@@ -75,12 +82,32 @@ namespace Sketch.PropertyEditor
                         _rectangleWrapper.Assign((Rect)value, true);
                         value = _rectangleWrapper;
                     }
+                    else if( _propertyInfo.PropertyType == typeof(FontWeight))
+                    {
+                        value = new FontWeightConverter().ConvertToInvariantString(
+                            _propertyInfo.GetValue(_parent));
+                    }
+                    else if( _propertyInfo.PropertyType.IsEnum)
+                    {
+                        value = value.ToString();
+                    }
                     _getValue = false;
                 }
                 return value;
             }
 
-            set => _propertyInfo.SetValue(_parent, value);
+            set
+            {
+                if( _propertyInfo.PropertyType.IsEnum )
+                {
+                    value = Enum.Parse(_propertyInfo.PropertyType, value?.ToString(), true);
+                }
+                else if( _propertyInfo.PropertyType == typeof(FontWeight))
+                {
+                    value = new FontWeightConverter().ConvertFromString(value?.ToString());
+                }
+                _propertyInfo.SetValue(_parent, value);
+            }
         }
 
         private void Wrapper_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

@@ -5,31 +5,34 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Windows.Media;
 
 namespace Sketch.PropertyEditor
 {
-    public class IntegerConverter : IValueConverter
+    public class ColorConverter : IValueConverter
     {
-        public IntegerConverter() { }
+        public ColorConverter() { }
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (targetType == typeof(string))
+            if (value is System.Windows.Media.Color col)
             {
-                return value.ToString();
+                if (targetType == typeof(System.Windows.Media.Brush))
+                {
+                    return new SolidColorBrush(col);
+                }
             }
             throw new NotSupportedException();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null) return 0;
-            if (value is string strValue)
+            if (value == null) return Colors.White;
+            if (value is SolidColorBrush brush)
             {
-                if (string.IsNullOrEmpty(strValue)) return 0.0;
-                return int.Parse(strValue);
+                return brush.Color;
             }
-            throw new NotSupportedException("conversion not supporeted");   
+            throw new NotSupportedException("conversion not supporeted");
         }
     }
 }

@@ -7,6 +7,7 @@
   xmlns:Ctrl="clr-namespace:Sketch.Controls"
   xmlns:ColorPicker="clr-namespace:Sketch.Controls.ColorPicker"
     xmlns:models="clr-namespace:Sketch.Models"
+    xmlns:BasicItems="clr-namespace:Sketch.Models.BasicItems"
   >
     <Style x:Key="DecoratorTextStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="10"/>
@@ -27,6 +28,25 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
+    <DataTemplate DataType="{x:Type BasicItems:FreeTextModel}">
+        <Border Background="{Binding Fill}" 
+                BorderThickness="{Binding BorderThickness}" 
+                BorderBrush="{Binding BorderBrush}">
+            <TextBox Style="{StaticResource LabelEditorStyle}" 
+                     TextAlignment="{Binding TextAlignment, UpdateSourceTrigger=PropertyChanged}"
+                     VerticalAlignment="Top"
+                     FontSize="{Binding FontSize}" 
+                     FontFamily="{Binding FontFamily}" 
+                     TextWrapping="Wrap"
+                     Foreground="{Binding TextBrush}"
+                     FontWeight="{Binding FontWeight, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                     FontStyle="{Binding ShownFontStyle, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                     
+                     Margin="2,5,1,5">
+
+            </TextBox>
+        </Border>
+    </DataTemplate>
     <DataTemplate DataType="{x:Type models:ConnectorLabelModel}">
         <Ctrl:GeometryBorder BorderGeometry="{Binding Geometry}" Background="{Binding Fill}" BorderBrush="{Binding Fill}">
         <TextBox Margin="5,5" Style="{StaticResource LabelEditorStyle }"
@@ -726,8 +746,10 @@
                     MaxLength="9"
                     FontFamily="{TemplateBinding FontFamily}"
                     FontSize="{TemplateBinding FontSize}"
-                    Foreground="{TemplateBinding Foreground}"                     
-                    Text="{Binding HexadecimalString, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                    Foreground="Black"                     
+                    Text="{Binding Path=HexadecimalString, Mode=TwoWay,
+                      UpdateSourceTrigger=LostFocus,
+                      RelativeSource={RelativeSource Mode=TemplatedParent}}" />
                     
 
                 </Grid>

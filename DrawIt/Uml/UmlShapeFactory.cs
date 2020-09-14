@@ -16,6 +16,7 @@ using Sketch.Models;
 using DrawIt.Shapes;
 using DrawIt.Properties;
 using Sketch.Interface;
+using Sketch.Models.BasicItems;
 
 namespace DrawIt.Uml
 {
@@ -39,6 +40,7 @@ namespace DrawIt.Uml
             _factory.RegisterSketchItem(typeof(UmlActionConnector), "Connector", "Add an ActionConnector", Properties.Resources.UmlActionConnectorShape);
             _factory.RegisterSketchItem(typeof(UmlActivityModel), "Action", "Add an Action", Properties.Resources.UmlActionShape);
             _factory.RegisterSketchItem(typeof(UmlActivityDiagramEdge), "Activity Diagram Edge", "Add edge to next action or activity", Properties.Resources.UmlAssociationShape);
+            _factory.RegisterSketchItem(typeof(FreeTextModel), "Free text element", "Add a text element to the diagram", Sketch.Properties.Resources.free_text);
             _factory.SetInitialSelection(  typeof(UmlInitialStateModel) );
         }
 
