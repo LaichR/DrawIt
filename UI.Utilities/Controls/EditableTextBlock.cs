@@ -107,15 +107,17 @@ namespace UI.Utilities.Controls
 
         private static void OnEditModeOnChanged(DependencyObject source, DependencyPropertyChangedEventArgs args)
         {
-            var tb = source as EditableTextBlock;
-            var editModeOnNew = Convert.ToBoolean(args.NewValue);
-            var editModeOnOld = Convert.ToBoolean(args.OldValue);
-            if (tb != null && editModeOnNew != editModeOnOld)
+            if (source is EditableTextBlock tb)
             {
-                tb.Focusable = editModeOnNew;
-                if (editModeOnNew)
+                var editModeOnNew = Convert.ToBoolean(args.NewValue);
+                var editModeOnOld = Convert.ToBoolean(args.OldValue);
+                if (tb != null && editModeOnNew != editModeOnOld)
                 {
-                    tb.Focus();
+                    tb.Focusable = editModeOnNew;
+                    if (editModeOnNew)
+                    {
+                        tb.Focus();
+                    }
                 }
             }
         }

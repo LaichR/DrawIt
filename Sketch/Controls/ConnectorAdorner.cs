@@ -15,24 +15,22 @@ namespace Sketch.Controls
 {
     class ConnectorAdorner: Adorner
     {
-        ConnectorModel _model;
-        System.Windows.Media.Geometry _shadowGeometry;
+        readonly ConnectorModel _model;
 
-        ISketchItemDisplay _parent;
+        readonly ISketchItemDisplay _parent;
         double _lineWidht = 3;
         Brush _myLineBrush;
         Brush _myFillBrush;
         Pen _myPen;
-        
         
         public ConnectorAdorner(ISketchItemDisplay parent, ConnectorUI ui)
             :base(ui)
         {
             _parent = parent;
             _model = ((ConnectorUI)this.AdornedElement).Model as ConnectorModel;
-            _shadowGeometry = _model.Geometry;
             this.Visibility = System.Windows.Visibility.Visible;
             this._model.PropertyChanged += OnModelPropertyChanged;
+            
             IsHitTestVisible = true;
             ui.InvalidateVisual();
         }
@@ -56,7 +54,6 @@ namespace Sketch.Controls
             _myFillBrush = _myLineBrush;
 
             _myPen = new Pen(_myLineBrush, _lineWidht);
-            _shadowGeometry = _model.Geometry;
             InvalidateVisual();
         }
 
@@ -95,6 +92,7 @@ namespace Sketch.Controls
                 _model.ConnectorEndSelected = value;
             }
         }
+
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {

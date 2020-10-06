@@ -296,36 +296,35 @@ namespace UI.Utilities.Controls
                     for (int i = 0; i < itemLocator.Items.Count; ++i)
                     {
                         itemLocator.ChildIndex = i;
-                        var node = itemLocator.GetCurrentItem() as Interfaces.IHierarchicalNode;
-
-                        if (node == null) return;
-
-                        if (node.Label == p)
+                        if (itemLocator is Interfaces.IHierarchicalNode node)
                         {
-                            container = itemLocator.GetCurrentChildContainer();
-
-                            selected = container as TreeViewItem;
-                            if (selected != null)
+                            if (node.Label == p)
                             {
+                                container = itemLocator.GetCurrentChildContainer();
 
-                                if (selected.Items.Count > 0)
+                                selected = container as TreeViewItem;
+                                if (selected != null)
                                 {
-                                    item = selected.Items[0];
+
+                                    if (selected.Items.Count > 0)
+                                    {
+                                        item = selected.Items[0];
+                                    }
+                                    selected.IsExpanded = true;
+                                    selected.IsSelected = true;
+                                    selected.Focus();
+                                    selected.BringIntoView();
+                                    this.UpdateLayout();
                                 }
-                                selected.IsExpanded = true;
-                                selected.IsSelected = true;
-                                selected.Focus();
-                                selected.BringIntoView();
-                                this.UpdateLayout();
+                                break;
                             }
-                            break;
-                        }
-                        else
-                        {
-                            var notSelected = container as TreeViewItem;
-                            if (notSelected != null)
+                            else
                             {
-                                notSelected.IsExpanded = false;
+                                var notSelected = container as TreeViewItem;
+                                if (notSelected != null)
+                                {
+                                    notSelected.IsExpanded = false;
+                                }
                             }
                         }
                     }

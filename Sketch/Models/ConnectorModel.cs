@@ -11,6 +11,8 @@ using Prism.Commands;
 using UI.Utilities.Interfaces;
 using UI.Utilities.Behaviors;
 using Sketch.Interface;
+using System.Net;
+using System.ComponentModel;
 
 namespace Sketch.Models
 {
@@ -30,7 +32,8 @@ namespace Sketch.Models
 
         DoubleCollection _dashArray;
         IConnectorStrategy _myConnectorStrategy;
-
+        bool _connectorStartSelected;
+        bool _connectorEndSelected;
         
         PathGeometry _path = new PathGeometry();
         GeometryGroup _geometry = new GeometryGroup();
@@ -51,7 +54,14 @@ namespace Sketch.Models
 
         [PersistentField(ModelVersion.V_0_1, "IsLabelShown")]
         bool _isLabelShown = false;
-        
+        [PersistentField(ModelVersion.V_2_0, "IsEndpointLabelShown", true)]
+        bool _isEndpointLabelShown = false;
+
+        [PersistentField(ModelVersion.V_2_0, "EndpointLabel", true)]
+        string _endPointLabel = "Endpoint";
+
+        [PersistentField(ModelVersion.V_2_0, "EndpointLabelArea")]
+        Rect _endPointLabelArea;
 
         [PersistentField(ModelVersion.V_0_1, "Container")]
         SketchItemContainerProxy _containerProxy;
@@ -69,6 +79,7 @@ namespace Sketch.Models
 
         
         ConnectorLabelModel _connectorStartLabel;
+        ConnectorLabelModel _connectorEndLabel;
 
         
         DelegateCommand _cmdShowLabel;
@@ -113,7 +124,11 @@ namespace Sketch.Models
             _cmdUpdateTo = new DelegateCommand(ExecuteChangeTo);
             if (_isLabelShown)
             {
-                ExecuteShowLabel();
+                ShowConnectorLabel(GetLabelPosition(true), true);
+            }
+            if( _isEndpointLabelShown )
+            {
+                ShowConnectorLabel(GetLabelPosition(false), false);
             }
             UpdateGeometry();
         }
@@ -133,6 +148,8 @@ namespace Sketch.Models
                 return _connectorStartLabel;
             }
         }
+
+
 
         public bool FillEndings
         {
@@ -203,14 +220,22 @@ namespace Sketch.Models
 
         public bool ConnectorStartSelected
         {
-            get;
-            set;
+            get => _connectorStartSelected;
+            set
+            {
+                SetProperty<bool>(ref _connectorStartSelected, value);
+                _cmdShowLabel.RaiseCanExecuteChanged();
+            }
         }
 
         public bool ConnectorEndSelected
         {
-            get;
-            set;
+            get => _connectorEndSelected;
+            set
+            {
+                SetProperty<bool>(ref _connectorEndSelected, value);
+                _cmdShowLabel.RaiseCanExecuteChanged();
+            }
         }
 
         public ConnectorLabelModel ConnectorStartLabel
@@ -222,7 +247,32 @@ namespace Sketch.Models
             private set
             {
                 SetProperty<ConnectorLabelModel>(ref _connectorStartLabel, value );
+                _cmdHideLabel.RaiseCanExecuteChanged();
+                _cmdShowLabel.RaiseCanExecuteChanged();
             }
+        }
+
+        public ConnectorLabelModel ConnectorEndLabel
+        {
+            get
+            {
+                return _connectorEndLabel;
+            }
+            private set
+            {
+                SetProperty<ConnectorLabelModel>(ref _connectorEndLabel, value);
+                _cmdHideLabel.RaiseCanExecuteChanged();
+                _cmdShowLabel.RaiseCanExecuteChanged();
+            }
+        }
+
+        public string GetLabel(bool isStartPointLabel)
+        {
+            if( isStartPointLabel)
+            {
+                return Label;
+            }
+            return _endPointLabel;
         }
 
         public IEnumerable<ConnectorModel> SiblingConnections => 
@@ -273,6 +323,16 @@ namespace Sketch.Models
                     updateTo,
                     updateFrom
                 };
+            }
+        }
+
+        [Browsable(true)]
+        public string EndpointLabel
+        {
+            get => _endPointLabel;
+            set
+            {
+                SetProperty<string>(ref _endPointLabel, value);
             }
         }
 
@@ -362,19 +422,30 @@ namespace Sketch.Models
             base.FieldDataRestored();
             _container = _containerProxy.Container;
             _myConnectorStrategy = ConnectorUtilities.GetConnectionType(this, _connectionType);
-
         }
 
 
-        public void ShowLabelConnectorStart( Point p)
+        public void ShowConnectorLabel( Point p, bool isConnectorStartLabel)
         {
-            if (ConnectorStartLabel == null)
+           
+           
+            if (isConnectorStartLabel)
             {
-                var labelModel = new ConnectorLabelModel(this, true, p);
-                ConnectorStartLabel = labelModel;
-                _cmdHideLabel.RaiseCanExecuteChanged();
-                _cmdShowLabel.RaiseCanExecuteChanged();
-                _isLabelShown = true;
+                if (ConnectorStartLabel == null)
+                {
+                    var labelModel = new ConnectorLabelModel(this, true, p);
+                    ConnectorStartLabel = labelModel;
+                    _isLabelShown = true;
+                }
+            }
+            else
+            {
+                if (ConnectorEndLabel == null)
+                {
+                    var labelModel = new ConnectorLabelModel(this, false, p);
+                    ConnectorEndLabel = labelModel;
+                    _isEndpointLabelShown = true;
+                }
             }
         }
 
@@ -396,9 +467,52 @@ namespace Sketch.Models
             }
         }
 
-        Point GetLabelPosition()
+        Point GetLabelPosition(bool isStartpointLabel)
         {
-            if (LabelArea.Width == 0)
+            var labelArea = GetLabelArea(isStartpointLabel);
+            if (labelArea.Width == 0)
+            {
+                return GetPositionFromDocking(isStartpointLabel);
+            }
+            return labelArea.Location;
+        }
+
+        public Rect GetLabelArea(bool isStartPointLabel)
+        {
+            if (isStartPointLabel) return LabelArea;
+            return _endPointLabelArea;
+        }
+
+        public void SetLabelArea(bool isStartPointLabel, Rect r)
+        {
+            if (isStartPointLabel)
+            {
+                LabelArea = r;
+            }
+            else
+            {
+                _endPointLabelArea = r;
+                RaisePropertyChanged("LabelArea");
+            }
+        }
+
+        public void SetLabel(bool isStartPointLabel, string l)
+        {
+            if(isStartPointLabel )
+            {
+                Label = l;
+            }
+            else
+            {
+                _endPointLabel = l;
+                RaisePropertyChanged("Label");
+            }
+        }
+
+
+        Point GetPositionFromDocking( bool isStartPointLabel)
+        {
+            if( isStartPointLabel)
             {
                 switch (StartPointDocking)
                 {
@@ -451,7 +565,57 @@ namespace Sketch.Models
 
                 }
             }
-            return LabelArea.Location;
+            else
+            {
+                switch( EndPointDocking)
+                {
+                    case ConnectorDocking.Top:
+                        {
+                            double y = ConnectorEnd.Y - LabelDistanceY - LabelDefaultHeight;
+                            double x = ConnectorEnd.X + LabelDistanceX;
+                            if (ConnectorEnd.X > ConnectorEnd.X)
+                            {
+                                x = ConnectorEnd.X - LabelDistanceX - LabelDefaultWidht;
+                            }
+                            return new Point(x, y);
+                        }
+                    case ConnectorDocking.Bottom:
+                        {
+                            double y = ConnectorEnd.Y + LabelDistanceY;
+                            double x = ConnectorEnd.X + LabelDistanceX;
+                            if (ConnectorEnd.X > ConnectorStart.X)
+                            {
+                                x = ConnectorEnd.X - LabelDistanceX - LabelDefaultWidht;
+                            }
+                            return new Point(x, y);
+                        }
+                    case ConnectorDocking.Left:
+                        {
+                            double y = ConnectorEnd.Y - LabelDistanceY - LabelDefaultHeight;
+                            double x = ConnectorEnd.X - LabelDistanceX;
+                            if (ConnectorEnd.Y < ConnectorEnd.Y)
+                            {
+                                y = ConnectorEnd.Y + LabelDistanceY;
+                            }
+                            return new Point(x, y);
+                        }
+                    case ConnectorDocking.Right:
+                        {
+                            double y = ConnectorEnd.Y - LabelDistanceY - LabelDefaultHeight;
+                            double x = ConnectorEnd.X - LabelDistanceX - LabelDefaultWidht;
+
+                            if (ConnectorEnd.Y < ConnectorEnd.Y)
+                            {
+                                y = ConnectorEnd.Y + LabelDistanceY;
+                            }
+                            return new Point(x, y);
+                        }
+
+                    default:
+                        throw new NotSupportedException("the end point has no docking");
+                        
+                }
+            }
         }
 
         Rect GetHotSpotRectangle(Point p)
@@ -463,12 +627,13 @@ namespace Sketch.Models
 
         void ExecuteShowLabel()
         {
-            ShowLabelConnectorStart(GetLabelPosition());
+            ShowConnectorLabel(GetLabelPosition(ConnectorStartSelected), ConnectorStartSelected);
         }
 
         bool CanExecuteShowLabel()
         {
-            var ret = _connectorStartLabel == null;
+            var ret = (_connectorStartLabel == null && _connectorStartSelected) ||
+                (_connectorEndLabel == null && _connectorEndSelected);
 
             return ret;
         }
@@ -476,7 +641,9 @@ namespace Sketch.Models
         void ExecuteHideLabel()
         {
             ConnectorStartLabel = null;
+            ConnectorEndLabel = null;
             _isLabelShown = false;
+            _isEndpointLabelShown = false;
             _cmdHideLabel.RaiseCanExecuteChanged();
             _cmdShowLabel.RaiseCanExecuteChanged();
         }

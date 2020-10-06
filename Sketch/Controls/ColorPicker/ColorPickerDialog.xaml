@@ -11,8 +11,8 @@
       Orientation="Horizontal"
       HorizontalAlignment="Right" 
       Margin="10">
-            <Button Name="OKButton" Click="okButtonClicked" IsEnabled="False" Margin="5,5,5,5">OK</Button>
-            <Button Click="cancelButtonClicked" Margin="5,5,5,5">Cancel</Button>
+            <Button Name="OKButton" Click="OkButtonClicked" IsEnabled="False" Margin="5,5,5,5">OK</Button>
+            <Button Click="CancelButtonClicked" Margin="5,5,5,5">Cancel</Button>
         </StackPanel>
         <customCtrl:ColorPicker x:Name="cPicker"
             SelectedColorChanged="onSelectedColorChanged"

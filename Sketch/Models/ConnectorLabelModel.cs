@@ -12,26 +12,31 @@ namespace Sketch.Models
 {
     /// <summary>
     /// Model of a label that belongs to a connector. 
-    /// A label can be attached to the  starting point or the end point of a connector
+    /// A ConnectorLabelModel can be attached to 
+    /// - the  starting point 
+    /// - the end point of a connector
+    /// A connector may have two labels at the same time
+    /// The Label of the connector always refers to the Label of the Starting Point.
+    /// 
     /// </summary>
     /// 
     [DoNotConsiderForConnectorRouting]
     public class ConnectorLabelModel : ConnectableBase
     {
         bool _geometryUpdating = false;
-        ConnectorModel _connector;
-        bool _isStartpointLabel;
+        readonly ConnectorModel _connector;
+        readonly bool _isStartpointLabel;
         System.Windows.Point _labelPosition;
         
         LineGeometry _linkToConnector;
-        FormattedText _formattedText;
+        //FormattedText _formattedText;
         
         List<UI.Utilities.Interfaces.ICommandDescriptor> _tools = new List<UI.Utilities.Interfaces.ICommandDescriptor>();
 
         public ConnectorLabelModel(ConnectorModel connector, bool isStartPointLabel, Point labelPosition)
             :base(labelPosition, 
-                 ComputeSizeOfBounds(connector.Label), 
-                 connector.Label, Colors.Snow )
+                 ComputeSizeOfBounds(connector.GetLabel(isStartPointLabel)), 
+                 connector.GetLabel(isStartPointLabel), Colors.Snow )
         {
             _connector = connector;
             _connector.PropertyChanged += _connector_PropertyChanged;
@@ -63,11 +68,11 @@ namespace Sketch.Models
         {
             get
             {
-                return _connector.Label;
+                return _connector.GetLabel(_isStartpointLabel);
             }
             set
             {
-                _connector.Label = value;
+                _connector.SetLabel(_isStartpointLabel, value );
                 AdjustBounds();
                 RaisePropertyChanged();
             }
@@ -128,7 +133,7 @@ namespace Sketch.Models
             set
             {
                 base.Bounds = value;
-                _connector.LabelArea = Bounds;
+                _connector.SetLabelArea(_isStartpointLabel, Bounds);
             }
         }
 

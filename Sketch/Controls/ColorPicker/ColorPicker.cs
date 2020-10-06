@@ -519,8 +519,10 @@ namespace Sketch.Controls.ColorPicker
             {
                 SetColor(newColor);
                 RoutedPropertyChangedEventArgs<Color> newEventArgs =
-                    new RoutedPropertyChangedEventArgs<Color>(oldColor, newColor);
-                    newEventArgs.RoutedEvent = ColorPicker.SelectedColorChangedEvent;
+                    new RoutedPropertyChangedEventArgs<Color>(oldColor, newColor)
+                    {
+                        RoutedEvent = ColorPicker.SelectedColorChangedEvent
+                    };
                 RaiseEvent(newEventArgs);
             }
         }
@@ -557,7 +559,7 @@ namespace Sketch.Controls.ColorPicker
             if (_colorPosition != null)
             {
 
-                determineColor((Point)_colorPosition);
+                DetermineColor((Point)_colorPosition);
             }
 
         }
@@ -627,7 +629,7 @@ namespace Sketch.Controls.ColorPicker
             p.X /= _colorDetail.ActualWidth;
             p.Y /= _colorDetail.ActualHeight;
             _colorPosition = p;
-            determineColor(p);
+            DetermineColor(p);
         }
 
         private void UpdateMarkerPosition(Color theColor)
@@ -649,7 +651,7 @@ namespace Sketch.Controls.ColorPicker
 
         }
 
-        private void determineColor(Point p)
+        private void DetermineColor(Point p)
         {
 
             HsvColor hsv = new HsvColor(360 - _colorSlider.Value, 1, 1)
@@ -674,7 +676,7 @@ namespace Sketch.Controls.ColorPicker
         private static readonly string ColorSliderName = "PART_ColorSlider";
         private FrameworkElement _colorDetail;
         private static readonly string ColorDetailName = "PART_ColorDetail";
-        private TranslateTransform markerTransform = new TranslateTransform();
+        readonly private TranslateTransform markerTransform = new TranslateTransform();
         private Path _colorMarker;
         private static readonly string ColorMarkerName = "PART_ColorMarker";
         private Point? _colorPosition;

@@ -25,7 +25,7 @@ namespace Sketch.Controls.ColorPicker
             InitializeComponent();
         }
 
-        private void okButtonClicked(object sender, RoutedEventArgs e)
+        private void OkButtonClicked(object sender, RoutedEventArgs e)
         {
 
             OKButton.IsEnabled = false;
@@ -36,7 +36,7 @@ namespace Sketch.Controls.ColorPicker
         }
 
 
-        private void cancelButtonClicked(object sender, RoutedEventArgs e)
+        private void CancelButtonClicked(object sender, RoutedEventArgs e)
         {
 
             OKButton.IsEnabled = false;
@@ -44,7 +44,7 @@ namespace Sketch.Controls.ColorPicker
 
         }
 
-        private void onSelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color> e)
+        private void OnSelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color> e)
         {
 
             if (e.NewValue != _color)

@@ -25,7 +25,7 @@ namespace UI.Utilities.Controls.ShowError.View
     public partial class ShowErrorDlg : Window
     {
 
-        ViewModel.ViewModel _model;
+        readonly ViewModel.ViewModel _model;
 
         public ShowErrorDlg(string title, Exception ex, bool showStackTrace)
         {

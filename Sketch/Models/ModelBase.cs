@@ -19,9 +19,9 @@ namespace Sketch.Models
     public abstract class ModelBase : Prism.Mvvm.BindableBase, IHierarchicalNode, ISketchItemModel
     {
         
-        FontFamily _labelFont;
+        //FontFamily _labelFont;
 
-        ModelVersion _version = ModelVersion.V_1_1;
+        ModelVersion _version = ModelVersion.V_2_0;
 
         [PersistentField(ModelVersion.V_0_1,"Label",true)]
         string _label = "";
@@ -63,6 +63,14 @@ namespace Sketch.Models
         }
 
         public abstract void UpdateGeometry();
+
+
+        public virtual ModelVersion Version
+        {
+            get => _version;
+            set => _version = value;
+        }
+
 
         public virtual ISketchItemModel RefModel
         {
@@ -135,13 +143,13 @@ namespace Sketch.Models
         {
             PrepareFieldBackup();
             var fields = GetAllPersistentFields();
+            info.AddValue(nameof(Version), Version);
             foreach (var f in fields) 
             {
                 var persistent = f.GetCustomAttributes(true).OfType<PersistentFieldAttribute>();
                 
                 var persistentSpec = persistent.First();
                 info.AddValue(persistentSpec.Name, f.GetValue(this), f.FieldType);
-                
             }
         }
 
@@ -161,10 +169,10 @@ namespace Sketch.Models
             // see if there is a version in the stream
             try
             {
-                _version = (ModelVersion)info.GetValue("Version", typeof(ModelVersion));
+                Version = (ModelVersion)info.GetValue(nameof(Version), typeof(ModelVersion));
                 
             }
-            catch 
+            catch
             {
                 _version = ModelVersion.V_0_1; // in case there is no version, set it to an old one!
             }
@@ -181,6 +189,7 @@ namespace Sketch.Models
                     var persistentSpec = persistent.First();
                     if (persistentSpec.AvalailableSince <= _version)
                     {
+                        
                         var val = info.GetValue(persistentSpec.Name, f.FieldType);
                         f.SetValue(this, val);
                         persistentNames.Add(persistentSpec.Name);

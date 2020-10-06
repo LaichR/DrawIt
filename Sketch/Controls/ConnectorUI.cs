@@ -41,6 +41,10 @@ namespace Sketch.Controls
             DependencyProperty.Register("ConnectorStartLabel", typeof(ConnectorLabelModel), typeof(ConnectorUI),
             new PropertyMetadata(OnConnectorStartLabelChanged));
 
+        public static readonly DependencyProperty ConnectorEndLabelProperty =
+            DependencyProperty.Register("ConnectorEndLabel", typeof(ConnectorLabelModel), typeof(ConnectorUI),
+            new PropertyMetadata(OnConnectorEndLabelChanged));
+
         public static readonly DependencyProperty FromProperty =
             DependencyProperty.Register("From", typeof(ConnectableBase), typeof(ConnectorUI),
             new PropertyMetadata(OnFromChanged));
@@ -55,16 +59,16 @@ namespace Sketch.Controls
 
 
 
-        ConnectorModel _model;
-        ISketchItemDisplay _parent;
+        readonly ConnectorModel _model;
+        readonly ISketchItemDisplay _parent;
         Geometry _myGeometry = null;
         IEditOperation _currentOperationHandler;
         int _lineWidth;
         Brush _lineBrush;
-        static Brush _selectedLineBrush = new SolidColorBrush(Colors.Blue) { Opacity = 0.5 };
-        static Pen _hitTestPen = new Pen() { Thickness = 20 };
+        static readonly Brush _selectedLineBrush = new SolidColorBrush(Colors.Blue) { Opacity = 0.5 };
+        static readonly Pen _hitTestPen = new Pen() { Thickness = 20 };
 
-        Adorner _myAdorner;
+        readonly Adorner _myAdorner;
         bool _addornerAdded = false;
 
 
@@ -75,25 +79,32 @@ namespace Sketch.Controls
             this.DataContext = _model;
 
             _myAdorner = new ConnectorAdorner(_parent, this);
-
-            var isSelectedBinding = new Binding("IsSelected");
-            isSelectedBinding.Mode = BindingMode.TwoWay;
+            _myAdorner.MouseLeftButtonDown += Adorner_MouseLeftButtonDown;
+            _myAdorner.MouseRightButtonDown += Adorner_MouseRightButtonDown;
+            var isSelectedBinding = new Binding("IsSelected")
+            {
+                Mode = BindingMode.TwoWay
+            };
+            
             this.SetBinding(IsSelectedPropery, isSelectedBinding );
 
-            var startLabelBinding = new Binding("ConnectorStartLabel");
-            startLabelBinding.Mode = BindingMode.OneWay;
+            var startLabelBinding = new Binding("ConnectorStartLabel") { Mode = BindingMode.OneWay };
+            
             this.SetBinding(ConnectorStartLabelProperty, startLabelBinding);
 
-            var contextMenuBinding = new Binding("ContextMenuDeclaration");
-            contextMenuBinding.Mode = BindingMode.OneWay;
+            var endLabelBinding = new Binding("ConnectorEndLabel") { Mode = BindingMode.OneWay };
+            this.SetBinding(ConnectorEndLabelProperty, endLabelBinding);
+
+            var contextMenuBinding = new Binding("ContextMenuDeclaration") { Mode = BindingMode.OneWay };
+            
             this.SetBinding(ContextMenuDeclarationProperty, contextMenuBinding);
 
-            var fromBinding = new Binding("From");
-            fromBinding.Mode = BindingMode.OneWay;
+            var fromBinding = new Binding("From") { Mode = BindingMode.OneWay };
+            
             this.SetBinding(FromProperty, fromBinding);
 
-            var toBinding = new Binding("To");
-            toBinding.Mode = BindingMode.OneWay;
+            var toBinding = new Binding("To") { Mode = BindingMode.OneWay };
+            
             this.SetBinding(ToProperty, toBinding);
 
             SetBinding(StrokeDashArrayProperty,
@@ -110,7 +121,6 @@ namespace Sketch.Controls
             _myGeometry = _model.Geometry;
 
             AddAdorner();
-            _myAdorner.MouseLeftButtonDown += Adorner_MouseLeftButtonDown;
             this.SetBinding(GeometryProperty, "Geometry");
             
         }
@@ -118,6 +128,15 @@ namespace Sketch.Controls
         private void Adorner_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             this.OnMouseLeftButtonDown(e);
+        }
+
+        private void Adorner_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            this.OnMouseRightButtonDown(e);
+            if (ContextMenu != null)
+            {
+                this.ContextMenu.IsOpen = true;
+            }
         }
 
         public bool IsSelected
@@ -145,6 +164,12 @@ namespace Sketch.Controls
         {
             get { return (ConnectorLabelModel)GetValue(ConnectorStartLabelProperty); }
             set { SetValue(ConnectorStartLabelProperty, value); }
+        }
+
+        public ConnectorLabelModel ConnectorEndLabel
+        {
+            get { return (ConnectorLabelModel)GetValue(ConnectorEndLabelProperty); }
+            set { SetValue(ConnectorEndLabelProperty, value); }
         }
 
         public ConnectableBase From
@@ -325,9 +350,8 @@ namespace Sketch.Controls
             var pos = ConnectorUtilities.ComputeRelativePositionOfPoints(startPoint, endPoint);
 
             LineType lineType = (LineType)((int)_model.StartPointDocking << 8 | (int)_model.EndPointDocking);
-            SortedSet<RelativePosition> possibleConfigurations = null;
 
-            if (AllowedRelativePositions.Table.TryGetValue(lineType, out possibleConfigurations))
+            if (AllowedRelativePositions.Table.TryGetValue(lineType, out SortedSet<RelativePosition> possibleConfigurations))
             {
                 if (!possibleConfigurations.Contains(pos))
                 {
@@ -444,8 +468,8 @@ namespace Sketch.Controls
         private static void OnContextMenuDeclarationChanged(DependencyObject source,
              DependencyPropertyChangedEventArgs e)
         {
-            var me = source as ConnectorUI;
-            if( me != null)
+            
+            if( source is ConnectorUI me)
             {
                 var commands = e.NewValue as IList<ICommandDescriptor>;
                 if (commands != null)
@@ -465,6 +489,18 @@ namespace Sketch.Controls
                 me.UpdateLabel(e.OldValue, e.NewValue);
             }
             
+        }
+
+        private static void OnConnectorEndLabelChanged(DependencyObject source,
+            DependencyPropertyChangedEventArgs e)
+        {
+
+            var me = source as ConnectorUI;
+            if (me != null)
+            {
+                me.UpdateLabel(e.OldValue, e.NewValue);
+            }
+
         }
 
         private static void OnConnectorEndDecorationChanged(DependencyObject source,

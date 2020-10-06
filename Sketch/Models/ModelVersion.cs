@@ -10,5 +10,6 @@ namespace Sketch.Models
     {
         V_0_1 = 0,
         V_1_1 = 1,
+        V_2_0 = 2,
     };
 }

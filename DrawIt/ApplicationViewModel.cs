@@ -47,7 +47,7 @@ namespace DrawIt
 
         bool _isEditMode;
         bool _isInsertMode;
-        string _label = "No Name";
+        //string _label = "No Name";
         EditMode _editMode;
         object _selectedItem;
         Sketch.Models.Sketch _sketch;

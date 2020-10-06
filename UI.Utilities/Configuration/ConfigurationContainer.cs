@@ -105,8 +105,7 @@ namespace UI.Utilities.Configuration
                 {
                     if (reader.NodeType == XmlNodeType.Element)
                     {
-                        PropertyInfo pi = null;
-                        if (_propertyDictionary.TryGetValue(reader.Name, out pi))
+                        if (_propertyDictionary.TryGetValue(reader.Name, out PropertyInfo pi))
                         {
                             object value = null;
                             if (pi.PropertyType == typeof(string))

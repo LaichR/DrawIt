@@ -55,7 +55,7 @@ namespace Sketch.Controls
         bool _isNotifyingSelectionChange;
         bool _isNotifyingMarkingChanged;
         RelativePosition _mouseMoveHitResult;
-        Point _lastMouseDown; // this is used to show the tools if the model allows this
+        
         Models.ConnectableBase _model;
         ISketchItemDisplay _parent;
         SketchPad _sketchPad;

@@ -60,11 +60,11 @@ namespace Sketch.Models.BasicItems
 
         [PersistentField(ModelVersion.V_1_1, "BorderColor")]
         SerializableColor _borderColor = new SerializableColor() { Color = Colors.Black };
-        Brush _borderBrush;
+        //Brush _borderBrush;
 
         [PersistentField(ModelVersion.V_1_1, "TextColor")]
         SerializableColor _textColor = new SerializableColor() { Color = Colors.Black };
-        Brush _textBrush;
+        //Brush _textBrush;
 
         new const double DefaultHeight = 30;
         new const double DefaultWidth = 75;

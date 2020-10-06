@@ -59,11 +59,14 @@ namespace UI.Utilities
         {
             get
             {
-                List<float> scrgb = new List<float>();
-                scrgb.Add(_color.ScA );
-                scrgb.Add(_color.ScR);
-                scrgb.Add(_color.ScG);
-                scrgb.Add(_color.ScB);
+                List<float> scrgb = new List<float>()
+                {
+                    _color.ScA,
+                    _color.ScR,
+                    _color.ScG,
+                    _color.ScB
+                };
+                
                 return scrgb.ToArray();
             }
             set
@@ -102,7 +105,7 @@ namespace UI.Utilities
         public void WriteXml(System.Xml.XmlWriter writer)
         {
             var values = ScRgb;
-            writer.WriteString(string.Format("{0},{1},{2},{3}", values ));
+            writer.WriteString(string.Format("{0},{1},{2},{3}", values[0], values[1], values[2], values[3]  ));
         }
     }
 }

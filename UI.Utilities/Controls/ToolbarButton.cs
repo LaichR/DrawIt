@@ -18,7 +18,7 @@ namespace UI.Utilities.Controls
             DependencyProperty.Register("ImageBitmap", typeof(System.Drawing.Bitmap), typeof(ToolbarButton),
             new PropertyMetadata(OnBitmapPropertyChanged));
 
-        System.Windows.Controls.Image _image;
+        readonly System.Windows.Controls.Image _image;
 
         static ToolbarButton()
         {
@@ -37,8 +37,11 @@ namespace UI.Utilities.Controls
         public ToolbarButton(object viewModel, Bitmap bitmap, Dictionary<string, DependencyProperty> bindings)
         {
             this.Margin = new Thickness(5, 0, 0, 0);
-            _image = new System.Windows.Controls.Image();
-            _image.Source = UI.Utilities.ToBitmapSource.Bitmap2BitmapSource(bitmap);
+            _image = new System.Windows.Controls.Image()
+            {
+                Source = UI.Utilities.ToBitmapSource.Bitmap2BitmapSource(bitmap)
+            };
+        
 
             var stackPanel = new StackPanel();
             stackPanel.Children.Add(_image);
@@ -57,9 +60,11 @@ namespace UI.Utilities.Controls
 
         public ToolbarButton(object viewModel, Bitmap bitmap, TextBox textbox, Dictionary<string, DependencyProperty> bindings)
         {
-            _image = new System.Windows.Controls.Image();
-            _image.Source = UI.Utilities.ToBitmapSource.Bitmap2BitmapSource(bitmap);
-
+            _image = new System.Windows.Controls.Image() 
+            { 
+                Source = UI.Utilities.ToBitmapSource.Bitmap2BitmapSource(bitmap)
+            };
+            
             var stackPanel = new StackPanel() { Orientation = Orientation.Horizontal};
             stackPanel.Children.Add(_image);
             stackPanel.Children.Add(textbox);
@@ -77,8 +82,11 @@ namespace UI.Utilities.Controls
 
         public ToolbarButton(object viewModel, Bitmap bitmap, ComboBox combobox, Dictionary<string, DependencyProperty> bindings)
         {
-            _image = new System.Windows.Controls.Image();
-            _image.Source = UI.Utilities.ToBitmapSource.Bitmap2BitmapSource(bitmap);
+            _image = new System.Windows.Controls.Image()
+            {
+                Source = UI.Utilities.ToBitmapSource.Bitmap2BitmapSource(bitmap)
+            };
+            
 
             var stackPanel = new StackPanel() { Orientation = Orientation.Horizontal };
             stackPanel.Children.Add(_image);
@@ -122,11 +130,13 @@ namespace UI.Utilities.Controls
 
         private static void IsEnabledPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs args)
         {
-            var button = source as ToolbarButton;
-            var isEnable = Convert.ToBoolean(args.NewValue);
-            if (button != null && button._image.Source != null)
+            if (source is ToolbarButton button)
             {
-                RefreshBitmap(button, isEnable);
+                var isEnable = Convert.ToBoolean(args.NewValue);
+                if (button != null && button._image.Source != null)
+                {
+                    RefreshBitmap(button, isEnable);
+                }
             }
         }
         private static void RefreshBitmap(ToolbarButton button, bool isEnable)

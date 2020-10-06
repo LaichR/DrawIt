@@ -7,6 +7,7 @@ using Sketch.Models;
 using Sketch.Models.Geometries;
 using System.Runtime.Serialization;
 using System.Drawing;
+using System.ComponentModel;
 
 namespace DrawIt.Uml
 {
@@ -16,6 +17,9 @@ namespace DrawIt.Uml
     [AllowableConnectorTarget(typeof(UmlPackageModel))]
     public class UmlAssociationModel: ConnectorModel
     {
+
+        [PersistentField(ModelVersion.V_2_0, nameof(IsDirected), true)]
+        bool _isDirected = true;
 
         public UmlAssociationModel( ConnectionType type, IBoundedItemModel from, IBoundedItemModel to,
             ISketchItemContainer container)
@@ -32,11 +36,25 @@ namespace DrawIt.Uml
         {
             base.UpdateGeometry();
             var g = Geometry as GeometryGroup;
-            g.Children.Add(new Arrow
+            if (IsDirected)
             {
-                Translation = new Vector(ConnectorStrategy.ConnectionEnd.X, ConnectorStrategy.ConnectionEnd.Y),
-                Rotation = ConnectorStrategy.EndAngle
-            }.Ending);
+                g.Children.Add(new Arrow
+                {
+                    Translation = new Vector(ConnectorStrategy.ConnectionEnd.X, ConnectorStrategy.ConnectionEnd.Y),
+                    Rotation = ConnectorStrategy.EndAngle
+                }.Ending);
+            }
+        }
+
+        [Browsable(true)]
+        public bool IsDirected
+        {
+            get => _isDirected;
+            set
+            {
+                SetProperty<bool>(ref _isDirected, value);
+                UpdateGeometry();
+            }
         }
 
     }

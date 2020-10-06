@@ -15,13 +15,13 @@ namespace Sketch.Controls
     internal class ConnectablePairSelector: Shape
     {
         Point _start;
-        Point _temporaryEnd;
+       
         PathGeometry _myGeometry;
 
         public ConnectablePairSelector( Point start, Point tmp )
         {
             _start = start;
-            _temporaryEnd = tmp;
+            
             ComputePath(tmp);
             this.Stroke = Brushes.Black;
             this.StrokeDashArray.Add(5.0);
@@ -42,9 +42,12 @@ namespace Sketch.Controls
             List<System.Windows.Media.PathFigure> path = new List<System.Windows.Media.PathFigure>();
             System.Windows.Media.PathSegmentCollection ls = new System.Windows.Media.PathSegmentCollection();
             ls.Add(new System.Windows.Media.LineSegment(p, true));
-            var pf = new System.Windows.Media.PathFigure();
-            pf.StartPoint = _start;
-            pf.Segments = ls;
+            var pf = new System.Windows.Media.PathFigure()
+            {
+                StartPoint = _start,
+                Segments = ls
+            };
+
             path.Add(pf);
             
             _myGeometry = new PathGeometry(path);

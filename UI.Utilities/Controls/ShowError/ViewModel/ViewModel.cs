@@ -16,9 +16,9 @@ namespace UI.Utilities.Controls.ShowError.ViewModel
         string _dlgTitle;
         double _left;
         double _top;
-        DelegateCommand _copyToClipboardCmd;
-        DelegateCommand _closeDlg;
-        ConfigurationContainer _configContainer;
+        readonly DelegateCommand _copyToClipboardCmd;
+        readonly DelegateCommand _closeDlg;
+        readonly ConfigurationContainer _configContainer;
 
         public ViewModel(string title, Exception ex, bool showStackTrace, Action closeDlg)
         {
