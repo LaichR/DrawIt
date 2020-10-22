@@ -6,7 +6,6 @@ using Sketch.Interface;
 using Sketch.Models;
 using Sketch.Models.Geometries;
 using System.Runtime.Serialization;
-using System.Drawing;
 using System.ComponentModel;
 
 namespace DrawIt.Uml
@@ -22,8 +21,9 @@ namespace DrawIt.Uml
         bool _isDirected = true;
 
         public UmlAssociationModel( ConnectionType type, IBoundedItemModel from, IBoundedItemModel to,
+            Point connectorStartHint, Point connectorEndHint,
             ISketchItemContainer container)
-            :base(type, from, to, container)
+            : base(type, from, to, connectorStartHint, connectorEndHint, container)
         {
             UpdateGeometry();
         }

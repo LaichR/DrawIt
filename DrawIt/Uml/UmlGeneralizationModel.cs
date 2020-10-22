@@ -20,9 +20,10 @@ namespace DrawIt.Uml
     public class UmlGeneralizationModel: ConnectorModel
     {
         public UmlGeneralizationModel( ConnectionType type, IBoundedItemModel from, IBoundedItemModel to,
+            Point connectorStartHint, Point connectorEndHint,
             ISketchItemContainer container)
-            :base(type, from, to, container)
-        {}
+            : base(type, from, to, connectorStartHint, connectorEndHint, container)
+        { }
 
         protected UmlGeneralizationModel(SerializationInfo info, StreamingContext context) : base(info, context) 
         {}

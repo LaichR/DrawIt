@@ -131,9 +131,11 @@ namespace Sketch.Models
 
         List<System.Windows.Media.PathFigure> _myPath = new List<System.Windows.Media.PathFigure>();
 
-        public StraightLineConnectorStrategy(ConnectorModel connectorModel)
+        public StraightLineConnectorStrategy(ConnectorModel connectorModel, Point start, Point end)
         {
             _model = connectorModel;
+            _start = start;
+            _end = end;
         }
 
 
@@ -163,30 +165,27 @@ namespace Sketch.Models
         void ComputeConnectorLine()
         {
             _myPath.Clear();
-
-            if (_model.StartPointDocking == ConnectorDocking.Undefined &&
-                _model.EndPointDocking == ConnectorDocking.Undefined)
+            if (_model.StartPointDocking == ConnectorDocking.Undefined)
             {
-                var fromCenter = ConnectorUtilities.ComputeCenter(_model.From.Bounds);
-                var toCenter = ConnectorUtilities.ComputeCenter(_model.To.Bounds);
-                _start = ConnectorUtilities.Intersect(_model.From.Bounds, fromCenter, toCenter);
-                _end = ConnectorUtilities.Intersect(_model.To.Bounds, toCenter, fromCenter);
-
-                double relPos = 0;
-                _model.StartPointDocking = ConnectorUtilities.ComputeDocking(_model.From.Bounds, _start, ref relPos);
-                _model.StartPointRelativePosition = relPos;
-
-                _model.EndPointDocking = ConnectorUtilities.ComputeDocking(_model.To.Bounds, _end, ref relPos);
-                _model.EndPointRelativePosition = relPos;
-                
+                _start = _model.From.GetPreferredConnectorStart(_start, out double relPos1, out ConnectorDocking docking1);
+                _model.StartPointDocking = docking1;
+                _model.StartPointRelativePosition = relPos1;
             }
             else
             {
-                _start = ConnectorUtilities.ComputePoint(_model.From.Bounds, _model.StartPointDocking, _model.StartPointRelativePosition);
-                _end = ConnectorUtilities.ComputePoint(_model.To.Bounds, _model.EndPointDocking, _model.EndPointRelativePosition);
+                _start = _model.From.GetConnectorPoint(_model.StartPointDocking, _model.StartPointRelativePosition);
             }
- 
 
+            if (_model.EndPointDocking == ConnectorDocking.Undefined)
+            {
+                _end = _model.To.GetPreferredConnectorEnd(_end, out double relPos2, out ConnectorDocking docking2);
+                _model.EndPointDocking = docking2;
+                _model.EndPointRelativePosition = relPos2;
+            }
+            else
+            {
+                _end = _model.To.GetConnectorPoint( _model.EndPointDocking, _model.EndPointRelativePosition);
+            }
             //double relPos = 0;
             //_model.StartPointDocking = ConnectorUtilities.ComputeDocking(_model.From.Bounds, _start, ref relPos);
             //_model.StartPointRelativePosition = relPos;

@@ -13,6 +13,7 @@ using UI.Utilities.Behaviors;
 using Sketch.Interface;
 using System.Net;
 using System.ComponentModel;
+using System.Windows.Navigation;
 
 namespace Sketch.Models
 {
@@ -95,6 +96,7 @@ namespace Sketch.Models
 
         public ConnectorModel(ConnectionType type,
             IBoundedItemModel from, IBoundedItemModel to,
+            Point connectorStartHint, Point connectorEndHint,
             ISketchItemContainer container)
         //:base(new Guid())
         {
@@ -103,7 +105,7 @@ namespace Sketch.Models
             MiddlePointRelativePosition = 0.5;
             From = from;
             To = to;
-            _myConnectorStrategy = ConnectorUtilities.GetConnectionType(this, _connectionType);
+            _myConnectorStrategy = ConnectorUtilities.GetConnectionType(this, _connectionType, connectorStartHint, connectorEndHint);
             Label = string.Format("{0}->{1}", from.Label, to.Label);
             LineWidth = 1;
             _geometry.Children.Add(_path);
@@ -421,11 +423,13 @@ namespace Sketch.Models
         {
             base.FieldDataRestored();
             _container = _containerProxy.Container;
-            _myConnectorStrategy = ConnectorUtilities.GetConnectionType(this, _connectionType);
+            Point pStart = ConnectorUtilities.ComputePoint(From.Bounds, StartPointDocking, StartPointRelativePosition);
+            Point pEnd = ConnectorUtilities.ComputePoint(To.Bounds, EndPointDocking, EndPointRelativePosition);
+            _myConnectorStrategy = ConnectorUtilities.GetConnectionType(this, _connectionType, pStart, pEnd);
         }
 
 
-        public void ShowConnectorLabel( Point p, bool isConnectorStartLabel)
+        public virtual void ShowConnectorLabel( Point p, bool isConnectorStartLabel)
         {
            
            
@@ -433,7 +437,7 @@ namespace Sketch.Models
             {
                 if (ConnectorStartLabel == null)
                 {
-                    var labelModel = new ConnectorLabelModel(this, true, p);
+                    var labelModel = new ConnectorLabelModel(this, true, ShowLableHaderConnection, p);
                     ConnectorStartLabel = labelModel;
                     _isLabelShown = true;
                 }
@@ -442,12 +446,14 @@ namespace Sketch.Models
             {
                 if (ConnectorEndLabel == null)
                 {
-                    var labelModel = new ConnectorLabelModel(this, false, p);
+                    var labelModel = new ConnectorLabelModel(this, false, ShowLableHaderConnection, p);
                     ConnectorEndLabel = labelModel;
                     _isEndpointLabelShown = true;
                 }
             }
         }
+
+        protected virtual bool ShowLableHaderConnection => true;
 
         public void RestoreConnectionEnd()
         {
@@ -477,7 +483,7 @@ namespace Sketch.Models
             return labelArea.Location;
         }
 
-        public Rect GetLabelArea(bool isStartPointLabel)
+        public virtual Rect GetLabelArea(bool isStartPointLabel)
         {
             if (isStartPointLabel) return LabelArea;
             return _endPointLabelArea;
@@ -510,7 +516,7 @@ namespace Sketch.Models
         }
 
 
-        Point GetPositionFromDocking( bool isStartPointLabel)
+        protected virtual Point GetPositionFromDocking( bool isStartPointLabel)
         {
             if( isStartPointLabel)
             {
@@ -630,7 +636,7 @@ namespace Sketch.Models
             ShowConnectorLabel(GetLabelPosition(ConnectorStartSelected), ConnectorStartSelected);
         }
 
-        bool CanExecuteShowLabel()
+        protected virtual bool CanExecuteShowLabel()
         {
             var ret = (_connectorStartLabel == null && _connectorStartSelected) ||
                 (_connectorEndLabel == null && _connectorEndSelected);

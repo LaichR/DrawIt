@@ -93,6 +93,16 @@ namespace DrawIt.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap LifeLine {
+            get {
+                object obj = ResourceManager.GetObject("LifeLine", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Open_file_icon {
             get {
                 object obj = ResourceManager.GetObject("Open_file_icon", resourceCulture);

@@ -27,6 +27,7 @@ namespace Sketch.Interface
         IBoundedItemModel CreateConnectableSketchItem(Type cls, Point p);
         
         IConnectorItemModel CreateConnector(Type cls, ConnectionType type, IBoundedItemModel from, IBoundedItemModel to, 
+            Point startPointHint, Point endPointHint,
             ISketchItemContainer container );
 
         IList<IBoundedItemFactory> GetConnectableFactories(Type t);

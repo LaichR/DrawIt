@@ -17,8 +17,9 @@ namespace Sketch.Models.BasicItems
         
     {
         public StrightLineConnector(ConnectionType type, IBoundedItemModel from, IBoundedItemModel to,
+            Point connectorStartHint, Point connectorEndHint,
             ISketchItemContainer container)
-            : base(ConnectionType.StrightLine, from, to, container)
+            : base(ConnectionType.StrightLine, from, to, connectorStartHint, connectorEndHint, container)
         {
             UpdateGeometry();
         }

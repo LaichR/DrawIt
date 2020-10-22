@@ -12,6 +12,7 @@ namespace Sketch.Interface
 {
     delegate IConnectorItemModel CreateConnectorDelegate(ConnectionType
         connectionType, IBoundedItemModel from, IBoundedItemModel to,
+        Point start, Point end,
         ISketchItemContainer container);
 
     public interface IConnectorItemModel: ISketchItemModel

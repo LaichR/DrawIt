@@ -51,7 +51,7 @@ namespace Sketch.Controls
             new PropertyMetadata(OnContextMenuDeclarationChanged));
 
 
-        //Geometry _geometry;
+        Geometry _privateClip;
         bool _isNotifyingSelectionChange;
         bool _isNotifyingMarkingChanged;
         RelativePosition _mouseMoveHitResult;
@@ -307,16 +307,18 @@ namespace Sketch.Controls
 
         protected override void OnRender(DrawingContext drawingContext)
         {
-            drawingContext.PushClip(_model.Outline);
-
             if (!_model.Render(drawingContext))
             {
                 base.OnRender(drawingContext);
             }
+            var r = _model.Bounds;
+           
+            drawingContext.PushClip(_privateClip);
             _model.RenderAdornments(drawingContext);
+            //ClipToBounds = false;
             drawingContext.Pop();
             _adorner.InvalidateVisual();
-
+            
         }
 
         protected override void OnMouseLeave(MouseEventArgs e)
@@ -352,6 +354,7 @@ namespace Sketch.Controls
                         _mouseMoveHitResult = _adorner.HitShadowBorder(p);
                     }
                     SetMouseCursor(_mouseMoveHitResult);
+                    PositionTools();
                 }
             }
         }
@@ -434,10 +437,7 @@ namespace Sketch.Controls
                         _parent.Canvas.Children.Add(_myTools);
                         Canvas.SetZIndex(_myTools, 500);
                     }
-                    
-                    var pos = Bounds.TopRight;
-                    Canvas.SetTop(_myTools, pos.Y + 2);
-                    Canvas.SetLeft(_myTools, pos.X - 2);
+                    PositionTools();
                     _myTools.Visibility = System.Windows.Visibility.Visible;
                 }
             }
@@ -447,6 +447,38 @@ namespace Sketch.Controls
                 {
                     _myTools.Visibility = System.Windows.Visibility.Hidden;
                 }
+            }
+        }
+
+        internal void PositionTools()
+        {
+            if (_myTools != null)
+            {
+                var p = Mouse.GetPosition(_parent.Canvas);
+                var pos = _model.GetPreferredToolsLocation(p, out ConnectorDocking docking);
+                if (((int)docking & (int)ConnectorDocking.Bottom) != 0)
+                {
+                    _myTools.Orientation = Orientation.Horizontal;
+                }
+                else if (((int)docking & (int)ConnectorDocking.Top) != 0)
+                {
+                    _myTools.Orientation = Orientation.Horizontal;
+                    pos.Y = pos.Y -= 16;
+                }
+                else if (((int)docking & (int)ConnectorDocking.Left) != 0)
+                {
+                    _myTools.Orientation = Orientation.Vertical;
+                    pos.Y = pos.Y += 2;
+                    pos.X = pos.X -= 20;
+                }
+                else
+                {
+                    _myTools.Orientation = Orientation.Vertical;
+                    pos.Y = pos.Y += 2;
+                    pos.X = pos.X -= 2;
+                }
+                Canvas.SetTop(_myTools, pos.Y);
+                Canvas.SetLeft(_myTools, pos.X);
             }
         }
 
@@ -598,6 +630,7 @@ namespace Sketch.Controls
                 Canvas.SetTop(gadgetUI, loc.Y);
                 gadgetUI.Height = r.Height;
                 gadgetUI.Width = r.Width;
+                gadgetUI._privateClip = new RectangleGeometry(new Rect(r.Size));
             }
             gadgetUI.Model?.UpdateGeometry();
             gadgetUI.InvalidateVisual();
