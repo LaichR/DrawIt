@@ -27,6 +27,11 @@ namespace Sketch.Interface
         /// <returns>Bitmap containing the queried constraints</returns>
         ConnectorDocking AllowableDockings(bool incoming);
 
+        Point GetPreferredConnectorStart(Point hint, out double relativePosition, out ConnectorDocking docking );
+
+        Point GetPreferredConnectorEnd(Point hint, out double relativePosition, out ConnectorDocking docking );
+
+        Point GetConnectorPoint(ConnectorDocking docking, double relativePosition);
 
         event EventHandler<OutlineChangedEventArgs> ShapeChanged;
 

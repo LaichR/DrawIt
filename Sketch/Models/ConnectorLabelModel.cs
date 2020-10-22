@@ -26,6 +26,7 @@ namespace Sketch.Models
         bool _geometryUpdating = false;
         readonly ConnectorModel _connector;
         readonly bool _isStartpointLabel;
+        readonly bool _showLabelConnection;
         System.Windows.Point _labelPosition;
         
         LineGeometry _linkToConnector;
@@ -33,7 +34,7 @@ namespace Sketch.Models
         
         List<UI.Utilities.Interfaces.ICommandDescriptor> _tools = new List<UI.Utilities.Interfaces.ICommandDescriptor>();
 
-        public ConnectorLabelModel(ConnectorModel connector, bool isStartPointLabel, Point labelPosition)
+        public ConnectorLabelModel(ConnectorModel connector, bool isStartPointLabel, bool showLabelConnection, Point labelPosition)
             :base(labelPosition, 
                  ComputeSizeOfBounds(connector.GetLabel(isStartPointLabel)), 
                  connector.GetLabel(isStartPointLabel), Colors.Snow )
@@ -42,6 +43,7 @@ namespace Sketch.Models
             _connector.PropertyChanged += _connector_PropertyChanged;
             _labelPosition = labelPosition;
             _isStartpointLabel = isStartPointLabel;
+            _showLabelConnection = showLabelConnection;
             AllowSizeChange = false;
             StrokeThickness = 0.2;
             UpdateGeometry();
@@ -111,11 +113,14 @@ namespace Sketch.Models
         public override void RenderAdornments(DrawingContext drawingContext)
         {
             //drawingContext.DrawText(_formattedText, ComputeTextPosition(new Point(0,0)));
-            drawingContext.Pop();
+            if (_showLabelConnection)
+            {
+                drawingContext.Pop();
 
-            drawingContext.DrawGeometry(Brushes.LightGray,
-                new Pen(Brushes.DarkGray, 0.5), _linkToConnector);
-            drawingContext.PushClip(Outline);
+                drawingContext.DrawGeometry(Brushes.LightGray,
+                    new Pen(Brushes.DarkGray, 0.5), _linkToConnector);
+                drawingContext.PushClip(Outline);
+            }
         }
 
         public override void Move(Transform translation)

@@ -29,8 +29,13 @@ namespace Sketch.Controls
         {
             _from = from;
             _pad = pad;
-            
-            var start = ConnectorUtilities.ComputeCenter(from.Bounds);
+            //
+            // at this point it is not sufficient to consider only the bounds
+            // in case of a lengthy object, we would like to place that start point close to where 
+            // the user pressed the button!
+            // hence we should query the from object for a decent start point
+            //
+            var start = p;// ConnectorUtilities.ComputeCenter(from.Bounds);
             _selector = new ConnectablePairSelector(start, p);
             
             _pad.Canvas.Children.Add(_selector);
@@ -60,10 +65,10 @@ namespace Sketch.Controls
         void HandleMouseDown(object sender, MouseButtonEventArgs e)
         {
             e.Handled = true;
-            Point p = e.GetPosition(_pad.Canvas);
+            Point endPointHint = e.GetPosition(_pad.Canvas);
             var factory = _pad.ItemFactory;
             
-            ISketchItemUI sketchItemUI = _pad.GetItemAtPoint(e.GetPosition(_pad.Canvas));
+            ISketchItemUI sketchItemUI = _pad.GetItemAtPoint(endPointHint);
             
             if (sketchItemUI != null)
             {
@@ -74,7 +79,9 @@ namespace Sketch.Controls
 
                     var connectorModel = factory.CreateConnector(
                         factory.SelectedForCreation,
-                        ConnectionType.AutoRouting, _from, to, _pad );
+                        ConnectionType.AutoRouting, _from, to, _selector.Start
+                        , endPointHint,
+                        _pad );
                     _pad.SketchItems.Add(connectorModel);
                 }
                 _pad.EndEdit();
@@ -97,11 +104,11 @@ namespace Sketch.Controls
                            {
                                double dx = 0; double dy = 0;
                                var angle = Vector.AngleBetween(new Vector(1,0),
-                                   new Vector(_selector.Start.X-p.X, _selector.Start.Y-p.Y));
+                                   new Vector(_selector.Start.X-endPointHint.X, _selector.Start.Y- endPointHint.Y));
 
                                if (angle < 0) angle += 360.0;
 
-                               var connectable = fac.CreateConnectableItem(p);
+                               var connectable = fac.CreateConnectableItem(endPointHint);
                                
                                if( angle >= 0 && angle < 45)
                                {
@@ -130,7 +137,9 @@ namespace Sketch.Controls
                                    _pad.SketchItems.Add(connectable);
                                    var connector = factory.CreateConnector(
                                        selectedForCreation,
-                                       ConnectionType.AutoRouting, _from, connectable,
+                                       ConnectionType.AutoRouting, _from, connectable
+                                       , _selector.Start
+                                       , endPointHint,
                                        _pad );
                                    _pad.SketchItems.Add(connector);
                                    

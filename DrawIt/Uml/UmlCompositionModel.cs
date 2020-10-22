@@ -20,8 +20,9 @@ namespace DrawIt.Uml
     public class UmlCompositionModel: ConnectorModel
     {
         public UmlCompositionModel(ConnectionType type, IBoundedItemModel from, IBoundedItemModel to,
+            Point connectorStartHint, Point connectorEndHint,
             ISketchItemContainer container)
-            :base(type, from, to, container)
+            : base(type, from, to, connectorStartHint, connectorEndHint, container)
         {
             UpdateGeometry();
         }

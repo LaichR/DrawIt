@@ -23,8 +23,9 @@ namespace DrawIt.Uml
     public class UmlDependencyModel: ConnectorModel
     {
         public UmlDependencyModel( ConnectionType type, IBoundedItemModel from, IBoundedItemModel to,
+            Point connectorStartHint, Point connectorEndHint,
             ISketchItemContainer container)
-            :base(type, from, to, container)
+            : base(type, from, to, connectorStartHint, connectorEndHint, container)
         {
             StrokeDashArray = new DoubleCollection(new double[] { 2, 2 });
         }

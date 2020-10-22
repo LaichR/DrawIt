@@ -15,7 +15,7 @@ using LinqExp = System.Linq.Expressions.Expression;
 using System.Runtime.Hosting;
 using System.Security.Cryptography;
 using Sketch.Models;
-using System.Drawing;
+using Bitmap = System.Drawing.Bitmap;
 
 namespace Sketch.Models
 {
@@ -31,6 +31,8 @@ namespace Sketch.Models
             typeof(ConnectionType),
             typeof(IBoundedItemModel),
             typeof(IBoundedItemModel),
+            typeof(Point),
+            typeof(Point),
             typeof(ISketchItemContainer)
         };
 
@@ -112,11 +114,13 @@ namespace Sketch.Models
         }
 
         public IConnectorItemModel CreateConnector(Type cls, ConnectionType type, 
-            IBoundedItemModel from, IBoundedItemModel to, ISketchItemContainer container)
+            IBoundedItemModel from, IBoundedItemModel to, 
+            Point startPointHint, Point endPointHint,
+            ISketchItemContainer container)
         {
             if( _createConnectorItem.TryGetValue(cls, out CreateConnectorDelegate factorOp))
             {
-                return factorOp(type, from, to, container);
+                return factorOp(type, from, to, startPointHint, endPointHint, container);
             }
             throw new KeyNotFoundException(string.Format("No factory operation registered for class {0}", cls.Name));
         }

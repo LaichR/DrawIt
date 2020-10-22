@@ -91,6 +91,35 @@ namespace Sketch.Models
             _geometry.Children.Add(new RectangleGeometry(Bounds));
         }
 
+        public virtual Point GetPreferredToolsLocation( Point curMouse, out ConnectorDocking docking )
+        {
+            docking = ConnectorDocking.Undefined;
+            var leftThreshold = Bounds.X + Bounds.Width / 5;
+            var rightThreshold = Bounds.X + Bounds.Width / 5 * 4;
+            var topThreshold = Bounds.Y + Bounds.Height / 5;
+            var bottomThreshold = Bounds.Y + Bounds.Height / 5 * 4;
+            
+            var pos = Bounds.TopRight; // default position
+            docking = ConnectorDocking.Right;
+            if( curMouse.X < leftThreshold)
+            {
+                pos = Bounds.TopLeft;
+                docking = ConnectorDocking.Left;
+            }
+            if( curMouse.Y <= topThreshold)
+            {
+                pos = Bounds.TopLeft;
+                docking = ConnectorDocking.Top;
+            }
+            else if( curMouse.Y >= bottomThreshold)
+            {
+                pos = Bounds.BottomLeft;
+                docking = ConnectorDocking.Bottom;
+            }
+
+            return pos;
+        }
+
         public virtual ConnectorDocking AllowableDockings(bool incoming)
         {
             return ConnectorDocking.Bottom | ConnectorDocking.Left | 
@@ -166,6 +195,43 @@ namespace Sketch.Models
         public virtual RectangleGeometry Outline
         {
             get => new RectangleGeometry(Bounds);
+        }
+
+        public virtual Point GetConnectorPoint(ConnectorDocking docking, double relativePosition)
+        {
+            return ConnectorUtilities.ComputePoint(Bounds, docking, relativePosition);
+        }
+
+        public virtual Point GetPreferredConnectorStart(Point hint, out double relativePos, out ConnectorDocking docking)
+        {
+            return GetConnectorPositionInfo(hint, out relativePos, out docking);
+        }
+
+        public virtual Point GetPreferredConnectorEnd(Point hint, out double relativePos, out ConnectorDocking docking)
+        {
+            return GetConnectorPositionInfo(hint, out relativePos, out docking);
+        }
+
+        protected virtual Point GetConnectorPositionInfo(Point hint, out double relativePos, out ConnectorDocking docking)
+        {
+            var center = ConnectorUtilities.ComputeCenter(Bounds);
+            if (Bounds.Contains(hint))
+            {
+                if (center.X != hint.X)
+                {
+                    hint.X = hint.X - 000;
+                    hint.Y = hint.Y - 500 * ConnectorUtilities.Slope(hint, center);
+                }
+                else
+                {
+                    hint.Y = 0;
+                }
+            }
+            Point p = ConnectorUtilities.Intersect(Bounds, hint, center);
+            double pos = 0.0;
+            docking = ConnectorUtilities.ComputeDocking(Bounds, p, ref pos);
+            relativePos = pos;
+            return p;
         }
 
         protected virtual FormattedText ComputeFormattedText(
@@ -352,6 +418,8 @@ namespace Sketch.Models
                 Command = _cmdSelectColor
             });
         }
+
+
 
         static Color GetStopColor(Color color )
         {

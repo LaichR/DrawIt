@@ -193,7 +193,8 @@ namespace Sketch.Controls
                 _from = _selectedUI.Model as ConnectableBase;
                 if (_from != null)
                 {
-                    var p = ConnectorUtilities.ComputeCenter(_from.Bounds);
+                    Point startPointHint = Mouse.GetPosition(Canvas);
+                    var p = _from.GetPreferredConnectorStart(startPointHint, out double relPos, out ConnectorDocking docking);
                     BeginEdit(new AddConnectorOperation(this, _from, p));
                 }
             }

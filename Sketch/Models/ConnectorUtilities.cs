@@ -72,7 +72,7 @@ namespace Sketch.Models
 
 
 
-        public static IConnectorStrategy GetConnectionType( ConnectorModel parent, ConnectionType type )
+        public static IConnectorStrategy GetConnectionType( ConnectorModel parent, ConnectionType type, Point s, Point e )
         {
             if( parent.From == parent.To)
             {
@@ -83,7 +83,7 @@ namespace Sketch.Models
                 case ConnectionType.AutoRouting:
                     return CreateAutoRoutingConnector(parent);
                 case ConnectionType.StrightLine:
-                    return CreateStrightLineConnector(parent);
+                    return CreateStrightLineConnector(parent, s, e);
                 default:
                     throw new NotSupportedException(string.Format("connection type {0} not supported", type ));
             }
@@ -298,9 +298,9 @@ namespace Sketch.Models
             return new AutoRoutingConnectorStrategy(connectorModel);
         }
 
-        static IConnectorStrategy CreateStrightLineConnector(ConnectorModel connectorModel)
+        static IConnectorStrategy CreateStrightLineConnector(ConnectorModel connectorModel, Point start, Point end)
         {
-            return new StraightLineConnectorStrategy(connectorModel);
+            return new StraightLineConnectorStrategy(connectorModel, start, end);
         }
 
         public static double RoundToGrid(double number)

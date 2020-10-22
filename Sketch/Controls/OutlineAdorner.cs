@@ -169,9 +169,11 @@ namespace Sketch.Controls
             }
             else
             {
+                
                 Mouse.OverrideCursor = null;
             }
             //}
+            _adorned?.PositionTools();
             e.Handled = true;
         }
 

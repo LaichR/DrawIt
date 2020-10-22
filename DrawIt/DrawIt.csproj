@@ -114,6 +114,8 @@
     </Compile>
     <Compile Include="Uml\UmlActionConnector.cs" />
     <Compile Include="Uml\UmlActivityModel.cs" />
+    <Compile Include="Uml\UmlMessageModel.cs" />
+    <Compile Include="Uml\UmlLifeLine.cs" />
     <Compile Include="Uml\UmlStereotypes.cs" />
     <Compile Include="Uml\UmlActivityDiagramEdge.cs" />
     <Compile Include="Uml\UmlTansitionModel.cs" />
@@ -221,6 +223,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\LifeLine.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
