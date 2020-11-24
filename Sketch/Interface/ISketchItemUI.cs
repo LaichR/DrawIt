@@ -9,7 +9,7 @@ using System.Windows.Shapes;
 
 namespace Sketch.Interface
 {
-    public interface ISketchItemUI
+    public interface ISketchItemUI: IDisposable
     {
         bool IsSelected
         {

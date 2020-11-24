@@ -23,7 +23,7 @@ namespace Sketch.Controls
     public class SketchItemDisplay: Canvas, ISketchItemDisplay
     {
         
-        LinkedList<byte[]> _snapshots = new LinkedList<byte[]>();
+        readonly LinkedList<byte[]> _snapshots = new LinkedList<byte[]>();
         
         ISketchItemUI _selectedUI = null;                    // currently selected item or null if no item is selected
         
@@ -31,11 +31,11 @@ namespace Sketch.Controls
         
         IEditOperation _currentInputHandler;                 // handles the user input
 
-        IList<ISketchItemUI> _markedUis = new List<ISketchItemUI>(); // list of items that are highlighted; this includes the selected item as well
+        readonly IList<ISketchItemUI> _markedUis = new List<ISketchItemUI>(); // list of items that are highlighted; this includes the selected item as well
         
         bool _outlineEnable = true;                          // flag to indicate if new items shall react on user gestures
 
-        object _synchRoot = new object();                    // i think this is not really consistently used!
+        readonly object _synchRoot = new object();                    // i think this is not really consistently used!
         IntersectionFinder _intersectionFinder;
         readonly SketchPad _parent;
         readonly ISketchItemContainer _container;
@@ -194,7 +194,7 @@ namespace Sketch.Controls
                 if (_from != null)
                 {
                     Point startPointHint = Mouse.GetPosition(Canvas);
-                    var p = _from.GetPreferredConnectorStart(startPointHint, out double relPos, out ConnectorDocking docking);
+                    var p = _from.GetPreferredConnectorStart(startPointHint, out double _1, out ConnectorDocking _2);
                     BeginEdit(new AddConnectorOperation(this, _from, p));
                 }
             }
@@ -443,6 +443,7 @@ namespace Sketch.Controls
                 ui.SelectionChanged -= SketchItemSelectionChanged;
                 ui.IsMarkedChanged -= SketchItemIsMarkedChanged;
                 Children.Remove(ui.Shape);
+                ui.Dispose();
             }
         }
 

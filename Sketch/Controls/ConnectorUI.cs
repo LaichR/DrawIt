@@ -1,6 +1,8 @@
 ﻿
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using UI.Utilities.Interfaces;
+using UI.Utilities.Behaviors;
 
 using Sketch.Models;
 using Sketch.Types;
@@ -12,6 +14,10 @@ using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using Sketch.Interface;
+using System.Collections.ObjectModel;
+using Prism.Commands;
+using System.Windows.Input;
+using System.Linq;
 
 namespace Sketch.Controls
 {
@@ -57,8 +63,12 @@ namespace Sketch.Controls
             DependencyProperty.Register("ContextMenuDeclaration", typeof(IList<ICommandDescriptor>), typeof(ConnectorUI),
             new PropertyMetadata(OnContextMenuDeclarationChanged));
 
+        public static readonly DependencyProperty WaypointsProperty =
+            DependencyProperty.Register("Waypoints", typeof(ObservableCollection<IWaypoint>), typeof(ConnectorUI),
+                new PropertyMetadata(OnWaypointsChanged));
 
 
+       
         readonly ConnectorModel _model;
         readonly ISketchItemDisplay _parent;
         Geometry _myGeometry = null;
@@ -68,19 +78,22 @@ namespace Sketch.Controls
         static readonly Brush _selectedLineBrush = new SolidColorBrush(Colors.Blue) { Opacity = 0.5 };
         static readonly Pen _hitTestPen = new Pen() { Thickness = 20 };
 
-        readonly Adorner _myAdorner;
+        readonly ConnectorAdorner _myAdorner;
+        
         bool _addornerAdded = false;
-
+        Point _lastContextMenuPosition;
+        MenuItem _deleteWaypointMenuItem;
 
         public ConnectorUI(ISketchItemDisplay parent, ConnectorModel model)
         {
             _model = model;
             _parent = parent;
             this.DataContext = _model;
-
+                
             _myAdorner = new ConnectorAdorner(_parent, this);
             _myAdorner.MouseLeftButtonDown += Adorner_MouseLeftButtonDown;
             _myAdorner.MouseRightButtonDown += Adorner_MouseRightButtonDown;
+            
             var isSelectedBinding = new Binding("IsSelected")
             {
                 Mode = BindingMode.TwoWay
@@ -110,6 +123,9 @@ namespace Sketch.Controls
             SetBinding(StrokeDashArrayProperty,
                 new Binding("StrokeDashArray"));
 
+            var waypointBinding = new Binding("Waypoints") { Mode = BindingMode.OneWay };
+            SetBinding(WaypointsProperty, waypointBinding);
+
             _model.From.ShapeChanged += From_ShapeChanged;
             _model.To.ShapeChanged += To_ShapeChanged;
          
@@ -135,9 +151,36 @@ namespace Sketch.Controls
             this.OnMouseRightButtonDown(e);
             if (ContextMenu != null)
             {
+                if (_myAdorner.HitWaypoint(out int index))
+                {
+                    _deleteWaypointMenuItem = new MenuItem()
+                    {
+                        Header = "Delete Waypoint",
+                        Command = new DelegateCommand(() =>
+                        {
+                            Waypoints.RemoveAt(index);
+                            _model.UpdateGeometry();
+                        }
+                        )
+                    };
+                    ContextMenu.Items.Add(_deleteWaypointMenuItem);
+                }
                 this.ContextMenu.IsOpen = true;
+                _lastContextMenuPosition = e.GetPosition(_parent.Canvas);
+                this.ContextMenu.Closed += ContextMenu_Closed;
+
             }
         }
+
+        private void ContextMenu_Closed(object sender, RoutedEventArgs e)
+        {
+            if (e.Source is ContextMenu contextMenu)
+            {
+                contextMenu.Closed -= ContextMenu_Closed;
+                contextMenu.Items.Remove(_deleteWaypointMenuItem);
+            }
+        }
+
 
         public bool IsSelected
         {
@@ -152,6 +195,12 @@ namespace Sketch.Controls
         {
             get { return (bool)GetValue(IsMarkedPropery); }
             set { SetValue(IsMarkedPropery, value); }
+        }
+
+        public ObservableCollection<IWaypoint> Waypoints
+        {
+            get { return (ObservableCollection<IWaypoint>)GetValue(WaypointsProperty); }
+            set { SetValue(WaypointsProperty, value); }
         }
 
         public IList<ICommandDescriptor> ContextMenuDeclaration
@@ -252,6 +301,8 @@ namespace Sketch.Controls
         {
             get { return _model.RefModel; }
         }
+
+        
         protected override void OnMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
         {
         
@@ -267,7 +318,19 @@ namespace Sketch.Controls
             e.Handled = true;
             
             var p = e.GetPosition(_parent.Canvas);
-            _currentOperationHandler = new MoveConnectorOperation(this, p );
+
+            if (_myAdorner.HitWaypoint(out int waypointIndex))
+            {
+                _currentOperationHandler = new WaypointMoveOperation(this, p, Waypoints[waypointIndex]);
+            }
+            //else if( Keyboard.IsKeyDown(Key.LeftShift))
+            //{
+                
+            //}
+            else
+            {
+                _currentOperationHandler = new MoveConnectorOperation(this, p);
+            }
 
             if( IsSelected)
             {
@@ -278,11 +341,30 @@ namespace Sketch.Controls
             
         }
 
+        protected override void OnContextMenuOpening(ContextMenuEventArgs e)
+        {
+            _lastContextMenuPosition = Mouse.GetPosition(_parent.Canvas);
+            
+            base.OnContextMenuOpening(e);
+        }
+
+        protected override void OnContextMenuClosing(ContextMenuEventArgs e)
+        {
+            base.OnContextMenuClosing(e);
+            if ( _deleteWaypointMenuItem != null)
+            {
+                ContextMenu.Items.Remove(_deleteWaypointMenuItem);
+            }
+            
+        }
+
+
 
         void OnShadowMouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
+            _lastContextMenuPosition = e.GetPosition(_parent.Canvas);
             base.OnMouseRightButtonDown(e);
-            //e.Handled = true;
+            
         }
 
         void OnShadowMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -324,7 +406,7 @@ namespace Sketch.Controls
         void To_ShapeChanged(object sender, OutlineChangedEventArgs e)
         {
             // make a quick plausibility test in order to avoid overlapping of connector and shape!
-            CheckLineConfigurations();
+            CheckLineEnding();
             UpdateGeometry();
             
         }
@@ -332,38 +414,59 @@ namespace Sketch.Controls
         void From_ShapeChanged(object sender, OutlineChangedEventArgs e)
         {
             // make a quick plausibility test in order to avoid overlapping of connector and shape!
-            CheckLineConfigurations();
+            CheckLineStart();
             UpdateGeometry();
         }
 
-        void CheckLineConfigurations()
+        void CheckLineStart()
         {
             if (_model.From == null || _model.To == null) return;
-
-            
 
             // nothing to do for self transistions!
             if (_model.From == _model.To) return;
 
-            var startPoint = ConnectorUtilities.ComputePoint(_model.From.Bounds, _model.StartPointDocking, _model.StartPointRelativePosition);
-            var endPoint = ConnectorUtilities.ComputePoint(_model.To.Bounds, _model.EndPointDocking, _model.EndPointRelativePosition);
+            _model.Reset();
+            var startingFrom = _model.Current;
+            _model.MoveNext();
+            var endingAt = _model.Current;
+            CheckLineConfiguration(startingFrom, endingAt);
+        }
+
+        void CheckLineEnding()
+        {
+            if (_model.From == null || _model.To == null) return;
+
+            // nothing to do for self transistions!
+            if (_model.From == _model.To) return;
+
+            _model.Reset(); // reset the iterator
+            var startingFrom = _model.Current;
+            while (_model.MoveNext()) startingFrom = _model.Current;
+            var endingAt = _model.Current;
+
+            CheckLineConfiguration(startingFrom, endingAt);
+        }
+
+        void CheckLineConfiguration(IWaypoint from, IWaypoint to)
+        {
+            var startPoint = ConnectorUtilities.ComputePoint(from.Bounds, from.OutgoingDocking, from.OutgoingRelativePosition);
+            var endPoint = ConnectorUtilities.ComputePoint(to.Bounds, to.IncomingDocking, to.IncomingRelativePosition);
             var pos = ConnectorUtilities.ComputeRelativePositionOfPoints(startPoint, endPoint);
 
-            LineType lineType = (LineType)((int)_model.StartPointDocking << 8 | (int)_model.EndPointDocking);
+            LineType lineType = (LineType)((int)from.OutgoingDocking << 8 | (int)to.IncomingDocking);
 
             if (AllowedRelativePositions.Table.TryGetValue(lineType, out SortedSet<RelativePosition> possibleConfigurations))
             {
                 if (!possibleConfigurations.Contains(pos))
                 {
-                    _model.StartPointDocking = ConnectorDocking.Undefined;
-                    _model.EndPointDocking = ConnectorDocking.Undefined;
+                    from.OutgoingDocking = ConnectorDocking.Undefined;
+                    to.IncomingDocking = ConnectorDocking.Undefined;
                 }
-                
             }
             else
             {
-                _model.StartPointDocking = ConnectorDocking.Undefined;
-                _model.EndPointDocking = ConnectorDocking.Undefined;
+                from.OutgoingDocking = ConnectorDocking.Undefined;
+                to.IncomingDocking = ConnectorDocking.Undefined;
             }
         }
 
@@ -374,19 +477,17 @@ namespace Sketch.Controls
 
         void UpdateLabel(object oldValue, object newValue)
         {
+            
+            if( oldValue is ConnectorLabelModel oldLabel )
             {
-                var oldLabel = oldValue as ConnectorLabelModel;
-                if (oldLabel != null)
-                {
-                    _parent.SketchItems.Remove(oldLabel);
+                _parent.SketchItems.Remove(oldLabel);
                     
-                }
-                var newLabel = newValue as ConnectorLabelModel;
-                if( newValue != null)
-                {
-                    _parent.SketchItems.Add(newLabel);
-                }
             }
+            if( newValue is ConnectorLabelModel newLabel)
+            {
+                _parent.SketchItems.Add(newLabel);
+            }
+            
         }
 
         void NotifySelectionChanged()
@@ -416,10 +517,20 @@ namespace Sketch.Controls
 
         void NotifyIsMarkedChanged()
         {
-            if (IsMarkedChanged != null)
-            {
-                IsMarkedChanged(this, IsMarked);
-            }
+            IsMarkedChanged?.Invoke(this, IsMarked);
+        }
+
+        void AddWaypoint()
+        {
+            Point pos = RoundToGrid(_lastContextMenuPosition);
+
+            var marker = new Waypoint( pos);
+            _model.AddWaypoint(marker);
+        }
+
+        private void OnWaypoint_DragDelta(object sender, DragDeltaEventArgs e)
+        {
+            
         }
 
         private static void OnSelectedChanged(DependencyObject source,
@@ -471,9 +582,12 @@ namespace Sketch.Controls
             
             if( source is ConnectorUI me)
             {
-                var commands = e.NewValue as IList<ICommandDescriptor>;
-                if (commands != null)
+                if( e.NewValue is IList<ICommandDescriptor>  commands)
                 {
+                    if (me._model.AllowWaypoints)
+                    {
+                        commands.Add(CreateAddWaypointMenuItem(me));
+                    }
                     me.ContextMenu = OutlineHelper.InitContextMenu(commands);
                 }
             }
@@ -482,31 +596,19 @@ namespace Sketch.Controls
         private static void OnConnectorStartLabelChanged(DependencyObject source,
             DependencyPropertyChangedEventArgs e)
         {
-
-            var me = source as ConnectorUI;
-            if (me != null)
+            if( source is ConnectorUI me)
             {
                 me.UpdateLabel(e.OldValue, e.NewValue);
-            }
-            
+            }   
         }
 
         private static void OnConnectorEndLabelChanged(DependencyObject source,
             DependencyPropertyChangedEventArgs e)
         {
-
-            var me = source as ConnectorUI;
-            if (me != null)
+            if( source is ConnectorUI me)
             {
                 me.UpdateLabel(e.OldValue, e.NewValue);
             }
-
-        }
-
-        private static void OnConnectorEndDecorationChanged(DependencyObject source,
-            DependencyPropertyChangedEventArgs e)
-        {
-
         }
 
         private static void OnFromChanged(DependencyObject source,
@@ -527,7 +629,7 @@ namespace Sketch.Controls
                     newFrom.ShapeChanged += me.From_ShapeChanged;
                     if (!model.IsRewireing)
                     {
-                        me.CheckLineConfigurations();
+                        me.CheckLineStart();
                         me.UpdateGeometry();
                     }
                 }
@@ -554,17 +656,33 @@ namespace Sketch.Controls
                 if( newTo != null)
                 {
                     newTo.ShapeChanged += me.To_ShapeChanged;
-                    me.CheckLineConfigurations();
+                    me.CheckLineEnding();
                     me.UpdateGeometry();
                 }
                 else
                 {
                     me._parent.BeginEdit(new RewireConnectorOperation(me._parent, me._model, me._model.ConnectorEnd));
                 }
-
                 
             }
         }
+
+        private static void OnWaypointsChanged(DependencyObject source,
+            DependencyPropertyChangedEventArgs e)
+        {
+            if(source is ConnectorUI me)
+            {
+                if( e.OldValue != e.NewValue)
+                {
+                    if (me._addornerAdded)
+                    {
+                        me._myAdorner.InvalidateVisual();
+                    }
+                }
+            }
+        }
+
+        
 
         private static void OnGeometryChanged(DependencyObject source,
              DependencyPropertyChangedEventArgs e)
@@ -582,5 +700,27 @@ namespace Sketch.Controls
             }
 
         }
+
+        private static ICommandDescriptor CreateAddWaypointMenuItem(ConnectorUI ui)
+        {
+            var descriptor = new CommandDescriptor()
+            {
+                Name = "Add Waypoint",
+                Command = new DelegateCommand(ui.AddWaypoint)
+            };
+            return descriptor;
+        }
+
+        internal static Point RoundToGrid(Point p)
+        {
+            return new Point(RoundToGrid(p.X), RoundToGrid(p.Y));
+        }
+
+        internal static double RoundToGrid(double val)
+        {
+            return Math.Round(val / SketchPad.GridSize) * SketchPad.GridSize;
+        }
+
+        public void Dispose(){}
     }
 }

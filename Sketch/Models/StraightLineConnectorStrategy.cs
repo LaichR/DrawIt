@@ -5,131 +5,22 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Navigation;
 using Sketch.Interface;
+using Sketch.Types;
 
 namespace Sketch.Models
 {
     internal class StraightLineConnectorStrategy: IConnectorStrategy
     {
-        class MovingState: IConnectorMoveHelper
-        {
-            StraightLineConnectorStrategy _parent;
-            Point _start;
-            Point _end;
-            Types.MoveType _moveType;
-
-            public MovingState(StraightLineConnectorStrategy parent, Point p)
-            {
-                _parent = parent;
-                _start = parent.ConnectionStart;
-                _end = parent.ConnectionEnd;
-                var v1 = p - _start;
-                var v2 = p - _end;
-                _moveType = Types.MoveType.MoveStartPoint;
-                
-                if( (v1.Length > v2.Length))
-                {
-                    _moveType = Types.MoveType.MoveEndPoint; 
-                }
-            }
-
-            public System.Windows.Media.Geometry GetGeometry(
-                GeometryGroup gg,
-                Types.LineType lineType, Point start, Point end, double distance)
-            {
-                
-                if( _moveType == Types.MoveType.MoveStartPoint)
-                {
-                    _start = start;
-                }
-                else
-                {
-                    _end = end;
-                }
-                gg.Children.Clear();
-                gg.Children.Add(new LineGeometry(_start, _end));
-                return gg;
-                //PathFigure path = ConnectorUtilities.GetPathFigureFromPoints(new Point[] { _start, _end }); 
-                //return new PathGeometry(new PathFigure[]{path});
-            }
-
-            public void Commit(ConnectorDocking movePointDocking, 
-                ConnectorDocking otherPointDocking, 
-                Point newPositionStartPoint, 
-                Point newPositionEndPoint, double newDistance)
-            {
-                //_parent._start = newPositionStartPoint;
-                //_parent._end = newPositionEndPoint;
-                
-                if( _moveType == Types.MoveType.MoveStartPoint)
-                {
-                    _parent._model.StartPointDocking = movePointDocking;
-                    _parent._model.EndPointDocking = otherPointDocking;
-                    _parent._model.StartPointRelativePosition =
-                        ConnectorUtilities.ComputeRelativePosition(_parent._model.From.Bounds, newPositionStartPoint, movePointDocking); ;
-                }
-                else
-                {
-                    _parent._model.EndPointDocking = movePointDocking;
-                    _parent._model.StartPointDocking = otherPointDocking;
-                    _parent._model.EndPointRelativePosition =
-                            ConnectorUtilities.ComputeRelativePosition(_parent._model.To.Bounds, newPositionStartPoint, movePointDocking);
-                }
-
-            }
-
-            public void ComputeDockingDuringMove(Rect rect, Point p, ref ConnectorDocking currentDocking, ref Point lastPos)
-            {
-                ConnectorUtilities.ComputeDockingDuringMove(rect, p, ref currentDocking, ref lastPos);
-            }
-
-            public Point StartPoint
-            {
-                get {
-                    if (_moveType == Types.MoveType.MoveStartPoint)
-                    {
-                        return _start;
-                    }
-                    return _end;
-                }
-            }
-
-            public ConnectionType ConnectionType
-            {
-                get { return ConnectionType.StrightLine ; }
-            }
-
-            public Types.LineType LineType
-            {
-                get { return Types.LineType.Undefined; }
-            }
-
-            public double Distance
-            {
-                get
-                {
-                    if (_moveType == Types.MoveType.MoveStartPoint)
-                    {
-                        return _parent._model.StartPointRelativePosition;
-                    }
-                    return _parent._model.EndPointRelativePosition;
-                }
-            }
-
-            public Types.MoveType MoveType
-            {
-                get { return _moveType; }
-            }
-        }
-
+        
         static readonly Vector _horizontalVector = new Vector(100, 0);
-        ConnectorModel _model;
+        readonly ConnectorModel _model;
         Point _start;
         Point _end;
 
-        
 
-        List<System.Windows.Media.PathFigure> _myPath = new List<System.Windows.Media.PathFigure>();
+        readonly List<PathFigure> _myPath = new List<PathFigure>();
 
         public StraightLineConnectorStrategy(ConnectorModel connectorModel, Point start, Point end)
         {
@@ -138,6 +29,12 @@ namespace Sketch.Models
             _end = end;
         }
 
+        public ConnectionType ConnectionType => ConnectionType.StrightLine;
+
+        public bool AllowWaypoints
+        {
+            get => false;
+        }
 
 
         public System.Windows.Point ConnectionStart
@@ -184,29 +81,51 @@ namespace Sketch.Models
             }
             else
             {
-                _end = _model.To.GetConnectorPoint( _model.EndPointDocking, _model.EndPointRelativePosition);
+                _end = _model.To.GetConnectorPoint(_model.EndPointDocking, _model.EndPointRelativePosition);
             }
-            //double relPos = 0;
-            //_model.StartPointDocking = ConnectorUtilities.ComputeDocking(_model.From.Bounds, _start, ref relPos);
-            //_model.StartPointRelativePosition = relPos;
 
-            //_model.EndPointDocking = ConnectorUtilities.ComputeDocking(_model.To.Bounds, _end, ref relPos);
-            //_model.EndPointRelativePosition = relPos;
+            System.Windows.Media.PathSegmentCollection ls = new System.Windows.Media.PathSegmentCollection()
+            {
+                new System.Windows.Media.LineSegment(_end, true)
+            };
 
-            System.Windows.Media.PathSegmentCollection ls = new System.Windows.Media.PathSegmentCollection();
-            ls.Add(new System.Windows.Media.LineSegment(_end, true));
-            var pf = new System.Windows.Media.PathFigure();
-            pf.StartPoint = _start;
-            pf.Segments = ls;
+            var pf = new System.Windows.Media.PathFigure()
+            {
+                StartPoint = _start,
+                Segments = ls
+            };
+
             _myPath.Add(pf);
         }
 
 
         public IConnectorMoveHelper StartMove(Point p)
         {
-            return new MovingState(this, p);
+            return new ConnectorMoveHelper(_model, this, p);
         }
 
+        public IEnumerable<Point> ComputeLinePoints(Point start, Point end, LineType lineType, double middlePosition, out double startAngle, out double endAngle)
+        {
+            ConnectorDocking startPointDocking = (ConnectorDocking)((int)lineType >> 8);
+            ConnectorDocking endPointDocking = (ConnectorDocking)((int)lineType & 0xFF);
+            //var pf = ConnectorUtilities.GetPathFigureFromPoints(new Point[] { start, end });
+
+            startAngle = ConnectorUtilities.ComputeAngle(startPointDocking, end - start);
+            endAngle = ConnectorUtilities.ComputeAngle(endPointDocking, end - start);
+            return new[] { start, end };
+        }
+
+        public PathFigure ComputePathFigure(Point start, Point end, LineType lineType, double middlePosition, out double startAngle, out double endAngle)
+        {
+            return ConnectorUtilities.GetPathFigureFromPoints(
+                ComputeLinePoints(start, end, lineType, middlePosition, out startAngle, out endAngle));
+
+        }
+
+        public void ComputeDockingDuringMove(Rect rect, Point p, ref ConnectorDocking currentDocking, ref Point lastPos)
+        {
+            ConnectorUtilities.ComputeDockingDuringMove(rect, p, ref currentDocking, ref lastPos);
+        }
 
         public double StartAngle
         {
@@ -217,5 +136,7 @@ namespace Sketch.Models
         {
             get { return Vector.AngleBetween(_horizontalVector, Point.Subtract(_end, _start)); }
         }
+
+
     }
 }

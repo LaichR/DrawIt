@@ -65,15 +65,15 @@
         </DataTemplate>
         
         <DataTemplate DataType="{x:Type uml:UmlClassModel}">
-            <Border x:Name="Outline" BorderBrush="Black" BorderThickness="2"
+            <SketchCtrl:GeometryBorder x:Name="Outline" BorderBrush="Black" BorderGeometry="{Binding Geometry}" BorderThickness="0.5"
                     Background="{Binding Fill}" CornerRadius="1" Width="{Binding Bounds.Width}"
-                    Height="{Binding Bounds.Height}" Visibility="Visible">
+                    Height="{Binding Bounds.Height}" Visibility="Visible" ShowShadow="True">
                 <StackPanel>
                     <TextBox Margin="20,5,20,5" Style="{StaticResource LabelEditorStyle}"/>
                     <Line X1="0"  X2="{Binding Bounds.Width}" Y1="2" Y2="2"
                           Stroke="Black" StrokeThickness="1"/>
                 </StackPanel>
-            </Border>
+            </SketchCtrl:GeometryBorder>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type uml:UmlLifeLineModel}">
@@ -115,9 +115,9 @@
         </DataTemplate>
         
         <DataTemplate DataType="{x:Type uml:UmlStateModel}">
-            <SketchCtrl:GeometryBorder x:Name="Outline"  BorderThickness="1" BorderBrush="{Binding Stroke}"
+            <SketchCtrl:GeometryBorder x:Name="Outline"  BorderThickness="0.5" BorderBrush="{Binding Stroke}"
                     Background="{Binding Fill}" BorderGeometry="{Binding Geometry}" Visibility="Visible"
-                    Style="{StaticResource BorderShadowStyle}">
+                    Style="{StaticResource BorderShadowStyle}" ShowShadow="True">
                 <StackPanel>
                     <TextBox Text="{Binding Label}" Margin="20,5,20,5" 
                              Style="{StaticResource LabelEditorStyle}"/>
@@ -188,11 +188,11 @@
                     </Button>
                     <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="15,0,15,0" Orientation="Vertical" >
                         <StackPanel Orientation="Horizontal" Visibility="{Binding PreconditionVisibility}" Margin="0,2,0,0">
-                            <TextBlock Text="&lt;&lt;precondition>>" Style="{StaticResource DecoratorTextStyle}" Margin="0,0,5,0"/>
+                            <TextBlock Text="{Binding PreLabel}" Style="{StaticResource DecoratorTextStyle}" Margin="0,0,5,0"/>
                             <TextBlock Text="{Binding Precondition}" Style="{StaticResource DecoratorTextStyle}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Visibility="{Binding PostconditionVisibility}">
-                            <TextBlock Text="&lt;&lt;postcondition>>" Style="{StaticResource DecoratorTextStyle}" Margin="0,0,5,0"/>
+                            <TextBlock Text="{Binding PostLabel}" Style="{StaticResource DecoratorTextStyle}" Margin="0,0,5,0"/>
                             <TextBlock Text="{Binding Postcondition}" Style="{StaticResource DecoratorTextStyle}" />
                         </StackPanel>
                         <TextBox Style="{StaticResource LabelEditorStyle}" AcceptsReturn="True"/>

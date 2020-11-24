@@ -117,14 +117,22 @@
     <Compile Include="Controls\ConnectablePairSelector.cs" />
     <Compile Include="Controls\IntersectionFinder.cs" />
     <Compile Include="Controls\GeometryBorder.cs" />
+    <Compile Include="Controls\Operations\ConnectorUI.WaypointMoveOperation.cs" />
     <Compile Include="Interface\ISketchPadControl.cs" />
+    <Compile Include="Interface\IConnectable.cs" />
+    <Compile Include="Interface\IWaypoint.cs" />
     <Compile Include="Models\BasicItems\FreeTextModel.cs" />
     <Compile Include="Models\BasicItems\StrightLineConnector.cs" />
+    <Compile Include="Models\ConnectorMoveHelper.cs" />
     <Compile Include="Models\DoNotConsiderForConnectorRoutingAttribute.cs" />
     <Compile Include="Models\ModelVersion.cs" />
+    <Compile Include="Models\PersistencyHelper.cs" />
     <Compile Include="Models\PersistentFieldAttribute.cs" />
     <Compile Include="Models\Sketch.cs" />
     <Compile Include="Models\SketchItemContainerSerializationSurrogate.cs" />
+    <Compile Include="Models\ToWaypointAdapter.cs" />
+    <Compile Include="Models\Waypoint.cs" />
+    <Compile Include="Models\WaypointWrapper.cs" />
     <Compile Include="PropertyEditor\ColorConverter.cs" />
     <Compile Include="PropertyEditor\DoubleConverter.cs" />
     <Compile Include="PropertyEditor\PropertyDisplayTemplateSelector.cs" />
@@ -245,6 +253,7 @@
     <None Include="Resources\top_align.png" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\SaveAsPicture.png" />
     <None Include="Resources\align_center.png" />
     <None Include="Resources\free_text.png" />
     <Content Include="Resources\paint_roller.png" />

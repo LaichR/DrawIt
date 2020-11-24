@@ -50,9 +50,7 @@ namespace Sketch.Test
         {
             var rand = new Random(-127);
             
-
-            
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < count; i++)
             {
                 var x = rand.NextDouble() * 2048;
                 var y = rand.NextDouble() * 1600;

@@ -19,7 +19,7 @@ namespace Sketch.PropertyEditor
         string _displayName;
         
         bool _getValue = false;
-        RectangleWrapper _rectangleWrapper;
+        readonly RectangleWrapper _rectangleWrapper;
         public PropertyValueModel(ITemplateProvider templateProvider, object parent, PropertyInfo propertyInfo)
         {
             _parent = parent;

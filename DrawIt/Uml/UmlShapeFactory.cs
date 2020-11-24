@@ -75,12 +75,12 @@ namespace DrawIt.Uml
             return _factory.CreateConnectableSketchItem(cls, p);
         }
 
-        public IConnectorItemModel CreateConnector(Type cls, ConnectionType type, 
+        public IConnectorItemModel CreateConnector(Type cls, 
             IBoundedItemModel from, IBoundedItemModel to,
             Point startPointHint, Point endPointHint,
             ISketchItemContainer container)
         {
-            return _factory.CreateConnector(cls, type, from, to, startPointHint, endPointHint, container);
+            return _factory.CreateConnector(cls, from, to, startPointHint, endPointHint, container);
         }
 
         public IList<ICommandDescriptor> GetAllowableConnctors(Type t)

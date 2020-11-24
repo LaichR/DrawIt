@@ -15,7 +15,7 @@ namespace Sketch.Controls
 
     internal class AddConnectableItemOperation : IEditOperation
     {
-        ISketchItemDisplay _pad;
+        readonly ISketchItemDisplay _pad;
 
         public AddConnectableItemOperation(ISketchItemDisplay pad)
         {

@@ -26,12 +26,12 @@ namespace DrawIt.Uml
         new static readonly double DefaultHeight = 60;
 
         static readonly double DefaultRoundingEdgeRadius = DefaultHeight / 4;
-        static readonly BitmapSource CallActionIndicator = ToBitmapSource.Bitmap2BitmapSource(Properties.Resources.CallActionIndicator);
+        //static readonly BitmapSource CallActionIndicator = ToBitmapSource.Bitmap2BitmapSource(Properties.Resources.CallActionIndicator);
 
-        [PersistentField(ModelVersion.V_0_1, "Precondition")]
+        [PersistentField((int)ModelVersion.V_0_1, "Precondition")]
         string _precondition = "";
 
-        [PersistentField(ModelVersion.V_0_1, "Postcondition")]
+        [PersistentField((int)ModelVersion.V_0_1, "Postcondition")]
         string _postcondition = "";
 
         public UmlActivityModel(Point p)
@@ -47,10 +47,24 @@ namespace DrawIt.Uml
         {
             var labelAreaLocation = new Point(5, DefaultRoundingEdgeRadius);
             var size = new Size(DefaultWidth-20, DefaultHeight / 2);
+            
             if (!string.IsNullOrEmpty(label))
             {
                 size = ComputeFormattedTextSize(label, ConnectableBase.DefaultFont, ConnectableBase.DefaultFontSize,
                 ConnectableBase.MinimalTextMarginX, ConnectableBase.MinimalTextMarginY);
+
+            }
+            if (!string.IsNullOrEmpty(Precondition))
+            {
+                var prSize = ComputeFormattedTextSize(GetPreconditionDisplayString(), ConnectableBase.DefaultFont, ConnectableBase.DefaultFontSize,
+                ConnectableBase.MinimalTextMarginX, ConnectableBase.MinimalTextMarginY);
+                size.Width = Math.Max(prSize.Width, size.Width);
+            }
+            if(!string.IsNullOrEmpty(Postcondition))
+            {
+                var poSize = ComputeFormattedTextSize(GetPostconditionDisplayString(), ConnectableBase.DefaultFont, ConnectableBase.DefaultFontSize,
+                ConnectableBase.MinimalTextMarginX, ConnectableBase.MinimalTextMarginY);
+                size.Width = Math.Max(poSize.Width, size.Width);
             }
             return new Rect(labelAreaLocation, size); // the entier shape may contain text!
         }
@@ -98,6 +112,9 @@ namespace DrawIt.Uml
             }
         }
 
+        public string PreLabel => "<<pre>>";
+        public string PostLabel => "<<post>>";
+
         public Visibility PreconditionVisibility
         {
             get => string.IsNullOrEmpty(Precondition) ? Visibility.Collapsed : Visibility.Visible;
@@ -136,10 +153,23 @@ namespace DrawIt.Uml
         {
             get
             {
-                var outline = new System.Windows.Media.RectangleGeometry(Bounds, DefaultRoundingEdgeRadius, DefaultRoundingEdgeRadius);
-                outline.Transform = Rotation;
+                var outline = new System.Windows.Media.RectangleGeometry(Bounds, DefaultRoundingEdgeRadius, DefaultRoundingEdgeRadius)
+                {
+                    Transform = Rotation
+                };
+                
                 return outline;
             }
+        }
+
+        string GetPreconditionDisplayString()
+        {
+            return string.Format("{0} {1}", PreLabel, Precondition);
+        }
+
+        string GetPostconditionDisplayString()
+        {
+            return string.Format("{0} {1}", PostLabel, Postcondition);
         }
 
         void AdjustBounds()

@@ -9,6 +9,7 @@ namespace Sketch.Interface
     public enum ConnectionType
     {
         StrightLine,
-        AutoRouting
+        AutoRouting,
+        RoutingWithWaypoint
     };
 }

@@ -18,7 +18,7 @@ namespace Sketch.Controls
 
         internal class Intersection
         {
-            IntersectionFinder _parent;
+            readonly IntersectionFinder _parent;
             Rect _toRestoreRect;
             Point _oldIntersectionPoint;
             Pen _toRestorePen;

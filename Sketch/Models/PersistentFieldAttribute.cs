@@ -10,7 +10,7 @@ namespace Sketch.Models
     [AttributeUsage(AttributeTargets.Field)]
     public class PersistentFieldAttribute:Attribute
     {
-        public PersistentFieldAttribute(ModelVersion availableSinceVersion, 
+        public PersistentFieldAttribute(int availableSinceVersion, 
             string serialisationName, bool hasDefault = false)
         {
             HasDefault = hasDefault;
@@ -30,7 +30,7 @@ namespace Sketch.Models
             private set;
         }
 
-        public ModelVersion AvalailableSince
+        public int AvalailableSince
         {
             get;
             private set;

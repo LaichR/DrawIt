@@ -38,32 +38,32 @@ namespace Sketch.Models.BasicItems
 
      
 
-        [PersistentField(ModelVersion.V_1_1, "BorderThickness")]
+        [PersistentField((int)ModelVersion.V_1_1, "BorderThickness")]
         double _borderThickness = 0;
 
-        [PersistentField(ModelVersion.V_1_1, "FontFamily")]
+        [PersistentField((int)ModelVersion.V_1_1, "FontFamily")]
         string _fontFamily = "Arial";
 
-        [PersistentField(ModelVersion.V_1_1, "FontSize")]
+        [PersistentField((int)ModelVersion.V_1_1, "FontSize")]
         double _fontSize = 12;
 
-        [PersistentField(ModelVersion.V_1_1, "FontStyle")]
+        [PersistentField((int)ModelVersion.V_1_1, "FontStyle")]
         FontStyle _fontStyle = FontStyle.Normal;
 
-        [PersistentField(ModelVersion.V_1_1, "TextAlignement")]
+        [PersistentField((int)ModelVersion.V_1_1, "TextAlignement")]
         TextAlignment _textAlignment = TextAlignment.Center;
 
-        [PersistentField(ModelVersion.V_1_1, "FontWeight")]
+        [PersistentField((int)ModelVersion.V_1_1, "FontWeight")]
         int _fontWeightNum;
 
         FontWeight _fontWeight;
 
-        [PersistentField(ModelVersion.V_1_1, "BorderColor")]
-        SerializableColor _borderColor = new SerializableColor() { Color = Colors.Black };
+        [PersistentField((int)ModelVersion.V_1_1, "BorderColor")]
+        readonly SerializableColor _borderColor = new SerializableColor() { Color = Colors.Black };
         //Brush _borderBrush;
 
-        [PersistentField(ModelVersion.V_1_1, "TextColor")]
-        SerializableColor _textColor = new SerializableColor() { Color = Colors.Black };
+        [PersistentField((int)ModelVersion.V_1_1, "TextColor")]
+        readonly SerializableColor _textColor = new SerializableColor() { Color = Colors.Black };
         //Brush _textBrush;
 
         new const double DefaultHeight = 30;

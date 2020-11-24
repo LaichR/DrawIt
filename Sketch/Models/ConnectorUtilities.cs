@@ -24,17 +24,6 @@ namespace Sketch.Models
             var pf = new PathFigure();
             System.Windows.Media.PathSegmentCollection ls = new System.Windows.Media.PathSegmentCollection();
             var start = linePoints.First();
-            //if (linePoints.Count() == 4)
-            //{
-            //    ls.Add(new BezierSegment(linePoints.ElementAt(1), linePoints.ElementAt(2),
-            //        linePoints.ElementAt(3), true));
-            //}
-            //else if( linePoints.Count() == 3)
-            //{
-            //    ls.Add(new QuadraticBezierSegment(linePoints.ElementAt(1),
-            //        linePoints.ElementAt(2), true));
-            //}
-            //else
             {
                 foreach (var p in linePoints.Skip(1))
                 {
@@ -45,7 +34,7 @@ namespace Sketch.Models
             pf.StartPoint = start;
             pf.Segments = ls;
             pf.IsClosed = false;
-            
+            pf.IsFilled = false;
             return pf;
         }
 
@@ -70,7 +59,14 @@ namespace Sketch.Models
             return sameEndpoints;
         }
 
-
+        public static ConnectorDocking ComputeDocking(Rect r, Point p)
+        {
+            if (p.X <= r.Left) return ConnectorDocking.Left;
+            if (p.X >= r.Right) return ConnectorDocking.Right;
+            if (p.Y <= r.Top ) return ConnectorDocking.Top;
+            if (p.Y >= r.Bottom) return ConnectorDocking.Bottom;
+            return ConnectorDocking.Undefined;
+        }
 
         public static IConnectorStrategy GetConnectionType( ConnectorModel parent, ConnectionType type, Point s, Point e )
         {
@@ -82,6 +78,8 @@ namespace Sketch.Models
             {
                 case ConnectionType.AutoRouting:
                     return CreateAutoRoutingConnector(parent);
+                case ConnectionType.RoutingWithWaypoint:
+                    return CreateRoutingWithWaypointsConnector(parent, s, e);
                 case ConnectionType.StrightLine:
                     return CreateStrightLineConnector(parent, s, e);
                 default:
@@ -91,9 +89,11 @@ namespace Sketch.Models
 
         public static Point ComputeCenter( Rect r )
         {
-            var center = new Point();
-            center.X = r.Left + r.Width / 2;
-            center.Y = r.Top + r.Height / 2;
+            var center = new Point()
+            {
+                X = r.Left + r.Width / 2,
+                Y = r.Top + r.Height / 2,
+            };
             return center;
         }
 
@@ -250,13 +250,13 @@ namespace Sketch.Models
             switch(docking)
             {
                 case ConnectorDocking.Top:
-                    return new Point(RoundToGrid(r.Left + relativePosition * r.Width), r.Top);
+                    return new Point(RoundToGrid(r.Left + relativePosition * r.Width), r.Top -1);
                 case ConnectorDocking.Right:
-                    return new Point(r.Right, RoundToGrid(r.Top + relativePosition*r.Height) );
+                    return new Point(r.Right +1, RoundToGrid(r.Top + relativePosition*r.Height) );
                 case ConnectorDocking.Bottom:
-                    return new Point(RoundToGrid(r.Left + relativePosition * r.Width), r.Bottom);
+                    return new Point(RoundToGrid(r.Left + relativePosition * r.Width), r.Bottom + 1);
                 case ConnectorDocking.Left:
-                    return new Point(r.Left, RoundToGrid(r.Top + relativePosition*r.Height) );
+                    return new Point(r.Left-1, RoundToGrid(r.Top + relativePosition*r.Height) );
                     
                 default:
                     return new Point(RoundToGrid(r.Left + relativePosition * r.Width), r.Top);
@@ -282,7 +282,7 @@ namespace Sketch.Models
             }
         }
 
-        public static double ComputeAngle( ConnectorDocking docking, Vector ending)
+        public static double ComputeAngle( ConnectorDocking _1, Vector ending)
         {
             return Vector.AngleBetween(HorizontalVector, ending);            
         }
@@ -303,9 +303,46 @@ namespace Sketch.Models
             return new StraightLineConnectorStrategy(connectorModel, start, end);
         }
 
+        static IConnectorStrategy CreateRoutingWithWaypointsConnector( ConnectorModel _0,
+            Point _1, Point _2)
+        {
+            return null;//new RoutingConnectorWithWaypointsStrategy(model, startHint, endHint);
+            
+        }
+
         public static double RoundToGrid(double number)
         {
             return Math.Round(number /  SketchPad.GridSize) * SketchPad.GridSize;
+        }
+
+        public static Point RoundToGrid(Point p)
+        {
+            p.X = RoundToGrid(p.X);
+            p.Y = RoundToGrid(p.Y);
+            return p;
+        }
+
+
+        internal static bool HitLineSegment(Point p, PathFigure pathFigure, out int index, out Point start, out Point end)
+        {
+            LineGeometry lineGeometry = new LineGeometry();
+            start = pathFigure.StartPoint;
+            end = ((LineSegment)pathFigure.Segments.OfType<LineSegment>().Last()).Point;
+            lineGeometry.StartPoint = start;
+            index = 0;
+            foreach (var lineSegment in pathFigure.Segments.OfType<LineSegment>())
+            {
+                lineGeometry.EndPoint = lineSegment.Point;
+                if (lineGeometry.StrokeContains(ConnectorModel.HittestPen, p))
+                {
+
+                    return true;
+                }
+                index++;
+                lineGeometry.StartPoint = lineGeometry.EndPoint;
+            }
+            index = -1;
+            return false;
         }
 
         #region internal helper
@@ -326,7 +363,7 @@ namespace Sketch.Models
             if (currentDocking == ConnectorDocking.Bottom || currentDocking == ConnectorDocking.Top)
             {
                 // point is within it's original boundary
-                if (newPos.X > (left + 5) && newPos.X < (right - 5))
+                if (newPos.X > left && newPos.X < right)
                 {
                     newPos.Y = lastPos.Y; // we are on the line bottom/top; y has not to be adapted
                 }
@@ -334,7 +371,7 @@ namespace Sketch.Models
                 {
 
                     // we may need to change the point docking
-                    if (newPos.X <= left + 5)
+                    if (newPos.X <= left)
                     {
                         currentDocking = BestDockingBottomLeft(rect, ref newPos);
                     }
@@ -358,14 +395,14 @@ namespace Sketch.Models
             else if (currentDocking == ConnectorDocking.Left || currentDocking == ConnectorDocking.Right)
             {
                 // point is within it's original boundary
-                if (newPos.Y < bottom - 5 && newPos.Y > top + 5)
+                if (newPos.Y < bottom && newPos.Y > top)
                 {
                     newPos.X = lastPos.X; // we are on the line bottom/top; y has not to be adapted
                 }
                 else if (currentDocking == ConnectorDocking.Left)
                 {
                     // we may need to change the point docking
-                    if (newPos.Y < top + 5)
+                    if (newPos.Y <= top)
                     {
                         currentDocking = BestDockingTopLeft(rect, ref newPos);
                     }
@@ -376,7 +413,7 @@ namespace Sketch.Models
                 }
                 else if (currentDocking == ConnectorDocking.Right)
                 {
-                    if (newPos.Y < top + 5)
+                    if (newPos.Y <= top)
                     {
                         currentDocking = BestDockingTopRight(rect, ref newPos);
                     }

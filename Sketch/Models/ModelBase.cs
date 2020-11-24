@@ -12,28 +12,31 @@ using Sketch.Interface;
 using System.ComponentModel;
 using RuntimeCheck;
 using System.Reflection;
+using System.Windows.Navigation;
 
 namespace Sketch.Models
 {
     [Serializable]
     public abstract class ModelBase : Prism.Mvvm.BindableBase, IHierarchicalNode, ISketchItemModel
     {
-        
+
         //FontFamily _labelFont;
 
-        ModelVersion _version = ModelVersion.V_2_0;
+        ModelVersion _version = ModelVersion.Undefined;
 
-        [PersistentField(ModelVersion.V_0_1,"Label",true)]
+        List<FieldInfo> _persistentFields = null;
+
+        [PersistentField((int)ModelVersion.V_0_1,"Label",true)]
         string _label = "";
 
-        [PersistentField(ModelVersion.V_0_1, "IsSelected",true)]
+        [PersistentField((int)ModelVersion.V_0_1, "IsSelected",true)]
         bool _isSelected;
 
         bool _isMarked;
 
         bool _editModeOn = false;
 
-        [PersistentField(ModelVersion.V_0_1, "LabelArea")]
+        [PersistentField((int)ModelVersion.V_0_1, "LabelArea")]
         Rect _labelArea;
 
         IList<ICommandDescriptor> _commands;
@@ -49,7 +52,7 @@ namespace Sketch.Models
         //    Id = id;
         //}
 
-        public ModelBase() { }
+        public ModelBase() {}
 
         public virtual bool IsSerializable
         {
@@ -67,8 +70,13 @@ namespace Sketch.Models
 
         public virtual ModelVersion Version
         {
-            get => _version;
-            set => _version = value;
+            get {
+                if( _version == ModelVersion.Undefined)
+                {
+                    _version = ComputeVersion();
+                }
+                return _version;
+            }
         }
 
 
@@ -165,43 +173,18 @@ namespace Sketch.Models
 
         protected virtual void RestoreFieldData(SerializationInfo info, StreamingContext context)
         {
-            List<string> persistentNames = new List<string>();
             // see if there is a version in the stream
+            ModelVersion version = ModelVersion.V_0_1;
             try
             {
-                Version = (ModelVersion)info.GetValue(nameof(Version), typeof(ModelVersion));
-                
+                version = (ModelVersion)info.GetValue(nameof(Version), typeof(ModelVersion));    
             }
-            catch
-            {
-                _version = ModelVersion.V_0_1; // in case there is no version, set it to an old one!
-            }
-
-            var currentType = this.GetType();
+            catch { }
+            
             var fields = GetAllPersistentFields();
-            foreach ( var f in fields )
-            {
-                // the version is restored at this point
-                var persistent = f.GetCustomAttributes(true).OfType<PersistentFieldAttribute>();
 
-                if (persistent.Any())
-                {
-                    var persistentSpec = persistent.First();
-                    if (persistentSpec.AvalailableSince <= _version)
-                    {
-                        
-                        var val = info.GetValue(persistentSpec.Name, f.FieldType);
-                        f.SetValue(this, val);
-                        persistentNames.Add(persistentSpec.Name);
-                    }
-                    else 
-                    {
-                        Assert.True(persistentSpec.HasDefault, "The field {0} cannot be restored from the current stream",
-                            persistentSpec.Name);
-                    }
-                }
-                
-            }
+            IEnumerable<string> persistentNames = PersistencyHelper.RestorePersistentFields(this, info, fields, (int)version);
+
             FieldDataRestored();
             foreach( var n in persistentNames)
             {
@@ -211,17 +194,28 @@ namespace Sketch.Models
 
         protected IEnumerable<System.Reflection.FieldInfo> GetAllPersistentFields()
         {
-            List<System.Reflection.FieldInfo> fields = new List<System.Reflection.FieldInfo>();
-            var type = this.GetType();
-            while( type != typeof(ModelBase).BaseType )
+            if (_persistentFields == null)
             {
-                fields.AddRange(type.GetFields(
-                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic |
-                    System.Reflection.BindingFlags.Instance).Where((x) => x.GetCustomAttributes(true).OfType<PersistentFieldAttribute>().Any())
-                    );
-                type = type.BaseType;
+                _persistentFields = new List<FieldInfo>(PersistencyHelper.GetAllPersistentFields(this, typeof(ModelBase).BaseType));
+                
             }
-            return fields;
+            return _persistentFields;
+        }
+
+        protected ModelVersion ComputeVersion()
+        {
+            ModelVersion v = ModelVersion.V_0_1;
+            foreach( var f in GetAllPersistentFields())
+            {
+                if( PersistencyHelper.GetPersistentFieldInfo(f, out PersistentFieldAttribute info))
+                {
+                    if( v < (ModelVersion)info.AvalailableSince)
+                    {
+                        v = (ModelVersion)info.AvalailableSince;
+                    }
+                }
+            }
+            return v;
         }
 
         public T GetCustomAttribute<T>() where T: Attribute
@@ -229,6 +223,8 @@ namespace Sketch.Models
             var type = this.GetType();
             return (T)type.GetCustomAttribute<T>();
         }
+
+
 
         protected abstract void Initialize();
         protected virtual void FieldDataRestored() { }

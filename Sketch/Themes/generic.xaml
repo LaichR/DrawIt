@@ -28,6 +28,7 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
+    
     <DataTemplate DataType="{x:Type BasicItems:FreeTextModel}">
         <Border Background="{Binding Fill}" 
                 BorderThickness="{Binding BorderThickness}" 

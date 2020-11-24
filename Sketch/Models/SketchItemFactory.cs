@@ -38,13 +38,14 @@ namespace Sketch.Models
 
         Type _selectedType = null;
 
-        Dictionary<Type, CommandDescriptor> _paletteCommands = new Dictionary<Type, CommandDescriptor>();
-        Dictionary<Type, CreateBoundedSketchItemDelegate> _createBoundedItem = new Dictionary<Type, CreateBoundedSketchItemDelegate>();
-        Dictionary<Type, CreateConnectorDelegate> _createConnectorItem = new Dictionary<Type, CreateConnectorDelegate>();
-        Dictionary<Type, List<Type>> _allowableConnectorTypes = new Dictionary<Type, List<Type>>();
-        Dictionary<Type, List<ICommandDescriptor>> _allowableConnectorCmdDesc = new Dictionary<Type, List<ICommandDescriptor>>();
-        Dictionary<Type, List<Type>> _allowableConnectorTargetTypes = new Dictionary<Type, List<Type>>();
-        Dictionary<Type, List<IBoundedItemFactory>> _allowableConnectorTargetTypesFactories = new Dictionary<Type, List<IBoundedItemFactory>>();
+        readonly Dictionary<Type, ConnectionType> _connectionTypeDefault = new Dictionary<Type, ConnectionType>();
+        readonly Dictionary<Type, CommandDescriptor> _paletteCommands = new Dictionary<Type, CommandDescriptor>();
+        readonly Dictionary<Type, CreateBoundedSketchItemDelegate> _createBoundedItem = new Dictionary<Type, CreateBoundedSketchItemDelegate>();
+        readonly Dictionary<Type, CreateConnectorDelegate> _createConnectorItem = new Dictionary<Type, CreateConnectorDelegate>();
+        readonly Dictionary<Type, List<Type>> _allowableConnectorTypes = new Dictionary<Type, List<Type>>();
+        readonly Dictionary<Type, List<ICommandDescriptor>> _allowableConnectorCmdDesc = new Dictionary<Type, List<ICommandDescriptor>>();
+        readonly Dictionary<Type, List<Type>> _allowableConnectorTargetTypes = new Dictionary<Type, List<Type>>();
+        readonly Dictionary<Type, List<IBoundedItemFactory>> _allowableConnectorTargetTypesFactories = new Dictionary<Type, List<IBoundedItemFactory>>();
 
         internal static ISketchItemFactory ActiveFactory
         {
@@ -113,14 +114,18 @@ namespace Sketch.Models
             throw new KeyNotFoundException(string.Format("No factory operation registered for class {0}", cls.Name));
         }
 
-        public IConnectorItemModel CreateConnector(Type cls, ConnectionType type, 
+        public IConnectorItemModel CreateConnector(Type cls,
             IBoundedItemModel from, IBoundedItemModel to, 
             Point startPointHint, Point endPointHint,
             ISketchItemContainer container)
         {
+            if(!_connectionTypeDefault.TryGetValue(cls, out ConnectionType connectionType))
+            {
+                connectionType = ConnectionType.AutoRouting;
+            }
             if( _createConnectorItem.TryGetValue(cls, out CreateConnectorDelegate factorOp))
             {
-                return factorOp(type, from, to, startPointHint, endPointHint, container);
+                return factorOp(connectionType, from, to, startPointHint, endPointHint, container);
             }
             throw new KeyNotFoundException(string.Format("No factory operation registered for class {0}", cls.Name));
         }
@@ -242,19 +247,13 @@ namespace Sketch.Models
 
         void NotifyOnBoundedItemSelected()
         {
-            if( OnBoundedItemSelected != null )
-            {
-                OnBoundedItemSelected(_selectedType, EventArgs.Empty);
-            }
+            OnBoundedItemSelected?.Invoke(_selectedType, EventArgs.Empty);
         }
 
         
         void NotifyOnConnectorItemSelected()
         {
-            if( OnConnectorItemSelected != null)
-            {
-                OnConnectorItemSelected(_selectedType, EventArgs.Empty);
-            }
+             OnConnectorItemSelected?.Invoke(_selectedType, EventArgs.Empty);   
         }
     }
 }

@@ -134,10 +134,10 @@ namespace UI.Utilities.Controls
 
         protected override void OnSelectedItemChanged(RoutedPropertyChangedEventArgs<object> e)
         {
-            var node = e.NewValue as IHierarchicalNode;
-            var oldNode = e.OldValue as IHierarchicalNode;
+            //var node = e.NewValue as IHierarchicalNode;
+            //var oldNode = e.OldValue as IHierarchicalNode;
             base.OnSelectedItemChanged(e);
-            if (node != null)
+            if (e.NewValue is IHierarchicalNode node)
             {
                 _nodePath.Clear();
                 _nodePath = new List<Interfaces.IHierarchicalNode>();
@@ -158,10 +158,7 @@ namespace UI.Utilities.Controls
                     _selectedItemIsChanging = false;
                 }
             }
-            //if (oldNode != null)
-            //{
-            //    oldNode.AllowEdit = false;
-            //}
+            
         }
 
         protected override void OnTextInput(System.Windows.Input.TextCompositionEventArgs e)

@@ -21,7 +21,6 @@ namespace Sketch.Controls
         static readonly DashStyle _activeDashStile = new DashStyle(new double[] { 2.0, 2.5 }, 0.0);
         static readonly double _activeStroke = 1.0;
         static readonly double _defaultStroke = 3.0;
-        static readonly Pen _hitTestPen = new Pen(Brushes.White, 13.0);
 
         readonly ConnectableBase _realBody;
         RectangleGeometry _shadowGeometry;
@@ -38,7 +37,7 @@ namespace Sketch.Controls
         readonly OutlineUI _adorned;
         readonly ISketchItemDisplay _parent;
         //double _strokeThickness = 3.0;
-        DashStyle _defaultDashstile;
+        readonly DashStyle _defaultDashstile;
         
         public OutlineAdorner(OutlineUI adorned, ISketchItemDisplay parent )
             :base(adorned)

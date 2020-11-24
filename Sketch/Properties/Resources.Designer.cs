@@ -113,6 +113,16 @@ namespace Sketch.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap SaveAsPicture {
+            get {
+                object obj = ResourceManager.GetObject("SaveAsPicture", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap top_align {
             get {
                 object obj = ResourceManager.GetObject("top_align", resourceCulture);

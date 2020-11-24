@@ -15,10 +15,15 @@ namespace Sketch.Controls
 {
     class ConnectorAdorner: Adorner
     {
+        const double SelectedRadius = 3;
+        const double NormalRadidius = 0.2;
+
         readonly ConnectorModel _model;
 
         readonly ISketchItemDisplay _parent;
         double _lineWidht = 3;
+        double _waypointRadius;
+        int _hitWaypoint = -1;
         Brush _myLineBrush;
         Brush _myFillBrush;
         Pen _myPen;
@@ -42,6 +47,7 @@ namespace Sketch.Controls
             {               
                 _myLineBrush = Brushes.Blue;
                 _lineWidht = 3;
+                _waypointRadius = SelectedRadius;
             }
             else
             {
@@ -49,6 +55,8 @@ namespace Sketch.Controls
                 _lineWidht = 1;
                 HitEnd = false;
                 HitStart = false;
+                _hitWaypoint = - 1;
+                _waypointRadius = NormalRadidius;
             }
 
             _myFillBrush = _myLineBrush;
@@ -66,7 +74,14 @@ namespace Sketch.Controls
             if (HitEnd)
             {
                 drawingContext.DrawRectangle(_myFillBrush, _myPen, _model.HotSpotEnd);
-            }   
+            }
+
+            foreach (var w in _model.Waypoints)
+            {
+                var center = ConnectorUtilities.ComputeCenter(w.Bounds);
+                drawingContext.DrawEllipse(_myFillBrush, _myPen, center, _waypointRadius, _waypointRadius);
+            }
+            
         }
 
         public bool HitStart
@@ -91,6 +106,12 @@ namespace Sketch.Controls
             {
                 _model.ConnectorEndSelected = value;
             }
+        }
+
+        public bool HitWaypoint(out int index)
+        {
+            index = _hitWaypoint;
+            return _hitWaypoint >= 0;
         }
 
 
@@ -137,7 +158,16 @@ namespace Sketch.Controls
             var p = MousePositionArea(hitTestParameters.HitPoint);
             var hitStart = _model.HotSpotStart.IntersectsWith(p);
             var hitEnd = _model.HotSpotEnd.IntersectsWith(p);
-            if( hitStart || hitEnd )
+            _hitWaypoint = -1;
+            for( int i = 0; i< _model.Waypoints.Count; i++)
+            {
+                if( _model.Waypoints[i].Bounds.IntersectsWith(p))
+                {
+                    _hitWaypoint = i;
+                    break;
+                }
+            }
+            if( hitStart || hitEnd || _hitWaypoint >= 0 )
             {                
                 var result = new PointHitTestResult(this, hitTestParameters.HitPoint);
                 InvalidateVisual();

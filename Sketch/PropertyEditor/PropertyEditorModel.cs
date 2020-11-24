@@ -15,13 +15,12 @@ namespace Sketch.PropertyEditor
 {
     public class PropertyEditorModel: BindableBase, ITemplateProvider
     {
-        ObservableCollection<PropertyValueModel> _properties = new ObservableCollection<PropertyValueModel>();
+        readonly ObservableCollection<PropertyValueModel> _properties = new ObservableCollection<PropertyValueModel>();
 
-        DataTemplateSelector _cellTemplateSelector = new PropertyEditTemplateSelector();
-        DataTemplateSelector _cellEditingTemplateSelector = new PropertyEditTemplateSelector();
+        readonly DataTemplateSelector _cellTemplateSelector = new PropertyEditTemplateSelector();
 
         const string NoObjSelectedLabel = "No Object Selected";
-
+        
         object _object = null;
         string _objectTypeName = NoObjSelectedLabel;
 

@@ -15,7 +15,7 @@ namespace Sketch.Models
         Geometry GetGeometry(GeometryGroup gg, LineType lineType, Point start, 
             Point end, double distance);
 
-        void Commit(ConnectorDocking movePointDocking, ConnectorDocking otherPointDocking, 
+        void Commit(ConnectorDocking movePointDocking, ConnectorDocking otherPointDocking,
             Point newPositionStartPoint, 
             Point newPositionEndPoint, double newDistance);
 
@@ -26,7 +26,18 @@ namespace Sketch.Models
             get;
         }
 
-        ConnectionType ConnectionType
+        Point EndPoint
+        {
+            get;
+        }
+
+        IWaypoint StartingFrom
+        {
+            get;
+
+        }
+
+        IWaypoint EndingAt
         {
             get;
         }
@@ -42,6 +53,16 @@ namespace Sketch.Models
         }
 
         MoveType MoveType
+        {
+            get;
+        }
+
+        double StartPointRelativePosition
+        {
+            get;
+        }
+
+        double EndPointRelativePosition
         {
             get;
         }

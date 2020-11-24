@@ -88,18 +88,21 @@ namespace Sketch.Controls
                 var path = geometry.Children.First() as PathGeometry;
                 if (path != null && path.Figures.Count() > 0)
                 {
-                    var pathFigureCollection = path.Figures.First();
-                    
-                    if (pathFigureCollection.Segments.Count() > 0)
+                    foreach (var f in path.Figures)
                     {
-                        var startPoint = pathFigureCollection.StartPoint;
-                        foreach (var segment in pathFigureCollection.Segments.OfType<LineSegment>())
-                        {
-                            var endPoint = segment.Point;
-                            lineSegments.Add(
-                                new LineSegmentDecorator(ui, startPoint, endPoint, id));
+                        var pathFigureCollection = f;
 
-                            startPoint = endPoint;
+                        if (pathFigureCollection.Segments.Count() > 0)
+                        {
+                            var startPoint = pathFigureCollection.StartPoint;
+                            foreach (var segment in pathFigureCollection.Segments.OfType<LineSegment>())
+                            {
+                                var endPoint = segment.Point;
+                                lineSegments.Add(
+                                    new LineSegmentDecorator(ui, startPoint, endPoint, id));
+
+                                startPoint = endPoint;
+                            }
                         }
                     }
                 }

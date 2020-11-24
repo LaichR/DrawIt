@@ -19,10 +19,10 @@ namespace Sketch.Controls
 
     internal class AddConnectorOperation : IEditOperation
     {
-        ConnectablePairSelector _selector;
-        ISketchItemDisplay _pad;
-        ConnectableBase _from;
-        ContextMenu _oldContextMenue;
+        readonly ConnectablePairSelector _selector;
+        readonly ISketchItemDisplay _pad;
+        readonly ConnectableBase _from;
+        readonly ContextMenu _oldContextMenue;
         bool _done = false;
 
         public AddConnectorOperation(ISketchItemDisplay pad, ConnectableBase from, Point p)
@@ -79,7 +79,7 @@ namespace Sketch.Controls
 
                     var connectorModel = factory.CreateConnector(
                         factory.SelectedForCreation,
-                        ConnectionType.AutoRouting, _from, to, _selector.Start
+                        _from, to, _selector.Start
                         , endPointHint,
                         _pad );
                     _pad.SketchItems.Add(connectorModel);
@@ -137,7 +137,7 @@ namespace Sketch.Controls
                                    _pad.SketchItems.Add(connectable);
                                    var connector = factory.CreateConnector(
                                        selectedForCreation,
-                                       ConnectionType.AutoRouting, _from, connectable
+                                        _from, connectable
                                        , _selector.Start
                                        , endPointHint,
                                        _pad );
@@ -149,6 +149,7 @@ namespace Sketch.Controls
                     }
                     );
                 }
+
                 _pad.Canvas.ContextMenu.IsOpen = true;
 
             }

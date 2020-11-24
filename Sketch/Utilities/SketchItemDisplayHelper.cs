@@ -52,7 +52,7 @@ namespace Sketch.Utilities
 
 
 
-            var label = canvas.Children.OfType<SketchItemDisplayLabel>().First();
+            //var label = canvas.Children.OfType<SketchItemDisplayLabel>().First();
 
             
 
@@ -152,8 +152,10 @@ namespace Sketch.Utilities
                 new StreamingContext(StreamingContextStates.All),
                 new SketchItemContainerSerializationSurrogate(container));
 
-            IFormatter formatter = new BinaryFormatter();
-            formatter.SurrogateSelector = ss;
+            IFormatter formatter = new BinaryFormatter()
+            {
+                SurrogateSelector = ss
+            };
 
             List<ISketchItemModel> list = new List<ISketchItemModel>(outlines.Where(
                 (x)=>x.IsSerializable));
@@ -169,8 +171,10 @@ namespace Sketch.Utilities
                 new StreamingContext(StreamingContextStates.All),
                 new SketchItemContainerSerializationSurrogate(container));
 
-            IFormatter formatter = new BinaryFormatter();
-            formatter.SurrogateSelector = ss;
+            IFormatter formatter = new BinaryFormatter()
+            {
+                SurrogateSelector = ss
+            };
             var list = (List<ISketchItemModel>)formatter.Deserialize(stream);
             RestoreChildren(outlines, list);
         }

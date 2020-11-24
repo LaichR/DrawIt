@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using Sketch.Types;
 
@@ -15,8 +16,7 @@ namespace Sketch.Controls
         class MoveOperation : IEditOperation
         {
             Point _start;
-            OutlineUI _ui;
-            Rect _originalRect;
+            readonly OutlineUI _ui;
             bool _done = false;
             Transform _moveTransform;
 
@@ -25,15 +25,16 @@ namespace Sketch.Controls
                 _start = p;
                 _ui = parent_;
                 
-                _originalRect = _ui.Bounds;
+                //_originalRect = _ui.Bounds;
                 _ui.MouseUp += HandleMouseUp;
                 _ui.MouseMove += HandleMouseMove;
                 _ui._adorner.SetActive(true);
                 _ui.CaptureMouse();
                 _ui.TriggerSnapshot();
+                
             }
 
-            Transform ComputeMoveformation(Point p)
+            Transform ComputeMoveTransformation(Point p)
             {
                 var v = Point.Subtract(p, _start);
                 v.X = Math.Round(v.X / SketchPad.GridSize) * SketchPad.GridSize;
@@ -45,7 +46,7 @@ namespace Sketch.Controls
             void HandleMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
             {
                 Point p = e.GetPosition(this._ui._parent.Canvas);
-                _moveTransform = ComputeMoveformation(p);
+                _moveTransform = ComputeMoveTransformation(p);
                 _ui._adorner.Transform(_moveTransform);
                 e.Handled = true;
             }

@@ -55,9 +55,10 @@ namespace Sketch.Types
             {
                 {LineType.TopBottom, _anyNorthernPos},
                 {LineType.BottomTop, _anySouthernPos},
-                {LineType.LeftRight, _anyWesternPos},
-                {LineType.RightLeft,  _anyEasternPos},
-                //{LineType.RightLeft,  _all},
+                //{LineType.LeftRight, _anyWesternPos},
+                //{LineType.RightLeft,  _anyEasternPos},
+                {LineType.RightLeft,  _all},
+                {LineType.LeftRight, _all },
                 {LineType.LeftTop, _southWest},
                 {LineType.TopLeft, _northEast},
                 {LineType.TopRight, _northWest},

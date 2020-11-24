@@ -39,12 +39,12 @@ namespace Sketch.Models
         SerializableColor _fillColor = new SerializableColor();
         
         
-        double _fontSize = DefaultFontSize;
+        readonly double _fontSize = DefaultFontSize;
         Brush _stroke = DefaultStroke;
         double _strokeThickness = 1;
 
         DelegateCommand _cmdSelectColor;
-        GeometryGroup _geometry = new GeometryGroup();
+        readonly GeometryGroup _geometry = new GeometryGroup();
 
         public ConnectableBase(Point pos, Size size, 
             string label,
@@ -77,13 +77,18 @@ namespace Sketch.Models
             }
         }
 
+        public virtual ConnectorDocking GetConnectorDocking(Point p, bool isIncomingConnection)
+        {
+            return ConnectorUtilities.ComputeDocking(Bounds, p);
+        }
+
         public virtual IList<ICommandDescriptor> AllowableConnectors
         {
             get => SketchItemFactory.ActiveFactory.GetAllowableConnctors(this.GetType());
         }
 
-        protected ConnectableBase(SerializationInfo info, StreamingContext context):base(info, context)
-        {}
+        protected ConnectableBase(SerializationInfo info, StreamingContext context)
+            : base(info, context) { }
 
         public override void UpdateGeometry()
         {
@@ -93,9 +98,8 @@ namespace Sketch.Models
 
         public virtual Point GetPreferredToolsLocation( Point curMouse, out ConnectorDocking docking )
         {
-            docking = ConnectorDocking.Undefined;
             var leftThreshold = Bounds.X + Bounds.Width / 5;
-            var rightThreshold = Bounds.X + Bounds.Width / 5 * 4;
+            //var rightThreshold = Bounds.X + Bounds.Width / 5 * 4;
             var topThreshold = Bounds.Y + Bounds.Height / 5;
             var bottomThreshold = Bounds.Y + Bounds.Height / 5 * 4;
             
@@ -219,8 +223,8 @@ namespace Sketch.Models
             {
                 if (center.X != hint.X)
                 {
-                    hint.X = hint.X - 000;
-                    hint.Y = hint.Y - 500 * ConnectorUtilities.Slope(hint, center);
+                    //hint.X = hint.X - 000;
+                    hint.Y -=  500 * ConnectorUtilities.Slope(hint, center);
                 }
                 else
                 {
@@ -228,9 +232,23 @@ namespace Sketch.Models
                 }
             }
             Point p = ConnectorUtilities.Intersect(Bounds, hint, center);
+            
             double pos = 0.0;
             docking = ConnectorUtilities.ComputeDocking(Bounds, p, ref pos);
-            relativePos = pos;
+            relativePos = 0.5;
+            switch(docking)
+            {
+                case ConnectorDocking.Bottom:
+                case ConnectorDocking.Top:
+                    p.X = center.X;
+                    break;
+                case ConnectorDocking.Left:
+                case ConnectorDocking.Right:
+                    p.Y = center.Y;
+                    break;
+                default:
+                    break;
+            }
             return p;
         }
 
@@ -365,15 +383,15 @@ namespace Sketch.Models
 
         protected virtual void NotifyShapeChanged(ref Rect old, ref Rect @new)
         {
-            if (ShapeChanged != null)
-            {
-                ShapeChanged(this, new OutlineChangedEventArgs(old, @new));
-            }
+            ShapeChanged?.Invoke(this, new OutlineChangedEventArgs(old, @new));
         }
         void SelectColor()
         {
-            var dlg = new Controls.ColorPicker.ColorPickerDialog();
-            dlg.StartingColor = _fillColor.Color;
+            var dlg = new Controls.ColorPicker.ColorPickerDialog()
+            {
+                StartingColor = _fillColor.Color
+            };
+            
             bool? result = dlg.ShowDialog();
 
             if( result ?? true)
@@ -411,12 +429,14 @@ namespace Sketch.Models
         {
             
             _cmdSelectColor = new DelegateCommand(SelectColor);
-            Commands = new List<ICommandDescriptor>();
-            Commands.Add(new UI.Utilities.Behaviors.CommandDescriptor
+            Commands = new List<ICommandDescriptor>()
             {
-                Name = "Select Color",
-                Command = _cmdSelectColor
-            });
+                new UI.Utilities.Behaviors.CommandDescriptor
+                    {
+                        Name = "Select Color",
+                        Command = _cmdSelectColor
+                    }
+            };
         }
 
 

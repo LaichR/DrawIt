@@ -50,7 +50,7 @@ namespace DrawIt
         //string _label = "No Name";
         EditMode _editMode;
         object _selectedItem;
-        Sketch.Models.Sketch _sketch;
+        readonly Sketch.Models.Sketch _sketch;
         System.Windows.Input.Cursor _editCursor;
 
         static readonly System.Drawing.Bitmap _insertPackage = Properties.Resources.UmlPackageShape;
@@ -124,7 +124,7 @@ namespace DrawIt
                 new UI.Utilities.Behaviors.CommandDescriptor
                 {
                     Command = _cmdSavePng,
-                    Bitmap = DrawIt.Properties.Resources.Actions_system_run_icon,
+                    Bitmap = global::Sketch.Properties.Resources.SaveAsPicture,
                     Name = "Save PNG.."
                 }
             };

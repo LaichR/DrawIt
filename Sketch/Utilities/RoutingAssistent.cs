@@ -201,7 +201,7 @@ namespace Sketch.Utilities
             else
             {
                 var middleX = (start.X + end.X) / 2;
-                var middleY = 0.0;
+                double middleY;
                 if( start.Y > end.Y)
                 {
                     middleY = assist.FindHorizontalRoutingSlotBottom((start.Y + end.Y)/2, start.X + MinimalDistance, end.X - MinimalDistance);
@@ -219,106 +219,152 @@ namespace Sketch.Utilities
 
         static IEnumerable<Point> LeftRightLine(RoutingAssistent assist, Point start, Point end, double distance)
         {
-
             List<Point> linePoints = new List<Point>();
-            linePoints.Add(start);
-            linePoints.Add(new Point { X = start.X * distance + end.X * (1 - distance), Y = start.Y });
-            linePoints.Add(new Point { X = start.X * distance + end.X * (1 - distance), Y = end.Y });
-            linePoints.Add(end);
+            if ( start.X > end.X)
+            {
+                linePoints.Add(start);
+                linePoints.Add(new Point { X = start.X * distance + end.X * (1 - distance), Y = start.Y });
+                linePoints.Add(new Point { X = start.X * distance + end.X * (1 - distance), Y = end.Y });
+                linePoints.Add(end);
+            }
+            else
+            {
+                {
+                    var middleX = (start.X + end.X) / 2;
+                    double middleY;
+                    if (start.Y > end.Y)
+                    {
+                        middleY = assist.FindHorizontalRoutingSlotBottom((start.Y + end.Y) / 2, start.X + MinimalDistance, end.X - MinimalDistance);
+                    }
+                    else
+                    {
+                        middleY = assist.FindHorizontalRoutingSlotTop((start.Y + end.Y) / 2, start.X + MinimalDistance, end.X - MinimalDistance);
+                    }
+                    linePoints.AddRange(LeftLeftLine(assist, start, new Point(middleX, middleY), 0.5));
+                    linePoints.AddRange(RightRightLine(assist, new Point(middleX, middleY), end, 0.5));
+                }
+            }
             return linePoints;
+
         }
 
         static IEnumerable<Point> TopBottomLine(RoutingAssistent assist, Point start, Point end, double distance)
         {
-            List<Point> linePoints = new List<Point>();
-            linePoints.Add(start);
-            linePoints.Add(new Point { X = start.X, Y = (start.Y * (1 - distance) + end.Y * distance) });
-            linePoints.Add(new Point { X = end.X, Y = (start.Y * (1 - distance) + end.Y * distance) });
-            linePoints.Add(end);
+            distance = Math.Min(0.8, Math.Max(0.2, distance));
+            List<Point> linePoints = new List<Point>()
+            {
+                start,
+                new Point { X = start.X, Y = (start.Y * (1 - distance) + end.Y * distance) },
+                new Point { X = end.X, Y = (start.Y * (1 - distance) + end.Y * distance) },
+                end
+            };
             return linePoints;
         }
 
         static IEnumerable<Point> BottomTopLine(RoutingAssistent assist, Point start, Point end, double distance)
         {
-            List<Point> linePoints = new List<Point>();
-            linePoints.Add(start);
-            linePoints.Add(new Point { X = start.X, Y = (start.Y * distance + end.Y * (1 - distance)) });
-            linePoints.Add(new Point { X = end.X, Y = (start.Y * distance + end.Y * (1 - distance)) });
-            linePoints.Add(end);
+            List<Point> linePoints = new List<Point>()
+            { 
+                start,
+                new Point { X = start.X, Y = (start.Y * distance + end.Y * (1 - distance)) },
+                new Point { X = end.X, Y = (start.Y * distance + end.Y * (1 - distance)) },
+                end,
+            };
+
             return linePoints;
         }
 
         static IEnumerable<Point> LeftRightTopBottomLine(RoutingAssistent assist, Point start, Point end, double distance)
         {
-            List<Point> linePoints = new List<Point>();
-            linePoints.Add(start);
-            linePoints.Add(new Point { X = end.X, Y = start.Y });
-            linePoints.Add(end);
+            List<Point> linePoints = new List<Point>()
+            {
+                start,
+                new Point { X = end.X, Y = start.Y },
+                end,
+            };
+
             return linePoints;
         }
 
 
         static IEnumerable<Point> TopBottomLeftRightLine(RoutingAssistent assist, Point start, Point end, double distance)
         {
-            List<Point> linePoints = new List<Point>();
-            linePoints.Add(start);
-            linePoints.Add(new Point { X = start.X, Y = end.Y });
-            linePoints.Add(end);
+            List<Point> linePoints = new List<Point>()
+            {
+                start,
+                new Point { X = start.X, Y = end.Y },
+                end,
+            };
             return linePoints;
         }
 
         static IEnumerable<Point> LeftLeftLine(RoutingAssistent assist, Point start, Point end, double distance)
         {
-            List<Point> linePoints = new List<Point>();
-            linePoints.Add(start);
             var minX = Math.Min(start.X, end.X) - distance * NormalDistance;
             var minX2 = assist.FindVerticalRoutingSlotLeft(Math.Min(start.X, end.X) - MinimalDistance, start.Y, end.Y);
             minX = Math.Min(minX, minX2);
-            linePoints.Add(new Point { X = minX, Y = start.Y });
-            linePoints.Add(new Point { X = minX, Y = end.Y });
-            linePoints.Add(end);
+
+            List<Point> linePoints = new List<Point>()
+            {
+                start,
+                new Point { X = minX, Y = start.Y },
+                new Point { X = minX, Y = end.Y },
+                end
+            };
+            
             return linePoints;
         }
 
         static IEnumerable<Point> RightRightLine(RoutingAssistent assist, Point start, Point end, double distance)
         {
-            List<Point> linePoints = new List<Point>();
-            linePoints.Add(start);
             var maxX2 = assist.FindVerticalRoutingSlotRight(Math.Max(start.X, end.X) + MinimalDistance,
                 start.Y, end.Y);
-            var maxX = Math.Max(start.X,end.X) + NormalDistance * distance;
+            var maxX = Math.Max(start.X, end.X) + NormalDistance * distance;
             maxX = Math.Max(maxX2, maxX);
-            linePoints.Add(new Point { X = maxX, Y = start.Y });
-            linePoints.Add(new Point { X = maxX, Y = end.Y });
-            linePoints.Add(end);
+
+            List<Point> linePoints = new List<Point>() 
+            { 
+                start,
+                new Point { X = maxX, Y = start.Y },
+                new Point { X = maxX, Y = end.Y },
+                end
+            };
+
             return linePoints;
         }
 
         static IEnumerable<Point> TopTopLine(RoutingAssistent assist, Point start, Point end, double distance)
         {
-            List<Point> linePoints = new List<Point>();
-            linePoints.Add(start);
+            
             var minY = Math.Min(start.Y, end.Y) - distance * NormalDistance;
             var minY2 = assist.FindHorizontalRoutingSlotTop(Math.Min(start.Y, end.Y) - MinimalDistance,
                 start.X, end.X);
             minY = Math.Min(minY, minY2);
-            linePoints.Add(new Point { X = start.X, Y = minY });
-            linePoints.Add(new Point { X = end.X, Y = minY });
-            linePoints.Add(end);
+            List<Point> linePoints = new List<Point>()
+            {
+                start,
+                new Point { X = start.X, Y = minY },
+                new Point { X = end.X, Y = minY },
+                end,
+            };
             return linePoints;
         }
 
         static IEnumerable<Point> BottomBottomLine(RoutingAssistent assist, Point start, Point end, double distance)
         {
-            List<Point> linePoints = new List<Point>();
-            linePoints.Add(start);
             var maxY = Math.Max(start.Y, end.Y) + distance * NormalDistance;
             var maxY2 = assist.FindHorizontalRoutingSlotBottom(Math.Max(start.Y, end.Y) + MinimalDistance,
                 start.X, end.X);
             maxY = Math.Max(maxY, maxY2);
-            linePoints.Add(new Point { X = start.X, Y = maxY });
-            linePoints.Add(new Point { X = end.X, Y = maxY });
-            linePoints.Add(end);
+
+            List<Point> linePoints = new List<Point>()
+            { 
+                start,
+                new Point { X = start.X, Y = maxY },
+                new Point { X = end.X, Y = maxY },
+                end
+            };
+            
             return linePoints;
         }
     }

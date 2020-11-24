@@ -27,6 +27,9 @@ namespace Sketch.Interface
             get;
         }
 
-
+        bool AllowWaypoints
+        {
+            get;
+        }
     }
 }

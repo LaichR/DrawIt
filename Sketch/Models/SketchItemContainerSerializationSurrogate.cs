@@ -37,7 +37,8 @@ namespace Sketch.Models
             _container = container;
         }
 
-        public void GetObjectData(object obj, SerializationInfo info, StreamingContext context){}
+        public void GetObjectData(object obj, SerializationInfo info, StreamingContext context)
+        {}
 
         public object SetObjectData(object obj, SerializationInfo info, StreamingContext context, ISurrogateSelector selector)
         {

@@ -689,5 +689,6 @@ namespace Sketch.Controls
             return Math.Round(val / SketchPad.GridSize) * SketchPad.GridSize;
         }
 
+        public void Dispose(){}
     }
 }

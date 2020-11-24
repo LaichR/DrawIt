@@ -17,7 +17,7 @@ namespace Sketch.Controls
     internal class SelectUisOperation : IEditOperation
     {
 
-        ISketchItemDisplay _pad;
+        readonly ISketchItemDisplay _pad;
         Point _startPoint;
         Rectangle _selectionAreaVisualizer;
         //bool _selecting = false;

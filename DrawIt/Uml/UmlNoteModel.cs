@@ -20,14 +20,14 @@ namespace DrawIt.Uml
        
         static readonly double DogEarSize = 30;
        
-        [PersistentField(ModelVersion.V_0_1,"Note")]
+        [PersistentField((int)ModelVersion.V_0_1,"Note")]
         string _note;
-        [PersistentField(ModelVersion.V_0_1,"IsDecisionInput")]
+        [PersistentField((int)ModelVersion.V_0_1,"IsDecisionInput")]
         bool _isDecistionInput;
 
         
         
-        readonly PathFigure[] _notePath = new PathFigure[1];
+        //readonly PathFigure[] _notePath = new PathFigure[1];
         
 
         public UmlNoteModel(Point p )

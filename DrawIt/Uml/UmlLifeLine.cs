@@ -78,7 +78,7 @@ namespace DrawIt.Uml
             relativePos = (p.Y -Bounds.Y) / Bounds.Height;
             if (hint.X < lifeLineX)
             {
-                docking = ConnectorDocking.Right;
+                docking = ConnectorDocking.Left;
             }
             return p;
         }

@@ -16,7 +16,7 @@ namespace Sketch.Models
     [Serializable]
     public class ContainerModel: ConnectableBase, ISketchItemContainer
     {
-        [PersistentField(ModelVersion.V_0_1,"Children")]
+        [PersistentField((int)ModelVersion.V_0_1,"Children")]
         byte[] _childDataBuffer;
         ObservableCollection<ISketchItemModel> _children = new ObservableCollection<ISketchItemModel>();
         
@@ -42,7 +42,6 @@ namespace Sketch.Models
         protected override void PrepareFieldBackup()
         {
             base.PrepareFieldBackup();
-            List<ModelBase> children = new List<ModelBase>(SketchItems.OfType<ModelBase>());
             using (var stream = new System.IO.MemoryStream())
             {
                 SketchItemDisplayHelper.TakeSnapshot(stream, this);

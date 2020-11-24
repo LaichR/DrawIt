@@ -42,26 +42,7 @@ namespace Sketch.PropertyEditor
             set => this.SetValue(RectangleProperty, value);
         }
 
-        private void RectViewer_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            if (e.OldValue != e.NewValue)
-            {
-                if (e.OldValue != null)
-                {
-                    if (e.OldValue is RectangleWrapper wrapper)
-                    {
-                        wrapper.PropertyChanged -= Wrapper_PropertyChanged;
-                    }
-                }
-                if (e.NewValue != null)
-                {
-                    if (e.NewValue is RectangleWrapper wrapper)
-                    {
-                        wrapper.PropertyChanged += Wrapper_PropertyChanged;
-                    }
-                }
-            }
-        }
+        
 
         private void Wrapper_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {

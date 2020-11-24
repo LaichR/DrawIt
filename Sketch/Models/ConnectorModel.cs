@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Runtime.Serialization;
@@ -11,13 +12,14 @@ using Prism.Commands;
 using UI.Utilities.Interfaces;
 using UI.Utilities.Behaviors;
 using Sketch.Interface;
-using System.Net;
 using System.ComponentModel;
+using System.Collections;
 using System.Windows.Navigation;
+using Sketch.PropertyEditor;
 
 namespace Sketch.Models
 {
-    public class ConnectorModel: ModelBase, IConnectorItemModel
+    public class ConnectorModel: ModelBase, IConnectorItemModel, IEnumerator<IWaypoint>
     {
         static readonly double HotSpotSize = 8;
         static readonly double LabelDistanceY = 15;
@@ -35,47 +37,61 @@ namespace Sketch.Models
         IConnectorStrategy _myConnectorStrategy;
         bool _connectorStartSelected;
         bool _connectorEndSelected;
-        
-        PathGeometry _path = new PathGeometry();
-        GeometryGroup _geometry = new GeometryGroup();
+        int _waypointIndex;
 
-        [PersistentField(ModelVersion.V_0_1, "ConnectionType")]
-        ConnectionType _connectionType;
-        [PersistentField(ModelVersion.V_0_1, "StartPointDocking")]
+        public static readonly System.Windows.Media.Pen HittestPen = new System.Windows.Media.Pen()
+        {
+            Brush = System.Windows.Media.Brushes.Transparent,
+            Thickness = ComputeConnectorLine.LineWidth,
+        };
+
+        readonly PathGeometry _path = new PathGeometry();
+        readonly GeometryGroup _geometry = new GeometryGroup();
+
+        [PersistentField((int)ModelVersion.V_0_1, "ConnectionType")]
+        readonly ConnectionType _connectionType;
+        [PersistentField((int)ModelVersion.V_0_1, "StartPointDocking")]
         ConnectorDocking _startpointDocking;
-        [PersistentField(ModelVersion.V_0_1, "EndPointDocking")]
+        [PersistentField((int)ModelVersion.V_0_1, "EndPointDocking")]
         ConnectorDocking _endpointDocking;
 
-        [PersistentField(ModelVersion.V_0_1, "StartPointRelativePosition")]
+        [PersistentField((int)ModelVersion.V_0_1, "StartPointRelativePosition")]
         double _startPointRelativePosition;
-        [PersistentField(ModelVersion.V_0_1, "EndPointRelativePosition")]
+
+
+        [PersistentField((int)ModelVersion.V_0_1, "EndPointRelativePosition")]
         double _endPointRelativePosition;
-        [PersistentField(ModelVersion.V_0_1, "MiddlePointRelativePosition")]
+        
+        [PersistentField((int)ModelVersion.V_0_1, "MiddlePointRelativePosition")]
         double _middlePointRelativePosition;
 
-        [PersistentField(ModelVersion.V_0_1, "IsLabelShown")]
+        [PersistentField((int)ModelVersion.V_0_1, "IsLabelShown")]
         bool _isLabelShown = false;
-        [PersistentField(ModelVersion.V_2_0, "IsEndpointLabelShown", true)]
+
+        [PersistentField((int)ModelVersion.V_2_0, "IsEndpointLabelShown", true)]
         bool _isEndpointLabelShown = false;
 
-        [PersistentField(ModelVersion.V_2_0, "EndpointLabel", true)]
+        [PersistentField((int)ModelVersion.V_2_0, "EndpointLabel", true)]
         string _endPointLabel = "Endpoint";
 
-        [PersistentField(ModelVersion.V_2_0, "EndpointLabelArea")]
+        [PersistentField((int)ModelVersion.V_2_0, "EndpointLabelArea")]
         Rect _endPointLabelArea;
 
-        [PersistentField(ModelVersion.V_0_1, "Container")]
+        [PersistentField((int)ModelVersion.V_2_1, "Waypoints")]
+        readonly ObservableCollection<IWaypoint> _waypoints = new ObservableCollection<IWaypoint> ();
+
+        [PersistentField((int)ModelVersion.V_0_1, "Container")]
         SketchItemContainerProxy _containerProxy;
         ISketchItemContainer _container;          // if i want to prevent two overlaying connections, 
                                                   // i need to have some knowledge about other connections
 
-        [PersistentField(ModelVersion.V_0_1, "From")]
+        [PersistentField((int)ModelVersion.V_0_1, "From")]
         ConnectableBase _from;
 
-        [PersistentField(ModelVersion.V_0_1, "To")]
+        [PersistentField((int)ModelVersion.V_0_1, "To")]
         ConnectableBase _to;
 
-        string _showHideLabelHeader = ShowLabelHeader;
+        
         bool _isRewireing = false;
 
         
@@ -96,7 +112,7 @@ namespace Sketch.Models
 
         public ConnectorModel(ConnectionType type,
             IBoundedItemModel from, IBoundedItemModel to,
-            Point connectorStartHint, Point connectorEndHint,
+            System.Windows.Point connectorStartHint, System.Windows.Point connectorEndHint,
             ISketchItemContainer container)
         //:base(new Guid())
         {
@@ -135,6 +151,12 @@ namespace Sketch.Models
             UpdateGeometry();
         }
 
+        public bool AllowWaypoints
+        {
+            get => ConnectorStrategy.AllowWaypoints;
+        }
+
+        public ObservableCollection<IWaypoint> Waypoints => _waypoints;
         public virtual IList<IBoundedItemFactory> AllowableConnectorTargets
         {
             get => SketchItemFactory.ActiveFactory?.GetConnectableFactories(this.GetType());
@@ -189,7 +211,7 @@ namespace Sketch.Models
             }
         }
 
-        public IConnectorMoveHelper StartMove(  Point p)
+        public IConnectorMoveHelper StartMove(  System.Windows.Point p)
         {
             return _myConnectorStrategy.StartMove( p);
         }
@@ -455,6 +477,25 @@ namespace Sketch.Models
 
         protected virtual bool ShowLableHaderConnection => true;
 
+        public IWaypoint Current
+        {
+            get
+            {
+                if( _waypointIndex < 0)
+                {
+                    return new ToWaypointAdapter(this, From);
+                }
+                else if( _waypointIndex >= _waypoints.Count)
+                {
+                    return new ToWaypointAdapter(this, To);
+                }
+                var p = _waypoints.ElementAt(_waypointIndex);
+                return p;
+            }
+        }
+
+        object IEnumerator.Current => Current;
+
         public void RestoreConnectionEnd()
         {
             _restoreAction();
@@ -686,6 +727,71 @@ namespace Sketch.Models
             To = null;
             _isRewireing = false;
         }
+
+        internal void DeleteWaypoint(int index)
+        {
+            var wp = Waypoints[index];
+            wp.ShapeChanged -= Waypoint_ShapeChanged;
+            Waypoints.RemoveAt(index);
+            UpdateGeometry();
+        }
+
+        internal void AddWaypoint(IWaypoint connectable)
+        {
+            int i = 0;
+            var l = new LineGeometry();
+            var p = connectable.Bounds.TopLeft;
+            
+
+            try
+            {
+                List<PathFigure> path = new List<PathFigure>(ConnectorStrategy.ConnectorPath);
+                
+                foreach (var pf in path) 
+                {
+                    var start = pf.StartPoint;
+                    foreach (var lineSegment in pf.Segments.OfType<LineSegment>())
+                    {
+                        l.StartPoint = start;
+                        l.EndPoint = lineSegment.Point;
+                        if (l.FillContains(p, 8, ToleranceType.Absolute)) 
+                        {
+                            Waypoints.Insert(i, connectable);
+                            connectable.GetPreferredConnectorEnd(start, out double relativePos, out ConnectorDocking docking);
+                            connectable.GetPreferredConnectorStart(l.EndPoint, out relativePos, out docking);
+                            connectable.MiddlePosition = 0.5;
+                            connectable.ShapeChanged += Waypoint_ShapeChanged;
+                            return;
+                        }
+                        start = lineSegment.Point;
+                    }
+                    i++;
+                }
+            }
+            finally
+            {
+                UpdateGeometry();
+            }
+        }
+
+        private void Waypoint_ShapeChanged(object sender, OutlineChangedEventArgs e)
+        {
+            UpdateGeometry();
+        }
+
+        public void Dispose(){}
+
+        public bool MoveNext()
+        {
+            _waypointIndex++;
+            return _waypointIndex < _waypoints.Count;
+        }
+
+        public void Reset()
+        {
+            _waypointIndex = -1;
+        }
+
 
     }
 }

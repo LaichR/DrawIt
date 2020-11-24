@@ -26,7 +26,7 @@ namespace Sketch.Interface
 
         IBoundedItemModel CreateConnectableSketchItem(Type cls, Point p);
         
-        IConnectorItemModel CreateConnector(Type cls, ConnectionType type, IBoundedItemModel from, IBoundedItemModel to, 
+        IConnectorItemModel CreateConnector(Type cls, IBoundedItemModel from, IBoundedItemModel to, 
             Point startPointHint, Point endPointHint,
             ISketchItemContainer container );
 
