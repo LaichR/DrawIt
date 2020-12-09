@@ -99,29 +99,30 @@ namespace Sketch.Models
             return docking;
         }
 
-        public Point GetConnectorPoint(ConnectorDocking docking, double relativePosition)
+        public Point GetConnectorPoint(ConnectorDocking docking, double relativePosition, ulong connectorPort)
         {
 
             return ConnectorUtilities.ComputeCenter(_bounds);
         }
 
-        public Point GetPreferredConnectorEnd(Point hint, out double relativePosition, out ConnectorDocking docking)
+        public Point GetPreferredConnectorEnd(Point hint, out double relativePosition, out ConnectorDocking docking, out ulong connectorPort)
         {
-            var p = GetPreferredConnectorPos(hint, out relativePosition, out _incomingDocking);
+            var p = GetPreferredConnectorPos(hint, out relativePosition, out _incomingDocking, out connectorPort);
             docking = _incomingDocking;
             return p;
         }
 
-        public Point GetPreferredConnectorStart(Point hint, out double relativePosition, out ConnectorDocking docking)
+        public Point GetPreferredConnectorStart(Point hint, out double relativePosition, out ConnectorDocking docking, out ulong connectorPort)
         {
-            var p = GetPreferredConnectorPos(hint, out relativePosition, out _outgoingDocking);
+            var p = GetPreferredConnectorPos(hint, out relativePosition, out _outgoingDocking, out connectorPort);
             docking = _outgoingDocking;
             return p;
         }
 
-        Point GetPreferredConnectorPos(Point hint, out double relativePosition, out ConnectorDocking docking)
+        Point GetPreferredConnectorPos(Point hint, out double relativePosition, out ConnectorDocking docking, out ulong connectorPort)
         {
             relativePosition = 0.5;
+            connectorPort = 0;
             if (_incomingDocking == ConnectorDocking.Undefined &&
                 _outgoingDocking == ConnectorDocking.Undefined)
             {

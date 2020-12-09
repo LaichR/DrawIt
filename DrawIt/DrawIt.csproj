@@ -114,6 +114,7 @@
     </Compile>
     <Compile Include="Uml\UmlActionConnector.cs" />
     <Compile Include="Uml\UmlActivityModel.cs" />
+    <Compile Include="Uml\UmlMemberDescription.cs" />
     <Compile Include="Uml\UmlMessageModel.cs" />
     <Compile Include="Uml\UmlLifeLine.cs" />
     <Compile Include="Uml\UmlStereotypes.cs" />

@@ -1,16 +1,19 @@
-﻿using Prism.Mvvm;
+﻿
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using UI.Utilities;
 
 namespace Sketch.PropertyEditor
 {
-    public class PropertyValueModel:BindableBase
+    public class PropertyValueModel:BindableModel
     {
         readonly PropertyInfo _propertyInfo;
         readonly object _parent;
@@ -26,7 +29,7 @@ namespace Sketch.PropertyEditor
             _templateProvider = templateProvider;
             _propertyInfo = propertyInfo;
             _displayName = propertyInfo.Name;
-            if( parent is BindableBase bindable)
+            if( parent is  INotifyPropertyChanged bindable)
             {
                 bindable.PropertyChanged += Bindable_PropertyChanged;
             }
@@ -79,7 +82,7 @@ namespace Sketch.PropertyEditor
                     value = _propertyInfo.GetValue(_parent);
                     if (_propertyInfo.PropertyType == typeof(Rect))
                     {
-                        _rectangleWrapper.Assign((Rect)value, true);
+                        _rectangleWrapper.Assign((Rect)value);
                         value = _rectangleWrapper;
                     }
                     else if( _propertyInfo.PropertyType == typeof(FontWeight))
@@ -91,8 +94,25 @@ namespace Sketch.PropertyEditor
                     {
                         value = value.ToString();
                     }
+                    else if(_propertyInfo.PropertyType.IsGenericType )
+                    {
+                        if( _propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(ObservableCollection<>))
+                        {
+                            var args = _propertyInfo.PropertyType.GetGenericArguments();
+                            if( args.Any())
+                            {
+                                //var collectionMemberType = args.First();
+
+                                //if( collectionMemberType.GetInterface(typeof(INotifyPropertyChanged).FullName) != null )
+                                //{
+                                    
+                                //}
+                            }
+                        }
+                    }
                     _getValue = false;
                 }
+                value.GetType();
                 return value;
             }
 
@@ -131,7 +151,7 @@ namespace Sketch.PropertyEditor
 
         public void ReleaseBinding()
         {
-            if( _parent is BindableBase bindable)
+            if( _parent is INotifyPropertyChanged bindable)
             {
                 bindable.PropertyChanged -= Bindable_PropertyChanged;
             }

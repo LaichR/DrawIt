@@ -21,11 +21,11 @@ namespace Sketch.Interface
         /// <returns>Bitmap containing the queried constraints</returns>
         ConnectorDocking AllowableDockings(bool incoming);
 
-        Point GetPreferredConnectorStart(Point hint, out double relativePosition, out ConnectorDocking docking);
+        Point GetPreferredConnectorStart(Point hint, out double relativePosition, out ConnectorDocking docking, out ulong connectorPort);
 
-        Point GetPreferredConnectorEnd(Point hint, out double relativePosition, out ConnectorDocking docking);
+        Point GetPreferredConnectorEnd(Point hint, out double relativePosition, out ConnectorDocking docking, out ulong connectorPort);
 
-        Point GetConnectorPoint(ConnectorDocking docking, double relativePosition);
+        Point GetConnectorPoint(ConnectorDocking docking, double relativePosition, ulong connectorPort);
 
         ConnectorDocking GetConnectorDocking(Point position, bool incomingConnection);
 

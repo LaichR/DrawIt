@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Prism.Mvvm;
 using System.Windows;
 using System.Windows.Media;
 using System.Runtime.Serialization;
@@ -13,11 +12,12 @@ using System.ComponentModel;
 using RuntimeCheck;
 using System.Reflection;
 using System.Windows.Navigation;
+using System.Runtime.CompilerServices;
 
 namespace Sketch.Models
 {
     [Serializable]
-    public abstract class ModelBase : Prism.Mvvm.BindableBase, IHierarchicalNode, ISketchItemModel
+    public abstract class ModelBase : INotifyPropertyChanged, IHierarchicalNode, ISketchItemModel
     {
 
         //FontFamily _labelFont;
@@ -40,6 +40,8 @@ namespace Sketch.Models
         Rect _labelArea;
 
         IList<ICommandDescriptor> _commands;
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         ////public Guid Id
         //{
@@ -159,6 +161,17 @@ namespace Sketch.Models
                 var persistentSpec = persistent.First();
                 info.AddValue(persistentSpec.Name, f.GetValue(this), f.FieldType);
             }
+        }
+
+        public void SetProperty<T>(ref T backup, T value, [CallerMemberName] string name = "")
+        {
+            backup = value;
+            RaisePropertyChanged(name);
+        }
+
+        public void RaisePropertyChanged([CallerMemberName]string name="")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
         public virtual IHierarchicalNode Parent

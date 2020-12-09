@@ -1,4 +1,4 @@
-﻿using Prism.Mvvm;
+﻿
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
@@ -8,10 +8,11 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using UI.Utilities;
 
 namespace Sketch.PropertyEditor
 {
-    public class RectangleWrapper:BindableBase
+    public class RectangleWrapper:BindableModel
     {
         Rect _rectangle;
         string _xValue;
@@ -27,7 +28,7 @@ namespace Sketch.PropertyEditor
             _heightValue = r.Height.ToString();
         }
 
-        public void Assign(RectangleWrapper wrapper, bool notify)
+        public void Assign(RectangleWrapper wrapper)
         {
             _rectangle = wrapper._rectangle;
             //if (notify)
@@ -39,7 +40,7 @@ namespace Sketch.PropertyEditor
             //}
         }
 
-        public void Assign(Rect other, bool notify)
+        public void Assign(Rect other)
         {
             _rectangle = other;
             XValue = _rectangle.X.ToString();

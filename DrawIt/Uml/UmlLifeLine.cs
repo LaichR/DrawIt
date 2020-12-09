@@ -70,8 +70,9 @@ namespace DrawIt.Uml
             drawingContext.DrawGeometry(_lifeLinePen.Brush, _lifeLinePen , _lifeLine);   
         }
 
-        protected override Point GetConnectorPositionInfo(Point hint, out double relativePos, out ConnectorDocking docking)
+        protected override Point GetConnectorPositionInfo(Point hint, out double relativePos, out ConnectorDocking docking, out ulong port)
         {
+            port = 0;
             var lifeLineX = Bounds.X + Bounds.Width / 2;
             Point p = new Point(lifeLineX, hint.Y);
             docking = ConnectorDocking.Right;
@@ -98,7 +99,7 @@ namespace DrawIt.Uml
             return p;
         }
 
-        public override Point GetConnectorPoint(ConnectorDocking docking, double relativePosition)
+        public override Point GetConnectorPoint(ConnectorDocking docking, double relativePosition, ulong connectorPort)
         {
             double y = Bounds.Height * relativePosition + Bounds.Top;
             return new Point(Bounds.Left + Bounds.Width / 2, y);

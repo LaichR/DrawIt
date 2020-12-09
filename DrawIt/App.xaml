@@ -52,6 +52,18 @@
                 -->
             </Style.Triggers>
         </Style>
+        <DataTemplate x:Key="ClassMembersTemplate">
+            <DataGrid  AutoGenerateColumns="False" ItemsSource="{Binding Value}"
+                       
+                      CanUserAddRows="True" CanUserDeleteRows="True" >
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Header="Name"/>
+                    <DataGridTextColumn Binding="{Binding DataType, UpdateSourceTrigger=PropertyChanged}" Header="Type"/>
+                    <DataGridCheckBoxColumn Binding="{Binding IsPublic, UpdateSourceTrigger=PropertyChanged}" Header="is public"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </DataTemplate>
         <DataTemplate DataType="{x:Type uml:UmlActionConnector}">
             <SketchCtrl:GeometryBorder BorderGeometry="{Binding Geometry}" BorderBrush="{Binding Stroke}"
                                        Background="{Binding Fill}" BorderThickness="{Binding StrokeThickness}">
@@ -67,31 +79,51 @@
         <DataTemplate DataType="{x:Type uml:UmlClassModel}">
             <SketchCtrl:GeometryBorder x:Name="Outline" BorderBrush="Black" BorderGeometry="{Binding Geometry}" BorderThickness="0.5"
                     Background="{Binding Fill}" CornerRadius="1" Width="{Binding Bounds.Width}"
-                    Height="{Binding Bounds.Height}" Visibility="Visible" ShowShadow="True">
+                    Visibility="Visible" ShowShadow="True">
                 <StackPanel>
                     <TextBox Margin="20,5,20,5" Style="{StaticResource LabelEditorStyle}"/>
                     <Line X1="0"  X2="{Binding Bounds.Width}" Y1="2" Y2="2"
                           Stroke="Black" StrokeThickness="1"/>
+                    <ListView ItemsSource="{Binding MemberList}" Background="{Binding Fill}" Focusable="False" IsHitTestVisible="False">
+                        <ListView.Resources>
+                            <DataTemplate DataType="{x:Type uml:UmlMemberDescription}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="4*" />
+                                        <ColumnDefinition Width="5" />
+                                        <ColumnDefinition Width="2*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" 
+                                               Text="{Binding Name, Mode=OneWay}" HorizontalAlignment="Stretch" Margin="0,0,2,0"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text=":" FontWeight="Bold"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding DataType}" HorizontalAlignment="Stretch" Margin="2,0,0,0"
+                                               FontStyle="Italic"/>
+                                </Grid>
+                                
+                            </DataTemplate>
+                        </ListView.Resources>
+                    </ListView>
                 </StackPanel>
             </SketchCtrl:GeometryBorder>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type uml:UmlLifeLineModel}">
-            <Border Width="{Binding Bounds.Width}" Height="{Binding Bounds.Height}" BorderThickness="0" Background="Transparent">            
+            <Border Width="{Binding Bounds.Width}" Height="{Binding Bounds.Height}" BorderThickness="0" Background="Transparent">
                 <SketchCtrl:GeometryBorder x:Name="Outline" BorderBrush="Black" BorderThickness="1" BorderGeometry="{Binding Geometry}"
                     Background="{Binding Fill}" CornerRadius="1" Width="{Binding Bounds.Width}" ShowShadow="True"
                     Height="{Binding Bounds.Height}" Visibility="Visible"
                                            VerticalAlignment="Top">
-                <StackPanel>
-                    <TextBox Margin="5,5,5,5" Style="{StaticResource LabelEditorStyle}"/>
-                    
-                </StackPanel>
-            </SketchCtrl:GeometryBorder>
+                    <StackPanel>
+                        <TextBox Margin="5,5,5,5" Style="{StaticResource LabelEditorStyle}"/>
+
+                    </StackPanel>
+                </SketchCtrl:GeometryBorder>
             </Border>
 
         </DataTemplate>
-
-
 
         <DataTemplate DataType="{x:Type uml:UmlPackageModel}">
             <SketchCtrl:GeometryBorder x:Name="Outline"  BorderThickness="1" BorderBrush="{Binding Stroke}"
@@ -131,7 +163,7 @@
         <DataTemplate DataType="{x:Type uml:UmlNoteModel}">
             
                 <SketchCtrl:GeometryBorder BorderGeometry="{Binding Geometry}" 
-                                           Visibility="Visible" BorderBrush="Black" BorderThickness="1" Background="{Binding Fill}">
+                                           Visibility="Visible" BorderBrush="Black" BorderThickness="1" Background="{Binding Fill}" ShowShadow="True">
 
                     <StackPanel Visibility="Visible">
                     <TextBlock Text="&lt;&lt;decisioninput>>" Visibility="{Binding StereotypeVisibility}" Style="{StaticResource DecoratorTextStyle}" 

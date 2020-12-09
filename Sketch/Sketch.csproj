@@ -71,17 +71,6 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="Prism, Version=7.2.0.1422, Culture=neutral, PublicKeyToken=40ee6c3a2184dc59, processorArchitecture=MSIL">
-      <HintPath>..\DrawIt\packages\Prism.Core.7.2.0.1422\lib\net45\Prism.dll</HintPath>
-    </Reference>
-    <Reference Include="Prism.Unity.Wpf, Version=6.2.0.0, Culture=neutral, PublicKeyToken=91a96d2a154366d8, processorArchitecture=MSIL">
-      <HintPath>$(PRISM_UNITY_PATH)\Prism.Unity.Wpf.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Prism.Wpf, Version=6.2.0.0, Culture=neutral, PublicKeyToken=91a96d2a154366d8, processorArchitecture=MSIL">
-      <HintPath>$(PRISM_WPF_PATH)\Prism.Wpf.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -115,15 +104,20 @@
     <Compile Include="Controls\ConnectorAdorner.cs" />
     <Compile Include="Controls\ConnectorUI.cs" />
     <Compile Include="Controls\ConnectablePairSelector.cs" />
+    <Compile Include="Controls\DecoratorAdorner.cs" />
     <Compile Include="Controls\IntersectionFinder.cs" />
     <Compile Include="Controls\GeometryBorder.cs" />
     <Compile Include="Controls\Operations\ConnectorUI.WaypointMoveOperation.cs" />
+    <Compile Include="Interface\IDecoratable.cs" />
+    <Compile Include="Interface\ISketchItemGroup.cs" />
     <Compile Include="Interface\ISketchPadControl.cs" />
     <Compile Include="Interface\IConnectable.cs" />
     <Compile Include="Interface\IWaypoint.cs" />
     <Compile Include="Models\BasicItems\FreeTextModel.cs" />
+    <Compile Include="Models\BasicItems\SqaredConnectorPort.cs" />
     <Compile Include="Models\BasicItems\StrightLineConnector.cs" />
     <Compile Include="Models\ConnectorMoveHelper.cs" />
+    <Compile Include="Models\DecoratorModel.cs" />
     <Compile Include="Models\DoNotConsiderForConnectorRoutingAttribute.cs" />
     <Compile Include="Models\ModelVersion.cs" />
     <Compile Include="Models\PersistencyHelper.cs" />
@@ -253,6 +247,10 @@
     <None Include="Resources\top_align.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\equal_spacing.png" />
+    <None Include="Resources\equal_spacing1.png" />
+    <None Include="Resources\equal_spacing2.png" />
+    <None Include="Resources\equal_sizing.png" />
     <Content Include="Resources\SaveAsPicture.png" />
     <None Include="Resources\align_center.png" />
     <None Include="Resources\free_text.png" />

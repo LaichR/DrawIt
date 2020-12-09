@@ -12,6 +12,7 @@ using System.Runtime.Serialization;
 using Sketch.Interface;
 using System.Windows.Media.Imaging;
 using UI.Utilities;
+using UI.Utilities.Behaviors;
 using System.ComponentModel;
 using System.Reflection;
 using System.Collections.Specialized;
@@ -40,8 +41,11 @@ namespace DrawIt.Uml
             IsSelected = true;
             AllowSizeChange = true;
             Label = "new action";
-            RotationAngle = 0.0;       
+            RotationAngle = 0.0;
+            Commands = GetUmlActivityModelCommands();
         }
+
+
 
         protected override Rect ComputeLabelArea(string label)
         {
@@ -196,6 +200,45 @@ namespace DrawIt.Uml
             base.SketchItemsChanged(sender, e);
             RaisePropertyChanged("ImageAreaWidth");
             RaisePropertyChanged("ImageAreaVisibility");
+        }
+
+        void AddInputPort()
+        {
+            var leftSideConnectors = Decorators.Where((x) => x.Side == ConnectorDocking.Left);
+            double relPos = 1.0 / (leftSideConnectors.Count() + 2);
+            double delta = relPos;
+            var R = new Rect(0, 0, Bounds.Width, Bounds.Height);
+            foreach (var d in leftSideConnectors)
+            {
+                d.Location = ConnectorUtilities.ComputePoint(R, ConnectorDocking.Left, relPos);
+                d.RelativePosition = relPos;
+                relPos += delta;
+            }
+            ulong id = 1;
+            if (Decorators.Any())
+            {
+                id = Decorators.Select<DecoratorModel, ulong>((x) => x.Id).Max() + 1;
+            }
+            var p = new Sketch.Models.BasicItems.SqaredConnectorPort(ConnectorDocking.Left, id)
+            {
+                Location = ConnectorUtilities.ComputePoint(R, ConnectorDocking.Left, relPos),
+                RelativePosition = relPos
+            };
+            
+            Decorators.Add(p);
+        }
+
+        List<ICommandDescriptor> GetUmlActivityModelCommands()
+        {
+            List<ICommandDescriptor> commands = new List<ICommandDescriptor>
+            {
+                new CommandDescriptor()
+                {
+                    Name = "Add Input Port",
+                    Command = new DelegateCommand(()=>AddInputPort())
+                }
+            };
+            return commands;
         }
 
     }

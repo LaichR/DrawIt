@@ -83,10 +83,7 @@ namespace DrawIt.Uml
             }
         }
 
-        //public override IList<ICommandDescriptor> Tools
-        //{
-        //    get { return new List<UI.Utilities.Interfaces.ICommandDescriptor>(); }
-        //}
+        
 
 
         public Visibility StereotypeVisibility
@@ -104,7 +101,7 @@ namespace DrawIt.Uml
             {
                         new Point(0,0),
                         new Point( Bounds.Width - DogEarSize, 0),
-                        new Point( Bounds.Width - DogEarSize, DogEarSize),
+                        //new Point( Bounds.Width - DogEarSize, DogEarSize),
                         new Point( Bounds.Width, DogEarSize),
                         new Point( Bounds.Width, Bounds.Height),
                         new Point( 0, Bounds.Height)
@@ -115,6 +112,8 @@ namespace DrawIt.Uml
 
             myGeometry.Children.Add(GeometryHelper.GetGeometryFromPath(pathFigure));
             myGeometry.Children.Add(new LineGeometry(new Point(Bounds.Width - DogEarSize, 0),
+                new Point(Bounds.Width-DogEarSize, DogEarSize)));
+            myGeometry.Children.Add(new LineGeometry(new Point(Bounds.Width - DogEarSize, DogEarSize),
                 new Point(Bounds.Width, DogEarSize)));
 
             myGeometry.Transform = Rotation;

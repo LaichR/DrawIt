@@ -4,13 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Drawing.Uml
+namespace Sketch.Interface
 {
-    enum ShapeType
+    public interface IDecoratable
     {
-        Class,
-        State,
-        Packet,
-        Note
+
     }
 }

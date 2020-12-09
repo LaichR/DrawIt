@@ -83,6 +83,26 @@ namespace Sketch.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap equal_sizing {
+            get {
+                object obj = ResourceManager.GetObject("equal_sizing", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap equal_spacing {
+            get {
+                object obj = ResourceManager.GetObject("equal_spacing", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap free_text {
             get {
                 object obj = ResourceManager.GetObject("free_text", resourceCulture);
@@ -96,16 +116,6 @@ namespace Sketch.Properties {
         public static System.Drawing.Bitmap left_align {
             get {
                 object obj = ResourceManager.GetObject("left_align", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap paint_roller {
-            get {
-                object obj = ResourceManager.GetObject("paint_roller", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

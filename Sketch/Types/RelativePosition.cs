@@ -12,7 +12,7 @@ namespace Sketch.Types
     /// </summary>
     /// 
     [Flags]
-    internal enum RelativePosition
+    public enum RelativePosition
     {
         Undefined = 0, // if we have a self connection and the From is the same as the To or if the two rectangle intersect!
         N = 1,

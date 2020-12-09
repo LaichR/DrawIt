@@ -143,6 +143,43 @@ namespace Sketch.Utilities
                 }
             }
         }
+        public static void SetEqualVerticalSpacing(IEnumerable<ISketchItemModel> outlines)
+        {
+            var orderedUis = outlines.OfType<ConnectableBase>().Where((x) => x.IsMarked).OrderBy((x) => x.Geometry.Bounds.Top);
+            int nrOfItems = orderedUis.Count();
+            if (nrOfItems>2)
+            {
+                var first = orderedUis.First();
+                var last = orderedUis.Last();
+                var delta = (last.Bounds.Top - first.Bounds.Top) / (nrOfItems - 1);
+                var top = first.Bounds.Top;
+                foreach( var m in orderedUis.Skip(1))
+                {
+                    var targetY = top + delta;
+                    var dy = m.Bounds.Top - targetY;
+                    m.Move(new TranslateTransform(0, -dy));
+                    top = targetY;
+                }
+            }
+        }
+
+        public static void SetToSameWidth(IEnumerable<ISketchItemModel> outlines)
+        {
+            var orderedUis = outlines.Where((x) => x is ConnectableBase && x.IsMarked).OrderBy((x) => x.Geometry.Bounds.Top);
+            if (orderedUis.Count() > 1)
+            {
+                var first = orderedUis.First();
+                var anchor = first as ConnectableBase;
+                var targetWidht = (anchor.Bounds.Width);
+                foreach (var model in orderedUis.Skip(1))
+                {
+                    var cb = model as ConnectableBase;
+                    var bounds = cb.Bounds;
+                    bounds.Width = targetWidht;
+                    cb.Bounds = bounds;
+                }
+            }
+        }
 
         public static void TakeSnapshot( Stream stream, ISketchItemContainer container)
         {

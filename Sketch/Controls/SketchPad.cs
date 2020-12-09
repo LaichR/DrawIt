@@ -61,13 +61,13 @@ namespace Sketch.Controls
         double _xScaling;
         double _yScaling;
         ISketchItemDisplay _rootDisplay;
-        Stack<ISketchItemDisplay> _displayStack = new Stack<ISketchItemDisplay>();
+        readonly Stack<ISketchItemDisplay> _displayStack = new Stack<ISketchItemDisplay>();
 
        
         public SketchPad():base()
         {
             EditMode = Types.EditMode.Insert;
-            SketchItemFactory.ActiveFactory = new SketchItemFactory();
+            //SketchItemFactory.ActiveFactory = new SketchItemFactory();
         }
 
 
@@ -210,15 +210,14 @@ namespace Sketch.Controls
         private static void OnSketchChanged(DependencyObject source,
             DependencyPropertyChangedEventArgs e)
         {
-            SketchPad pad = source as SketchPad;
-            if( pad != null)
+            if( source is SketchPad pad)
             {
                 if( e.NewValue != e.OldValue)
                 {
                     pad.Children.Clear();
                     //var oldCollection = e.OldValue as ObservableCollection<ISketchItemModel>;
-                    var oldSketch = e.OldValue as Sketch.Models.Sketch;
-                    if (oldSketch != null)
+                    
+                    if (e.OldValue is Sketch.Models.Sketch oldSketch)
                     {
                         oldSketch.SketchItemFactory.UnregisterBoundedItemSelectedNotification(pad.HandleAddConnector);
                         if( pad._displayStack != null && pad._displayStack.Any())
@@ -230,15 +229,16 @@ namespace Sketch.Controls
                             pad._displayStack.Clear();
                         }   
                     }
-                    var newSketch = e.NewValue as Sketch.Models.Sketch;
                     
-                    if (newSketch != null)
+                    if (e.NewValue is Sketch.Models.Sketch newSketch)
                     {
                         SketchItemFactory.ActiveFactory = newSketch.SketchItemFactory;
                         newSketch.RegisterControlImplementation(pad);
                         newSketch.SketchItemFactory.RegisterConnectorItemSelectedNotification(pad.HandleAddConnector);
-                        var b = new Binding("Sketch.Label");
-                        b.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+                        var b = new Binding("Sketch.Label")
+                        {
+                            UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+                        };
                         pad.SetBinding(SketchPad.LabelProperty, b); 
                         var display = new SketchItemDisplay(pad, pad);
                         pad._rootDisplay = display;
@@ -366,6 +366,22 @@ namespace Sketch.Controls
             if (_displayStack.Any())
             {
                 SketchItemDisplayHelper.AlignCenter(_displayStack.Peek().SketchItems);
+            }
+        }
+
+        public void SetToSameWidth()
+        {
+            if (_displayStack.Any())
+            {
+                SketchItemDisplayHelper.SetToSameWidth(_displayStack.Peek().SketchItems);
+            }
+        }
+
+        public void SetEqualVerticalSpacing()
+        {
+            if (_displayStack.Any())
+            {
+                SketchItemDisplayHelper.SetEqualVerticalSpacing(_displayStack.Peek().SketchItems);
             }
         }
 

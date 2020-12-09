@@ -21,6 +21,10 @@ namespace Sketch.Interface
 
         void AlignCenter();
 
+        void SetToSameWidth();
+
+        void SetEqualVerticalSpacing();
+
         void ZoomIn();
 
         void ZoomOut();

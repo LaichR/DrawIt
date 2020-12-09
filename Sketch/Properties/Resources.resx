@@ -124,14 +124,17 @@
   <data name="DefaultConnector" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\DefaultConnector.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="equal_sizing" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\equal_sizing.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="equal_spacing" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\equal_spacing.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="free_text" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\free_text.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="left_align" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\left_align.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="paint_roller" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\paint_roller.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="SaveAsPicture" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\SaveAsPicture.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

@@ -30,7 +30,7 @@ namespace DrawIt
         
         ApplicationViewModel _model;
         Sketch.Controls.ColorPicker.ColorPalette _palette;
-
+        TreeViewItem _focusedItem;
 
         public MainWindow()
         {
@@ -45,7 +45,7 @@ namespace DrawIt
             //this.OutlineView.DataContext = DataContext;
             
             InitTools(_model.FileTools);
-            InitTools(_model.Sketch.SketchItemFactory.Palette);
+            //InitTools(_model.Sketch.SketchItemFactory.Palette);
             InitTools(_model.AlignmentTools);
             InitTools(_model.ZoomTools);
             InitColorTools();
@@ -89,6 +89,30 @@ namespace DrawIt
             var selected = SketchPad.SelectedItem;
             _model.SelectedItem = selected;
             PropertyEditor.InspectedObject = selected;
+        }
+
+
+        private void TreeView_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if( e.OriginalSource is TreeViewItem item 
+                && e.Source is Sketch.Models.SketchItemFactory)
+            {
+                item.IsExpanded = false;
+            }
+        }
+
+        private void TreeView_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (e.OriginalSource is TreeViewItem item && item.Header is 
+                Sketch.Models.SketchItemGroup)
+            {
+                if( _focusedItem != null)
+                {
+                    _focusedItem.IsExpanded = false;
+                }
+                item.IsExpanded = true;
+                _focusedItem = item;
+            }
         }
     }
 }

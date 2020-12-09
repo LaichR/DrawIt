@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows;
 using System.Windows.Controls;
-using Prism.Commands;
 using Sketch.Models;
 using Sketch.Interface;
 using Sketch.Utilities;
-using Sketch.Types;
+using UI.Utilities;
 using System.Windows.Media;
 using System.Reflection;
 
@@ -65,14 +64,14 @@ namespace Sketch.Controls
         void HandleMouseDown(object sender, MouseButtonEventArgs e)
         {
             e.Handled = true;
-            Point endPointHint = e.GetPosition(_pad.Canvas);
+            Point moveDown = e.GetPosition(_pad.Canvas);
             var factory = _pad.ItemFactory;
             
-            ISketchItemUI sketchItemUI = _pad.GetItemAtPoint(endPointHint);
+            ISketchItemUI sketchItemUI = _pad.GetItemAtPoint(moveDown);
             
             if (sketchItemUI != null)
             {
-                
+                Point endPointHint = moveDown;// e.GetPosition(sketchItemUI.Shape);
                 if (sketchItemUI.Model is ConnectableBase)
                 {
                     var to = sketchItemUI.Model as ConnectableBase;
@@ -104,11 +103,11 @@ namespace Sketch.Controls
                            {
                                double dx = 0; double dy = 0;
                                var angle = Vector.AngleBetween(new Vector(1,0),
-                                   new Vector(_selector.Start.X-endPointHint.X, _selector.Start.Y- endPointHint.Y));
+                                   new Vector(_selector.Start.X-moveDown.X, _selector.Start.Y- moveDown.Y));
 
                                if (angle < 0) angle += 360.0;
 
-                               var connectable = fac.CreateConnectableItem(endPointHint);
+                               var connectable = fac.CreateConnectableItem(moveDown);
                                
                                if( angle >= 0 && angle < 45)
                                {
@@ -139,7 +138,7 @@ namespace Sketch.Controls
                                        selectedForCreation,
                                         _from, connectable
                                        , _selector.Start
-                                       , endPointHint,
+                                       , moveDown,
                                        _pad );
                                    _pad.SketchItems.Add(connector);
                                    

@@ -66,8 +66,8 @@ namespace Sketch.Controls.ColorPicker
         {
 
             base.OnApplyTemplate();
-            m_spectrumDisplay = GetTemplateChild(SpectrumDisplayName) as Rectangle;
-            updateColorSpectrum();
+            _spectrumDisplay = GetTemplateChild(SpectrumDisplayName) as Rectangle;
+            UpdateColorSpectrum();
             OnValueChanged(Double.NaN, Value);
 
         }
@@ -88,23 +88,26 @@ namespace Sketch.Controls.ColorPicker
 
         #region Private Methods
 
-        private void updateColorSpectrum()
+        private void UpdateColorSpectrum()
         {
-            if (m_spectrumDisplay != null)
+            if (_spectrumDisplay != null)
             {
-                createSpectrum();
+                CreateSpectrum();
             }
         }
 
 
 
-        private void createSpectrum()
+        private void CreateSpectrum()
         {
 
-            pickerBrush = new LinearGradientBrush();
-            pickerBrush.StartPoint = new Point(0.5, 0);
-            pickerBrush.EndPoint = new Point(0.5, 1);
-            pickerBrush.ColorInterpolationMode = ColorInterpolationMode.SRgbLinearInterpolation;
+            pickerBrush = new LinearGradientBrush()
+            {
+                StartPoint = new Point(0.5, 0),
+                EndPoint = new Point(0.5, 1),
+                ColorInterpolationMode = ColorInterpolationMode.SRgbLinearInterpolation
+            };
+            
 
 
             List<Color> colorsList = ColorUtilities.GenerateHsvSpectrum();
@@ -117,15 +120,15 @@ namespace Sketch.Controls.ColorPicker
             }
 
             pickerBrush.GradientStops[i - 1].Offset = 1.0;      
-            m_spectrumDisplay.Fill = pickerBrush;
+            _spectrumDisplay.Fill = pickerBrush;
 
         }
         #endregion
 
 
         #region Private Fields
-        private static string SpectrumDisplayName = "PART_SpectrumDisplay";
-        private Rectangle m_spectrumDisplay;
+        private static readonly string SpectrumDisplayName = "PART_SpectrumDisplay";
+        private Rectangle _spectrumDisplay;
         private LinearGradientBrush pickerBrush;
         #endregion
 
@@ -171,15 +174,19 @@ namespace Sketch.Controls.ColorPicker
 
                 h *= 60;
                 if (h < 0.0)
-                    h = h + 360;
+                {
+                    h += 360;
+                }
 
             }
 
-            HsvColor hsvColor = new HsvColor();
-            hsvColor.H = h;
-            hsvColor.S = s;
-            hsvColor.V = v / 255;
-
+            HsvColor hsvColor = new HsvColor()
+            {
+                H = h,
+                S = s,
+                V = v / 255
+            };
+            
             return hsvColor;
              
         }
@@ -188,7 +195,7 @@ namespace Sketch.Controls.ColorPicker
         public static Color ConvertHsvToRgb(double h, double s, double v)
         {
 
-            double r = 0, g = 0, b = 0;
+            double r, g, b;
 
             if (s == 0)
             {
@@ -201,11 +208,10 @@ namespace Sketch.Controls.ColorPicker
                 int i;
                 double f, p, q, t;
 
-   
-                if (h == 360)
-                    h = 0;
-                else
-                    h = h / 60;
+
+                if (h == 360){ h = 0; }
+                else { h /= 60; }
+                    
 
                 i = (int)Math.Truncate(h);
                 f = h - i;

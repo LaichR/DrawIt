@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using UI.Utilities.Interfaces;
 
-namespace UI.Utilities.Behaviors
+namespace Sketch.Types
 {
     [Serializable]
     public class CommandDescriptor : BindableModel, ICommandDescriptor

@@ -44,7 +44,7 @@ namespace Sketch.Controls
             Point _p0;
             readonly Point _startPoint;
             readonly ConnectorDocking _allowableDockings;
-            bool _moveEndingSuccessful;
+            bool _moveEndingSuccessful = true;
             public MoveConnectorOperation( ConnectorUI ui, Point p )
             {
                 _ui = ui;
@@ -76,7 +76,7 @@ namespace Sketch.Controls
                     _visualizer = new ConnectorMoveVisualizer(initialGeometry); //tbd
                                                                                 //_visualizer.MouseMove += HandleMouseMove;
                     _isSelfTransition = _model.From == _model.To;
-                    if (_moveHelper.MoveType == MoveType.MoveStartPoint)
+                    if (_moveHelper.MoveType == MoveType.MoveStartPoint && _model.CanMoveStart)
                     {
                         _mouseMove = MoveStartPoint;
                         _allowableDockings = from.AllowableDockings(false);
@@ -84,7 +84,7 @@ namespace Sketch.Controls
                         _otherPointDocking = to.GetConnectorDocking(_moveHelper.EndPoint, true);
                         _otherPointPosition = _moveHelper.EndPoint;
                     }
-                    else if (_moveHelper.MoveType == MoveType.MoveEndPoint)
+                    else if (_moveHelper.MoveType == MoveType.MoveEndPoint && _model.CanMoveEnd)
                     {
                         _allowableDockings = to.AllowableDockings(true);
                         _mouseMove = MoveEndPoint;

@@ -190,12 +190,15 @@ namespace Sketch.Controls
         {
             lock (_synchRoot)
             {
-                _from = _selectedUI.Model as ConnectableBase;
-                if (_from != null)
+                if (_selectedUI != null)
                 {
-                    Point startPointHint = Mouse.GetPosition(Canvas);
-                    var p = _from.GetPreferredConnectorStart(startPointHint, out double _1, out ConnectorDocking _2);
-                    BeginEdit(new AddConnectorOperation(this, _from, p));
+                    _from = _selectedUI.Model as ConnectableBase;
+                    if (_from != null)
+                    {
+                        Point startPointHint = Mouse.GetPosition(Canvas);
+                        var p = _from.GetPreferredConnectorStart(startPointHint, out double _1, out ConnectorDocking _2, out ulong _3);
+                        BeginEdit(new AddConnectorOperation(this, _from, p));
+                    }
                 }
             }
         }

@@ -1,6 +1,7 @@
 ﻿
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using UI.Utilities;
 using UI.Utilities.Interfaces;
 using UI.Utilities.Behaviors;
 
@@ -15,7 +16,6 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using Sketch.Interface;
 using System.Collections.ObjectModel;
-using Prism.Commands;
 using System.Windows.Input;
 using System.Linq;
 
@@ -84,61 +84,67 @@ namespace Sketch.Controls
         Point _lastContextMenuPosition;
         MenuItem _deleteWaypointMenuItem;
 
-        public ConnectorUI(ISketchItemDisplay parent, ConnectorModel model)
+        public ConnectorUI(ISketchItemDisplay parent, object modelInstance )
         {
-            _model = model;
-            _parent = parent;
-            this.DataContext = _model;
-                
-            _myAdorner = new ConnectorAdorner(_parent, this);
-            _myAdorner.MouseLeftButtonDown += Adorner_MouseLeftButtonDown;
-            _myAdorner.MouseRightButtonDown += Adorner_MouseRightButtonDown;
-            
-            var isSelectedBinding = new Binding("IsSelected")
+            if (modelInstance is ConnectorModel model)
             {
-                Mode = BindingMode.TwoWay
-            };
-            
-            this.SetBinding(IsSelectedPropery, isSelectedBinding );
+                _model = model;
+                _parent = parent;
+                this.DataContext = _model;
 
-            var startLabelBinding = new Binding("ConnectorStartLabel") { Mode = BindingMode.OneWay };
-            
-            this.SetBinding(ConnectorStartLabelProperty, startLabelBinding);
+                _myAdorner = new ConnectorAdorner(_parent, this);
+                _myAdorner.MouseLeftButtonDown += Adorner_MouseLeftButtonDown;
+                _myAdorner.MouseRightButtonDown += Adorner_MouseRightButtonDown;
 
-            var endLabelBinding = new Binding("ConnectorEndLabel") { Mode = BindingMode.OneWay };
-            this.SetBinding(ConnectorEndLabelProperty, endLabelBinding);
+                var isSelectedBinding = new Binding("IsSelected")
+                {
+                    Mode = BindingMode.TwoWay
+                };
 
-            var contextMenuBinding = new Binding("ContextMenuDeclaration") { Mode = BindingMode.OneWay };
-            
-            this.SetBinding(ContextMenuDeclarationProperty, contextMenuBinding);
+                this.SetBinding(IsSelectedPropery, isSelectedBinding);
 
-            var fromBinding = new Binding("From") { Mode = BindingMode.OneWay };
-            
-            this.SetBinding(FromProperty, fromBinding);
+                var startLabelBinding = new Binding("ConnectorStartLabel") { Mode = BindingMode.OneWay };
 
-            var toBinding = new Binding("To") { Mode = BindingMode.OneWay };
-            
-            this.SetBinding(ToProperty, toBinding);
+                this.SetBinding(ConnectorStartLabelProperty, startLabelBinding);
 
-            SetBinding(StrokeDashArrayProperty,
-                new Binding("StrokeDashArray"));
+                var endLabelBinding = new Binding("ConnectorEndLabel") { Mode = BindingMode.OneWay };
+                this.SetBinding(ConnectorEndLabelProperty, endLabelBinding);
 
-            var waypointBinding = new Binding("Waypoints") { Mode = BindingMode.OneWay };
-            SetBinding(WaypointsProperty, waypointBinding);
+                var contextMenuBinding = new Binding("ContextMenuDeclaration") { Mode = BindingMode.OneWay };
 
-            _model.From.ShapeChanged += From_ShapeChanged;
-            _model.To.ShapeChanged += To_ShapeChanged;
-         
-            this.Visibility = System.Windows.Visibility.Visible;
-            this.Stroke = Brushes.White;
-            
+                this.SetBinding(ContextMenuDeclarationProperty, contextMenuBinding);
 
-            this.StrokeThickness = 1;// ComputeConnectorLine.LineWidth;
-            _myGeometry = _model.Geometry;
+                var fromBinding = new Binding("From") { Mode = BindingMode.OneWay };
 
-            AddAdorner();
-            this.SetBinding(GeometryProperty, "Geometry");
-            
+                this.SetBinding(FromProperty, fromBinding);
+
+                var toBinding = new Binding("To") { Mode = BindingMode.OneWay };
+
+                this.SetBinding(ToProperty, toBinding);
+
+                SetBinding(StrokeDashArrayProperty,
+                    new Binding("StrokeDashArray"));
+
+                var waypointBinding = new Binding("Waypoints") { Mode = BindingMode.OneWay };
+                SetBinding(WaypointsProperty, waypointBinding);
+
+                _model.From.ShapeChanged += From_ShapeChanged;
+                _model.To.ShapeChanged += To_ShapeChanged;
+
+                this.Visibility = System.Windows.Visibility.Visible;
+                this.Stroke = Brushes.White;
+
+
+                this.StrokeThickness = 1;// ComputeConnectorLine.LineWidth;
+                _myGeometry = _model.Geometry;
+
+                AddAdorner();
+                this.SetBinding(GeometryProperty, "Geometry");
+            }
+            else
+            {
+                throw new NotSupportedException("Model needs to be derived from class ConnectorModel");
+            }
         }
 
         private void Adorner_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -459,14 +465,26 @@ namespace Sketch.Controls
             {
                 if (!possibleConfigurations.Contains(pos))
                 {
-                    from.OutgoingDocking = ConnectorDocking.Undefined;
-                    to.IncomingDocking = ConnectorDocking.Undefined;
+                    if (_model.CanMoveStart)
+                    {
+                        from.OutgoingDocking = ConnectorDocking.Undefined;
+                    }
+                    if (_model.CanMoveEnd)
+                    {
+                        to.IncomingDocking = ConnectorDocking.Undefined;
+                    }
                 }
             }
             else
             {
-                from.OutgoingDocking = ConnectorDocking.Undefined;
-                to.IncomingDocking = ConnectorDocking.Undefined;
+                if (_model.CanMoveStart)
+                {
+                    from.OutgoingDocking = ConnectorDocking.Undefined;
+                }
+                if (_model.CanMoveEnd)
+                {
+                    to.IncomingDocking = ConnectorDocking.Undefined;
+                }
             }
         }
 
@@ -614,18 +632,17 @@ namespace Sketch.Controls
         private static void OnFromChanged(DependencyObject source,
             DependencyPropertyChangedEventArgs e)
         {
-            var me = source as ConnectorUI;
-            if( me != null)
+            if( source is ConnectorUI me)
             {
-                var oldFrom = e.OldValue as ConnectableBase;
-                if (oldFrom != null)
+                if (e.OldValue is ConnectableBase oldFrom)
                 {
                     oldFrom.ShapeChanged -= me.From_ShapeChanged;
                 }
-                var newFrom = e.NewValue as ConnectableBase;
-                var model = (ConnectorModel)me.Model;
-                if ( newFrom != null )
+                
+                
+                if ( e.NewValue is ConnectableBase newFrom )
                 {
+                    var model = (ConnectorModel)me.Model;
                     newFrom.ShapeChanged += me.From_ShapeChanged;
                     if (!model.IsRewireing)
                     {
@@ -644,16 +661,15 @@ namespace Sketch.Controls
         private static void OnToChanged(DependencyObject source,
             DependencyPropertyChangedEventArgs e)
         {
-            var me = source as ConnectorUI;
-            if (me != null)
+            
+            if (source is ConnectorUI me)
             {
-                var oldTo = e.OldValue as ConnectableBase;
-                if( oldTo != null)
+                if( e.OldValue is ConnectableBase oldTo)
                 {
                     oldTo.ShapeChanged -= me.To_ShapeChanged;
                 }
-                var newTo = e.NewValue as ConnectableBase;
-                if( newTo != null)
+                
+                if( e.NewValue is ConnectableBase newTo)
                 {
                     newTo.ShapeChanged += me.To_ShapeChanged;
                     me.CheckLineEnding();

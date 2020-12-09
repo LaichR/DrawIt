@@ -52,22 +52,22 @@ namespace Sketch.Models
             return docking;
         }
 
-        public Point GetConnectorPoint(ConnectorDocking docking, double relativePosition)
+        public Point GetConnectorPoint(ConnectorDocking docking, double relativePosition, ulong connectorPort)
         {
-            return _connectable.GetConnectorPoint(docking, relativePosition);
+            return _connectable.GetConnectorPoint(docking, relativePosition, connectorPort);
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {}
 
-        public Point GetPreferredConnectorEnd(Point hint, out double relativePosition, out ConnectorDocking docking)
+        public Point GetPreferredConnectorEnd(Point hint, out double relativePosition, out ConnectorDocking docking, out ulong connectorPort)
         {
-            return _connectable.GetPreferredConnectorEnd(hint, out relativePosition, out docking);
+            return _connectable.GetPreferredConnectorEnd(hint, out relativePosition, out docking, out connectorPort);
         }
 
-        public Point GetPreferredConnectorStart(Point hint, out double relativePosition, out ConnectorDocking docking)
+        public Point GetPreferredConnectorStart(Point hint, out double relativePosition, out ConnectorDocking docking, out ulong connectorPort)
         {
-            return _connectable.GetPreferredConnectorStart(hint, out relativePosition, out docking);
+            return _connectable.GetPreferredConnectorStart(hint, out relativePosition, out docking, out connectorPort);
         }
 
         public void Move(Transform transform)

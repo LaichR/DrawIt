@@ -1,31 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using Prism.Mvvm;
-using Prism.Commands;
-using Sketch.Interface;
-using Sketch.Utilities;
-using Sketch.Controls;
 using Sketch.Types;
-using System.Windows;
 using System.Windows.Input;
-
-using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using Sketch.Controls.ColorPicker;
+using UI.Utilities;
 using DrawIt.Uml;
 using DrawIt.Shapes;
+using Sketch.Interface;
+using System.Windows.Controls;
+using UI.Utilities.Interfaces;
+using Sketch.Models;
 
 namespace DrawIt
 {
-    public class ApplicationViewModel : BindableBase
+    public class ApplicationViewModel : BindableModel
     {
         //DelegateCommand _cmdInsertMode;
         //DelegateCommand _cmdEditMode;
@@ -39,6 +26,8 @@ namespace DrawIt
         readonly DelegateCommand _cmdAlignTop;
         readonly DelegateCommand _cmdAlignLeft;
         readonly DelegateCommand _cmdAlignCenter;
+        readonly DelegateCommand _cmdSameWidth;
+        readonly DelegateCommand _cmdSameVerticalSpace;
 
         readonly DelegateCommand _cmdZoomIn;
         readonly DelegateCommand _cmdZoomOut;
@@ -65,20 +54,26 @@ namespace DrawIt
         readonly List<UI.Utilities.Interfaces.ICommandDescriptor> _fileTools;
         readonly List<UI.Utilities.Interfaces.ICommandDescriptor> _alignTools;
         readonly List<UI.Utilities.Interfaces.ICommandDescriptor> _zoomTools;
-        UmlShapeFactory _sketchItemFactory = new Uml.UmlShapeFactory();
 
+        readonly List<string> _supportedDiagrams = new List<string>()
+        {
+            "Class Diagram", "others"
+        };
+        readonly SketchItemFactory _factory = new Uml.UmlShapeFactory();
         
+        
+
+
         string _fileName;
 
         public ApplicationViewModel()
         {
-
             _sketch = new Sketch.Models.Sketch()
             {
-                SketchItemFactory = _sketchItemFactory
+                SketchItemFactory = _factory
             };
-            _sketchItemFactory.RegisterBoundedItemSelectedNotification((x, y) => IsInsertMode = true);
-
+            _factory.PropertyChanged += Factory_PropertyChanged;
+            
             _editMode = global::Sketch.Types.EditMode.Insert;
             _isInsertMode = true;
             _isEditMode = false;
@@ -101,6 +96,8 @@ namespace DrawIt
             _cmdAlignLeft = new DelegateCommand(this.Sketch.AlignLeft);
             _cmdAlignCenter = new DelegateCommand(this.Sketch.AlignCenter);
             _cmdAlignTop = new DelegateCommand(this.Sketch.AlignTop);
+            _cmdSameVerticalSpace = new DelegateCommand(this.Sketch.SetEqualVerticalSpacing);
+            _cmdSameWidth = new DelegateCommand(this.Sketch.SetToSameWidth);
 
             _cmdZoomIn = new DelegateCommand(this.Sketch.ZoomIn);
             _cmdZoomOut = new DelegateCommand(this.Sketch.ZoomOut);
@@ -149,7 +146,19 @@ namespace DrawIt
                     Bitmap = global::Sketch.Properties.Resources.top_align,
                     Name = "align top"
                 },
-               
+                new UI.Utilities.Behaviors.CommandDescriptor
+                {
+                    Command = _cmdSameWidth,
+                    Bitmap = global::Sketch.Properties.Resources.equal_sizing,
+                    Name = "same width"
+                },
+                new UI.Utilities.Behaviors.CommandDescriptor
+                {
+                    Command = _cmdSameVerticalSpace,
+                    Bitmap = global::Sketch.Properties.Resources.equal_spacing,
+                    Name = "equal spacing"
+                },
+
             };
 
             _zoomTools = new List<UI.Utilities.Interfaces.ICommandDescriptor>()
@@ -169,6 +178,22 @@ namespace DrawIt
                 }
             };
             //_cmdOpen = new DelegateCommand(LodadDrawing);
+        }
+
+        private void Factory_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(SketchItemFactory.SelectedItemBitmap))
+            {
+                if (Sketch.SketchItemFactory.SelectedForCreation != null &&
+                    Sketch.SketchItemFactory.SelectedForCreation.GetInterface("IBoundedItemModel") != null)
+                {
+                    IsInsertMode = true;
+                }
+                else
+                {
+                    IsEditMode = true;
+                }
+            }
         }
 
         ~ApplicationViewModel()
@@ -253,15 +278,25 @@ namespace DrawIt
             }
         }
 
+        
+
         public System.Windows.Input.Cursor Cursor
         {
             get
             {
                 if (_isInsertMode )
                 {
-                    if (!_registeredCursors.TryGetValue(_sketchItemFactory.SelectedForCreation, out Cursor insertCursor))
+                    Cursor insertCursor = Cursors.Hand;
+                    if( Sketch.SketchItemFactory.SelectedForCreation != null)
                     {
-                        insertCursor = Cursors.Hand;
+                        if (!_registeredCursors.TryGetValue(Sketch.SketchItemFactory?.SelectedForCreation, out insertCursor))
+                        {
+                            if (_factory.SelectedItemBitmap != null)
+                            {
+                                insertCursor = UI.Utilities.BitmapToCursor.CreateCursor(_factory.SelectedItemBitmap, 1, 1);
+                                _registeredCursors.Add(Sketch.SketchItemFactory.SelectedForCreation, insertCursor);
+                            }
+                        }
                     }
                     return insertCursor;
                 }
@@ -270,11 +305,16 @@ namespace DrawIt
             
         }
 
+        public IList<ISketchItemGroup> SupportedDiagrams
+        {
+            get => _factory.ItemGroups;
+        }
+
         public bool IsEditMode
         {
             get { return _isEditMode; }
             set { SetProperty<bool>(ref _isEditMode, value);
-                //IsInsertMode = !_isEditMode;
+                IsInsertMode = !_isEditMode;
                 EditMode = value ? global::Sketch.Types.EditMode.Select : global::Sketch.Types.EditMode.Insert;
 
             }
@@ -332,6 +372,23 @@ namespace DrawIt
             }
         }
 
-       
+        List<MenuItem> CreateDiagramTools(IEnumerable<ICommandDescriptor> commandDescriptors)
+        {
+            List<MenuItem> menuItems = new List<MenuItem>();
+            foreach( var d in commandDescriptors)
+            {
+                menuItems.Add(new MenuItem()
+                {
+                    //Name = d.Name,
+                    Command = d.Command,
+                    Icon = d.Bitmap,
+                    ToolTip = d.Name
+                }
+                );
+            }
+            return menuItems;
+        }
+
+
     }
 }

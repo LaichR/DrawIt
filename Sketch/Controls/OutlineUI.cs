@@ -10,12 +10,11 @@ using System.Windows.Shapes;
 using System.Windows.Media;
 using System.Windows.Controls;
 using System.Windows.Documents;
-using UI.Utilities.Controls;
+using UI.Utilities;
 using UI.Utilities.Interfaces;
 using Sketch.Types;
 using Sketch.Models;
 using Sketch.Interface;
-using Prism.Commands;
 
 namespace Sketch.Controls
 {
@@ -56,117 +55,98 @@ namespace Sketch.Controls
         bool _isNotifyingMarkingChanged;
         RelativePosition _mouseMoveHitResult;
         
-        Models.ConnectableBase _model;
+        ConnectableBase _model;
         ISketchItemDisplay _parent;
         SketchPad _sketchPad;
         OutlineAdorner _adorner;
-        bool _isAdornderAdded;
+        DecoratorAdorner _decoratorAdorner;
+        bool _isShadowAdornderAdded;
+        bool _isDecoratorAdornerAdded;
         StackPanel _myTools;
         IEditOperation _currentOperationHandler;
         ISketchItemDisplay _brushDisplay;
         Brush _visualBrush;
 
-        public OutlineUI(SketchPad pad, ISketchItemDisplay parent, ConnectableBase model)
+        public OutlineUI(SketchPad pad, ISketchItemDisplay parent, object modelInstance)
             :base()
         {
-            _sketchPad = pad;
-            _model = model;
-            Content = model;
-            IsHitTestVisible = true;
-            Canvas.SetLeft(this, model.Bounds.Left);
-            Canvas.SetTop(this, model.Bounds.Top);
-            _parent = parent;
-            var tools = model.AllowableConnectors;
-            if (tools.Count > 0)
+            if (modelInstance is ConnectableBase model)
             {
-                InitTools(tools);
-            }
+                _sketchPad = pad;
+                _model = model;
+                _model.Decorators.CollectionChanged += Decorators_CollectionChanged;
+                Content = model;
+                IsHitTestVisible = true;
+                Canvas.SetLeft(this, model.Bounds.Left);
+                Canvas.SetTop(this, model.Bounds.Top);
+                _parent = parent;
+                var tools = model.AllowableConnectors;
+                if (tools.Count > 0)
+                {
+                    InitTools(tools);
+                }
 
-            this.DataContext = model;
-            this.SetBinding(LabelProperty, model.LabelPropertyName );
+                this.DataContext = model;
+                this.SetBinding(LabelProperty, model.LabelPropertyName);
 
-            var boundsBinding = new Binding(nameof(Bounds));
-            boundsBinding.Mode = BindingMode.OneWay;
-            //boundsBinding.IsAsync = true;
-            
-            this.SetBinding(BoundsProperty, boundsBinding) ;
-            this.SetBinding(GeometryProperty, nameof(Geometry));
-            
-            
-            this.Visibility = System.Windows.Visibility.Visible;
+                var boundsBinding = new Binding(nameof(Bounds));
+                boundsBinding.Mode = BindingMode.OneWay;
+                //boundsBinding.IsAsync = true;
 
-            /* commented
+                this.SetBinding(BoundsProperty, boundsBinding);
+                this.SetBinding(GeometryProperty, nameof(Geometry));
 
-            // allow to bind Fill property
-            if (model.GetType().GetProperty("Fill") != null)
-            {
-                this.SetBinding(FillProperty, "Fill");
-            }
-            else
-            {
-                Fill = Brushes.Wheat;
-            }
 
-            // allow to bind Stroke property
-            if( model.GetType().GetProperty("Stroke") != null)
-            {
-                this.SetBinding(StrokeProperty, "Stroke");
-            }
-            else
-            {
-                Stroke = Brushes.Black;
-            }
+                this.Visibility = System.Windows.Visibility.Visible;
 
-            // allow to bind Stroke Thickness property
-            if (model.GetType().GetProperty("StrokeThickness") != null)
-            {
-                this.SetBinding(StrokeThicknessProperty, "StrokeThickness");
-            }
-            else
-            {
-                this.StrokeThickness = 0.1;
-            }
+                // some of the bindings must only occur after the shadow was created!
+                _adorner = new OutlineAdorner(this, parent);
+                _decoratorAdorner = new DecoratorAdorner(this, parent);
+                
 
-            // allow to bind Stroke dash array property
-            if (model.GetType().GetProperty("StrokeDashArray") != null)
-            {
-                this.SetBinding(StrokeDashArrayProperty, "StrokeDashArray");
-            }
-            */
+                var isSelecteBinding = new Binding("IsSelected");
+                isSelecteBinding.Mode = BindingMode.TwoWay;
+                this.SetBinding(IsSelectedProperty, isSelecteBinding);
 
-            // some of the bindings must only occur after the shadow was created!
-            _adorner = new OutlineAdorner(this, parent);
+                var isMarkedBinding = new Binding("IsMarked");
+                isMarkedBinding.Mode = BindingMode.TwoWay;
+                this.SetBinding(IsMarkedProperty, isMarkedBinding);
 
-            var isSelecteBinding = new Binding("IsSelected");
-            isSelecteBinding.Mode = BindingMode.TwoWay;
-            this.SetBinding(IsSelectedProperty, isSelecteBinding);
+                this.SetBinding(AllowSizeChangeProperty, "AllowSizeChange");
 
-            var isMarkedBinding = new Binding("IsMarked");
-            isMarkedBinding.Mode = BindingMode.TwoWay;
-            this.SetBinding(IsMarkedProperty, isMarkedBinding);
+                var commands = model.Commands;
+                if (commands != null && commands.Count > 0)
+                {
 
-            this.SetBinding(AllowSizeChangeProperty, "AllowSizeChange");
-
-            var commands = model.Commands;
-            if( commands != null && commands.Count > 0)
-            {
-
-                ContextMenu = OutlineHelper.InitContextMenu(commands);
-                ContextMenu.Items.Add(
-                    new MenuItem()
+                    ContextMenu = OutlineHelper.InitContextMenu(commands);
+                    if (_model.IsSerializable)
                     {
-                        Header = "Copy",
-                        Command = new DelegateCommand(() =>
-                        {
-                            var newElem = _model.Clone();
-                            var t = new TranslateTransform(
-                                ConnectableBase.DefaultWidth / 4,
-                                ConnectableBase.DefaultHeight / 4);
-                            newElem.Move(t);
-                            _parent.SketchItems.Add(newElem);
-                        })
-                    });
+                        ContextMenu.Items.Add(
+                            new MenuItem()
+                            {
+                                Header = "Copy",
+                                Command = new DelegateCommand(() =>
+                                {
+                                    var newElem = _model.Clone();
+                                    var t = new TranslateTransform(
+                                        ConnectableBase.DefaultWidth / 4,
+                                        ConnectableBase.DefaultHeight / 4);
+                                    newElem.Move(t);
+                                    _parent.SketchItems.Add(newElem);
+                                })
+                            });
+                    }
+                }
             }
+            else
+            {
+                throw new NotSupportedException("The model needs to be derived from ConnectableBase");
+            }
+        }
+
+        private void Decorators_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            _decoratorAdorner?.InvalidateVisual();
         }
 
         public Brush VisualBrush
@@ -318,6 +298,7 @@ namespace Sketch.Controls
             //ClipToBounds = false;
             drawingContext.Pop();
             _adorner.InvalidateVisual();
+            _decoratorAdorner.InvalidateVisual();
             
         }
 
@@ -510,20 +491,20 @@ namespace Sketch.Controls
             
             if (IsSelected || IsMarked)
             {
-                if (!_isAdornderAdded)
+                if (!_isShadowAdornderAdded)
                 {
                     adornderlayer.Add(_adorner);
                     _adorner.InvalidateVisual();
-                    _isAdornderAdded = true;
+                    _isShadowAdornderAdded = true;
                 }
                 
             }
             else
             {
-                if (_isAdornderAdded)
+                if (_isShadowAdornderAdded)
                 {
                     adornderlayer.Remove(_adorner);
-                    _isAdornderAdded = false;
+                    _isShadowAdornderAdded = false;
                 }
                 
             }
@@ -584,6 +565,16 @@ namespace Sketch.Controls
 
         }
 
+        protected override void OnVisualParentChanged(DependencyObject oldParent)
+        {
+            base.OnVisualParentChanged(oldParent);
+            var layer = AdornerLayer.GetAdornerLayer(this);
+            if( layer != null && !_isDecoratorAdornerAdded)
+            {
+                layer.Add(_decoratorAdorner);
+                _isDecoratorAdornerAdded = true;
+            }
+        }
 
         private static void OnSelectedChanged(DependencyObject source,
              DependencyPropertyChangedEventArgs e)
@@ -619,7 +610,7 @@ namespace Sketch.Controls
                 var r = (Rect)e.NewValue;
                 
                 gadgetUI.ShowHideTools();
-                if (gadgetUI._isAdornderAdded)
+                if (gadgetUI._isShadowAdornderAdded)
                 {
                     gadgetUI._adorner.UpdateGeometry();
                 }

@@ -37,7 +37,22 @@ namespace Sketch.Models
         public ISketchItemFactory SketchItemFactory
         {
             get => _sketchItemFactory;
-            set => SetProperty<ISketchItemFactory>(ref _sketchItemFactory, value);
+            set
+            {
+                SetProperty<ISketchItemFactory>(ref _sketchItemFactory, value);
+                
+            }
+        }
+
+       
+        public void SetEqualVerticalSpacing()
+        {
+            _control.SetEqualVerticalSpacing();
+        }
+
+        public void SetToSameWidth()
+        {
+            _control.SetToSameWidth();
         }
 
         public void AlignCenter()

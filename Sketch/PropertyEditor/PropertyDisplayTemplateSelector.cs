@@ -25,6 +25,16 @@ namespace Sketch.PropertyEditor
             {typeof(Enum), "StringDisplayTemplate" }
         };
 
+        public static void RegisterDataTemplate(Type dataType, string newTemplateName)
+        {
+            if (_typeToTemplateMapping.TryGetValue(dataType, out string _1))
+            {
+                throw new ApplicationException(
+                    string.Format("Template for type <{0}> already defined", dataType));
+            }
+            _typeToTemplateMapping.Add(dataType, newTemplateName);
+        }
+
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
             FrameworkElement element = container as FrameworkElement;
@@ -32,7 +42,8 @@ namespace Sketch.PropertyEditor
             {
                 if (_typeToTemplateMapping.TryGetValue(model.PropertyType, out string key))
                 {
-                    return element.FindResource(key) as DataTemplate;
+                    var template =  element.FindResource(key) as DataTemplate;
+                    return template;
                 }
                 if (model.PropertyType == typeof(FontWeight))
                 {

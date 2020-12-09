@@ -15,7 +15,7 @@
             <Button Click="CancelButtonClicked" Margin="5,5,5,5">Cancel</Button>
         </StackPanel>
         <customCtrl:ColorPicker x:Name="cPicker"
-            SelectedColorChanged="onSelectedColorChanged"
+            SelectedColorChanged="OnSelectedColorChanged"
        Margin="10,10,10,-5" Width="290" />
 
     </DockPanel>

@@ -37,8 +37,8 @@ namespace Sketch.Controls
             Transform ComputeMoveTransformation(Point p)
             {
                 var v = Point.Subtract(p, _start);
-                v.X = Math.Round(v.X / SketchPad.GridSize) * SketchPad.GridSize;
-                v.Y = Math.Round(v.Y / SketchPad.GridSize) * SketchPad.GridSize;
+                v.X = Math.Round(Math.Round(v.X / SketchPad.GridSize) * SketchPad.GridSize,2);
+                v.Y = Math.Round(Math.Round(v.Y / SketchPad.GridSize) * SketchPad.GridSize,2);
                 var translation = new TranslateTransform(v.X, v.Y);
                 return translation;
             }

@@ -1,4 +1,4 @@
-﻿using Prism.Commands;
+﻿
 using Sketch.Interface;
 using System;
 using System.CodeDom;
@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using UI.Utilities;
 using UI.Utilities.Behaviors;
 using UI.Utilities.Interfaces;
 using System.Linq.Expressions;
@@ -16,11 +17,53 @@ using System.Runtime.Hosting;
 using System.Security.Cryptography;
 using Sketch.Models;
 using Bitmap = System.Drawing.Bitmap;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace Sketch.Models
 {
-    public class SketchItemFactory: ISketchItemFactory
+    public class SketchItemGroup : ISketchItemGroup
     {
+        readonly string _name;
+        readonly SketchItemFactory _parent;
+        readonly List<ICommandDescriptor> _paletteCommands = new List<ICommandDescriptor>();
+        readonly List<Type> _types = new List<Type>();
+        public SketchItemGroup(string name, SketchItemFactory parent)
+        {
+            _name = name;
+            _parent = parent;
+        }
+
+        public void AddType(Type cls)
+        {
+            if (cls.GetInterface("IBoundedItemModel") != null)
+            {
+                if (_types.Contains(cls)) return;
+                _types.Add(cls);
+            }
+        }
+
+        public string Name => _name;
+
+        public IList<ICommandDescriptor> Palette
+        {
+            get
+            {
+                if (_paletteCommands.Count() == 0)
+                {
+                    _paletteCommands.AddRange(
+                        _parent.PaletteCommands.Where<KeyValuePair<Type, CommandDescriptor>>((x) => _types.Contains(x.Key)).
+                        Select<KeyValuePair<Type, CommandDescriptor>, ICommandDescriptor>((y) => y.Value).OrderBy((x)=>x.Name));
+                }
+                return _paletteCommands;
+            }
+        }
+    }
+    public abstract class SketchItemFactory: ISketchItemFactory, INotifyPropertyChanged
+    {
+        
+        
+
         static readonly Type[] boundedItemfactorOpParam = new Type[]
         {
             typeof(System.Windows.Point)
@@ -37,21 +80,42 @@ namespace Sketch.Models
         };
 
         Type _selectedType = null;
+        Bitmap _selectedItemBitmap = null;
 
         readonly Dictionary<Type, ConnectionType> _connectionTypeDefault = new Dictionary<Type, ConnectionType>();
         readonly Dictionary<Type, CommandDescriptor> _paletteCommands = new Dictionary<Type, CommandDescriptor>();
+        readonly Dictionary<string, ISketchItemGroup> _sketchItemGroups = new Dictionary<string, ISketchItemGroup>(); 
         readonly Dictionary<Type, CreateBoundedSketchItemDelegate> _createBoundedItem = new Dictionary<Type, CreateBoundedSketchItemDelegate>();
         readonly Dictionary<Type, CreateConnectorDelegate> _createConnectorItem = new Dictionary<Type, CreateConnectorDelegate>();
         readonly Dictionary<Type, List<Type>> _allowableConnectorTypes = new Dictionary<Type, List<Type>>();
         readonly Dictionary<Type, List<ICommandDescriptor>> _allowableConnectorCmdDesc = new Dictionary<Type, List<ICommandDescriptor>>();
         readonly Dictionary<Type, List<Type>> _allowableConnectorTargetTypes = new Dictionary<Type, List<Type>>();
         readonly Dictionary<Type, List<IBoundedItemFactory>> _allowableConnectorTargetTypesFactories = new Dictionary<Type, List<IBoundedItemFactory>>();
+        readonly List<ISketchItemGroup> _itemGroups = new List<ISketchItemGroup>();
+        readonly string _name;
+
+        protected SketchItemFactory(string name)
+        {
+            _name = name;
+            InitializeFactory();
+        }
+
+        public abstract void InitializeFactory();
+
+
+        public string Name
+        {
+            get => _name;
+        }
+
+        internal Dictionary<Type, CommandDescriptor> PaletteCommands => _paletteCommands;
 
         internal static ISketchItemFactory ActiveFactory
         {
             get;
             set;
         }
+
 
 
         public void RegisterBoundedItemSelectedNotification(EventHandler handler)
@@ -75,6 +139,7 @@ namespace Sketch.Models
         event EventHandler OnBoundedItemSelected;
 
         event EventHandler OnConnectorItemSelected;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public void SetInitialSelection(Type t)
         {
@@ -99,10 +164,24 @@ namespace Sketch.Models
             }
         }
 
+        public Bitmap SelectedItemBitmap
+        {
+            get => _selectedItemBitmap;
+            private set
+            {
+                SetProperty<Bitmap>(ref _selectedItemBitmap, value);
+            }
+        }
+
         public IList<ICommandDescriptor> Palette
             => new List<ICommandDescriptor>(_paletteCommands.Where(
                 (x)=>x.Key.GetInterface("IBoundedItemModel") != null)
-                .Select((x)=>x.Value).OrderBy((x) => x.Name));
+                    .Select((x)=>x.Value).OrderBy((x) => x.Name));
+
+        public IList<ISketchItemGroup> ItemGroups
+        {
+            get => new List<ISketchItemGroup>(_sketchItemGroups.Values);
+        }
 
         public IBoundedItemModel CreateConnectableSketchItem(Type cls, System.Windows.Point p)
         {
@@ -200,6 +279,18 @@ namespace Sketch.Models
             }
         }
 
+        public void RegisterSketchItemInCategory(string category, 
+            Type sketchItemType, string menuLabel, string menuBrief, Bitmap toolsBitmap)
+        {
+            RegisterSketchItem(sketchItemType, menuLabel, menuBrief, toolsBitmap);
+            if( !_sketchItemGroups.TryGetValue(category, out ISketchItemGroup group))
+            {
+                group = new SketchItemGroup(category, this);
+                _sketchItemGroups.Add(category, group);
+            }
+            group.AddType(sketchItemType);
+        }
+
         CommandDescriptor CreatePaletteCommandDescriptor(Type type, string menuLabel, string menuBrief, Bitmap toolsBitmap)
         {
             var cmdDescriptor = new CommandDescriptor()
@@ -208,7 +299,7 @@ namespace Sketch.Models
                 Name = menuLabel,
                 ToolTip = menuBrief,
                 Command = new DelegateCommand(
-                    () => SelectedForCreation = type)
+                    () => { SelectedForCreation = type; SelectedItemBitmap = toolsBitmap; })
             };
             return cmdDescriptor;
         }
@@ -254,6 +345,12 @@ namespace Sketch.Models
         void NotifyOnConnectorItemSelected()
         {
              OnConnectorItemSelected?.Invoke(_selectedType, EventArgs.Empty);   
+        }
+
+        void SetProperty<T>(ref T propertyValue, T value, [CallerMemberName] string name = "")
+        {
+            propertyValue = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 }

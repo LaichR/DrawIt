@@ -64,24 +64,24 @@ namespace Sketch.Models
             _myPath.Clear();
             if (_model.StartPointDocking == ConnectorDocking.Undefined)
             {
-                _start = _model.From.GetPreferredConnectorStart(_start, out double relPos1, out ConnectorDocking docking1);
+                _start = _model.From.GetPreferredConnectorStart(_start, out double relPos1, out ConnectorDocking docking1, out ulong _1);
                 _model.StartPointDocking = docking1;
                 _model.StartPointRelativePosition = relPos1;
             }
             else
             {
-                _start = _model.From.GetConnectorPoint(_model.StartPointDocking, _model.StartPointRelativePosition);
+                _start = _model.From.GetConnectorPoint(_model.StartPointDocking, _model.StartPointRelativePosition, 0);
             }
 
             if (_model.EndPointDocking == ConnectorDocking.Undefined)
             {
-                _end = _model.To.GetPreferredConnectorEnd(_end, out double relPos2, out ConnectorDocking docking2);
+                _end = _model.To.GetPreferredConnectorEnd(_end, out double relPos2, out ConnectorDocking docking2, out ulong _1);
                 _model.EndPointDocking = docking2;
                 _model.EndPointRelativePosition = relPos2;
             }
             else
             {
-                _end = _model.To.GetConnectorPoint(_model.EndPointDocking, _model.EndPointRelativePosition);
+                _end = _model.To.GetConnectorPoint(_model.EndPointDocking, _model.EndPointRelativePosition, 0);
             }
 
             System.Windows.Media.PathSegmentCollection ls = new System.Windows.Media.PathSegmentCollection()

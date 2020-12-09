@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Prism.Mvvm;
-using Prism.Commands;
 using System.Windows.Input;
 using System.Windows.Media;
-
+using UI.Utilities;
+using Sketch.Types;
 
 namespace Sketch.Controls.ColorPicker
 {
-    internal class ColorPaletteModel: BindableBase
+    internal class ColorPaletteModel: BindableModel
     {
         Color _customColor = Colors.Snow;
         Color _defaultColor = Colors.Wheat;

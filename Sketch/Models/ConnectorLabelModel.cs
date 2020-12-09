@@ -46,6 +46,7 @@ namespace Sketch.Models
             _showLabelConnection = showLabelConnection;
             AllowSizeChange = false;
             StrokeThickness = 0.2;
+            FillColor = Color.FromArgb(0x31, 0xFF, 0xFA, 0xFA);
             UpdateGeometry();
         }
 
@@ -158,10 +159,18 @@ namespace Sketch.Models
                 
                 var g = base.Geometry as GeometryGroup;
                 g.Children.Clear();
-                var endPoint = ConnectorUtilities.Intersect(Bounds,
-                               ConnectorUtilities.ComputeCenter(Bounds), ConnectorReferencePoint);
+                if (!Bounds.Contains(ConnectorReferencePoint))
+                {
+                    var endPoint = ConnectorUtilities.Intersect(Bounds,
+                                   ConnectorUtilities.ComputeCenter(Bounds), ConnectorReferencePoint);
 
-                _linkToConnector = new LineGeometry(endPoint, ConnectorReferencePoint);
+                    _linkToConnector = new LineGeometry(endPoint, ConnectorReferencePoint);
+                }
+                else
+                {
+                    _linkToConnector = new LineGeometry(ConnectorReferencePoint, ConnectorReferencePoint);
+                    
+                }
                 _linkToConnector.Transform = new TranslateTransform()
                 {
                     X = -Bounds.Left,

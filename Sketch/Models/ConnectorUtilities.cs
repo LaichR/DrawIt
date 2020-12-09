@@ -12,7 +12,7 @@ using Sketch.Types;
 
 namespace Sketch.Models
 {
-    internal static class ConnectorUtilities
+    public static class ConnectorUtilities
     {
         internal static readonly Pen ConnectorPen = new Pen(Brushes.White, ComputeConnectorLine.LineWidth);
 
@@ -77,7 +77,7 @@ namespace Sketch.Models
             switch( type)
             {
                 case ConnectionType.AutoRouting:
-                    return CreateAutoRoutingConnector(parent);
+                    return CreateAutoRoutingConnector(parent, s, e);
                 case ConnectionType.RoutingWithWaypoint:
                     return CreateRoutingWithWaypointsConnector(parent, s, e);
                 case ConnectionType.StrightLine:
@@ -102,7 +102,7 @@ namespace Sketch.Models
             Point inner = a;
             Point outer = b;
 
-            if (r.Contains(b))
+            if (r.Contains(b) && !r.Contains(a))
             {
                 inner = b;
                 outer = a;
@@ -293,9 +293,9 @@ namespace Sketch.Models
             return new SelfConnectorStrategy(connectorModel);
         }
 
-        static IConnectorStrategy CreateAutoRoutingConnector( ConnectorModel connectorModel )
+        static IConnectorStrategy CreateAutoRoutingConnector( ConnectorModel connectorModel, Point startPointHint, Point endPointHint )
         {
-            return new AutoRoutingConnectorStrategy(connectorModel);
+            return new AutoRoutingConnectorStrategy(connectorModel, startPointHint, endPointHint);
         }
 
         static IConnectorStrategy CreateStrightLineConnector(ConnectorModel connectorModel, Point start, Point end)

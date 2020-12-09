@@ -1,4 +1,4 @@
-﻿using Prism.Mvvm;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,10 +10,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using UI.Utilities;
 
 namespace Sketch.PropertyEditor
 {
-    public class PropertyEditorModel: BindableBase, ITemplateProvider
+    public class PropertyEditorModel: BindableModel, ITemplateProvider
     {
         readonly ObservableCollection<PropertyValueModel> _properties = new ObservableCollection<PropertyValueModel>();
 
@@ -33,6 +34,7 @@ namespace Sketch.PropertyEditor
             _object = obj;
             foreach( var m in _properties) { m.ReleaseBinding(); } // avoid memory leaks
             _properties.Clear();
+            List<PropertyValueModel> elements = new List<PropertyValueModel>();
             _objectTypeName = NoObjSelectedLabel;
             if (_object != null)
             {
@@ -46,7 +48,7 @@ namespace Sketch.PropertyEditor
                         if (attr.Browsable)
                         {
                             var pvModel = new PropertyValueModel(this, obj, pi);
-                            _properties.Add(pvModel);
+                            elements.Add(pvModel);
                         }
                     }
                 }
@@ -54,6 +56,11 @@ namespace Sketch.PropertyEditor
             else
             {
                 RaisePropertyChanged("ObjectTypeName");
+            }
+            
+            foreach( var m in elements.OrderBy((x)=>x.DisplayName))
+            {
+                _properties.Add(m);
             }
         }
 

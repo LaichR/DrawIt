@@ -241,10 +241,9 @@ namespace UI.Utilities.Controls
         {
             foreach (Object item in container.Items)
             {
-                System.Windows.Controls.TreeViewItem currentContainer = container.ItemContainerGenerator.ContainerFromItem(item) 
-                    as System.Windows.Controls.TreeViewItem;
-
-                if (currentContainer != null && currentContainer.Items.Count > 0)
+                
+                if(container.ItemContainerGenerator.ContainerFromItem(item) is TreeViewItem currentContainer &&
+                   currentContainer.Items.Count > 0)
                 {
                     //expand the item
                     currentContainer.IsExpanded = true;
@@ -317,8 +316,7 @@ namespace UI.Utilities.Controls
                             }
                             else
                             {
-                                var notSelected = container as TreeViewItem;
-                                if (notSelected != null)
+                                if (container is TreeViewItem notSelected)
                                 {
                                     notSelected.IsExpanded = false;
                                 }
@@ -385,10 +383,8 @@ namespace UI.Utilities.Controls
                 { 
                     
                     locator.ChildIndex = i;
-                    System.Windows.Controls.TreeViewItem currentContainer = locator.GetCurrentChildContainer()
-                        as System.Windows.Controls.TreeViewItem;
-                        
-                    if (currentContainer != null)
+                    
+                    if (locator.GetCurrentChildContainer() is TreeViewItem currentContainer)
                     {
                         currentContainer.BringIntoView();
 
@@ -434,8 +430,8 @@ namespace UI.Utilities.Controls
                 if ( searchStack.Count > 1)
                 {
                     var oldLocator = searchStack.Pop();
-                    var oldContainer = oldLocator.Container as TreeViewItem;
-                    if (oldContainer != null)
+                    
+                    if (oldLocator.Container is TreeViewItem oldContainer)
                     {
                         oldContainer.IsExpanded = false;
                     }
@@ -529,8 +525,7 @@ namespace UI.Utilities.Controls
         {
             if (e.NewValue != null && e.NewValue != e.OldValue )
             {
-                TreeView target = source as TreeView;
-                if( target != null)
+                if( source is TreeView target)
                 {
                     if(!target._selectedPathIsChanging &&
                        !target._selectedItemIsChanging)

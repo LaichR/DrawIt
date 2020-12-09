@@ -277,7 +277,7 @@ namespace Sketch.Controls
 
             double RoundToGrid(double val)
             {
-                return Math.Round(val / SketchPad.GridSize) * SketchPad.GridSize;
+                return Math.Round(Math.Round(val / SketchPad.GridSize) * SketchPad.GridSize, 2);
             }
         }
     }

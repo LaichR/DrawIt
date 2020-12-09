@@ -8,7 +8,6 @@ using System.Text;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
-using Prism.Regions;
 using RuntimeCheck;
 using Sketch.Interface;
 

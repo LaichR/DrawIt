@@ -63,5 +63,9 @@ namespace Sketch.Interface
         void BeginEdit(IEditOperation handler);
 
         void EndEdit();
+
+        //ISketchItemUI CreateConnectableUI();
+
+        //ISketchItemUI CreateConnectorUI();
     }
 }

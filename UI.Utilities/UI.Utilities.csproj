@@ -56,6 +56,7 @@
   <ItemGroup>
     <Compile Include="ActionDecorator.cs" />
     <Compile Include="Behaviors\CommandDescriptor.cs" />
+    <Compile Include="BindableModel.cs" />
     <Compile Include="BitmapOperations.cs" />
     <Compile Include="BitmapToBitmapImageConverter.cs" />
     <Compile Include="BitmapToBitmapSource.cs" />
@@ -69,6 +70,7 @@
     <Compile Include="Controls\ShowError\View\ShowErrorDlg.xaml.cs" />
     <Compile Include="Controls\ShowError\ViewModel\ViewModel.cs" />
     <Compile Include="Configuration\ConfigurableEntityAttribute.cs" />
+    <Compile Include="DelegateCommand.cs" />
     <Compile Include="Environment\PredefinedFolders.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Interfaces\ICommandDescriptor.cs" />

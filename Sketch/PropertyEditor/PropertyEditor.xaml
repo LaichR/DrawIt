@@ -14,7 +14,12 @@
         <local:ColorConverter x:Key="ColorConverter"/>
         <local:PropertyEditTemplateSelector x:Key="EditTemplateSelector"/>
         <local:PropertyDisplayTemplateSelector x:Key="DisplayTemplateSelector"/>
-        
+        <Style x:Key="SelectedElementDescriptionStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="SansSerif"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
     </Control.Resources>
     <Grid Background="WhiteSmoke">
         <Grid.ColumnDefinitions>
@@ -24,77 +29,105 @@
             <RowDefinition Height="1*"/>
             <RowDefinition Height="20*"/>
         </Grid.RowDefinitions>
-        <Border BorderBrush="LightGray" Background="Gray" BorderThickness="1.1">
+        <Border BorderBrush="LightGray" Background="Gray" BorderThickness="1.1" Margin="5,0,5,0">
             <Border BorderThickness="1.2" BorderBrush="White" Opacity="50" Background="WhiteSmoke"  >
-            
-                <TextBlock Grid.Row="0" Text="{Binding ObjectTypeName, Mode=OneWay}" IsEnabled="False" HorizontalAlignment="Stretch"
-                       TextAlignment="Left" VerticalAlignment="Center" Margin="20,0,0,0" FontStyle="Italic" FontWeight="Bold"/>
+                <StackPanel Orientation="Horizontal" Grid.Row="0">
+                    <TextBlock Text="Selected Item:"  Margin="5,0,5,0" Style="{StaticResource SelectedElementDescriptionStyle}"/>
+                    <TextBlock Text="{Binding ObjectTypeName, Mode=OneWay}" IsEnabled="False" HorizontalAlignment="Stretch"
+                         Margin="5,0,0,0" Style="{StaticResource SelectedElementDescriptionStyle}"/>
+                </StackPanel>
             </Border>
         </Border>
-        <DataGrid Grid.Row="1" Grid.Column="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+        <DataGrid Grid.Row="1" Grid.Column="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="5,0,5,0"
                   ItemsSource="{Binding ObjectProperties}"
                   AutoGenerateColumns="False">
             <DataGrid.Resources>
-                <Style x:Key="PropertyNameStyle" TargetType="DataGridCell">
+                <Style x:Key="ValueEditStyle" TargetType="TextBlock">
+                    <Setter Property="FontSize" Value="8"/>
+                    
+                </Style>
+                <Style x:Key="HeaderStyle" TargetType="DataGridColumnHeader">
+                    <Setter Property="FontStyle" Value="Normal"/>
+                    <Setter Property="FontFamily" Value="Arial"/>
+                    <Setter Property="FontWeight" Value="DemiBold"/>
+                </Style>
+                <Style x:Key="PropertyNameStyle" TargetType="DataGridCell" >
+                    <Setter Property="FontStyle" Value="Normal"/>
+                    <Setter Property="FontSize" Value="10"/>
+                    <Setter Property="FontWeight" Value="Medium"/>
+                    
                     <Style.Triggers>
-                        <Trigger Property="IsSelected" Value="False">
-                            <Setter Property="Background" Value="WhiteSmoke"/>
+                        <Trigger Property="IsSelected" Value="True">
+                            
+                            <Setter Property="FontStyle" Value="Italic"/>
                         </Trigger>
                     </Style.Triggers>
                 </Style>
                 <Style x:Key="PropertyValueStyle" TargetType="DataGridCell">
+                    <Setter Property="FontSize" Value="10"/>
+                    <Setter Property="FontStyle" Value="Normal"/>
                     <Style.Triggers>
-                        <Trigger Property="IsSelected" Value="False">
-                            <Setter Property="Background" Value="WhiteSmoke"/>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="FontStyle" Value="Italic"/>
+                            <!--<Setter Property="Background" Value="White"/>-->
                         </Trigger>
                     </Style.Triggers>
                 </Style>
                 <DataTemplate x:Key="RectValueTemplate">
                     <local:RectViewer DataContext="{Binding Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnTargetUpdated=True
-                        }" HorizontalAlignment="Stretch">
+                        }" HorizontalAlignment="Stretch" Margin="2,0,2,0">
                     
                     </local:RectViewer>
                 </DataTemplate>
                 <DataTemplate x:Key="StringValueTemplate">
-                    <TextBox Text="{Binding Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" TextWrapping="Wrap"/>
+                    <TextBox Text="{Binding Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" TextWrapping="Wrap" Margin="2,0,2,0" BorderThickness="0"/>
                 </DataTemplate>
                 <DataTemplate x:Key="StringDisplayTemplate">
-                    <TextBlock Text="{Binding Path=Value}"  TextWrapping="Wrap"/>
+                    <TextBlock Text="{Binding Path=Value}"  TextWrapping="Wrap" Margin="2,0,2,0"/>
                 </DataTemplate>
                 <DataTemplate x:Key="IntegerValueTemplate">
                     <TextBox Text="{Binding Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, 
-                        Converter={StaticResource IntegerConverter}}" />
+                        Converter={StaticResource IntegerConverter}}" TextAlignment="Right" Margin="2,0,2,0" BorderThickness="0" />
                 </DataTemplate>
                 <DataTemplate x:Key="DoubleValueTemplate">
                     <TextBox Text="{Binding Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, 
-                        Converter={StaticResource DoubleConverter}}" />
+                        Converter={StaticResource DoubleConverter}}"  TextAlignment="Right" Margin="2,0,2,0" BorderThickness="0"/>
                 </DataTemplate>
                 <DataTemplate x:Key="BoolValueTemplate">
-                    <CheckBox IsChecked="{Binding Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <CheckBox IsChecked="{Binding Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="2,0,2,0"/>
                 </DataTemplate>
                 <DataTemplate x:Key="SimpleCollectionTemplate">
-                    <ComboBox ItemsSource="{Binding ValueNames}" SelectedValue="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
+                    <ComboBox ItemsSource="{Binding ValueNames}" SelectedValue="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged}" Margin="2,0,2,0"/>
                 </DataTemplate>
                 <DataTemplate x:Key="ColorDisplayTemplate">
                     <Border Background="{Binding Value,
                         Converter={StaticResource ColorConverter}}"/>
                 </DataTemplate>
                 <DataTemplate x:Key="ColorPickerTemplate">
-                    <StackPanel>
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" > 
                     <ColPic:ColorPicker SelectedColor="{Binding Value, 
                         Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         />
-                    </StackPanel>
+                    </ScrollViewer>
                 </DataTemplate>
+                <!-- 
+                <DataTemplate DataType="{x:Type local:PropertyValueModel}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding ValueNames}"/>
+                        <TextBlock Text="{Binding DisplayName}"/>
+                        <ContentControl ContentTemplateSelector="{StaticResource EditTemplateSelector}" />
+                    </StackPanel>
+                </DataTemplate>-->
             </DataGrid.Resources>
+                    
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Property Name" Binding="{Binding DisplayName}" IsReadOnly="True" 
-                                    
+                                    HeaderStyle="{StaticResource HeaderStyle}"
                                     CellStyle="{StaticResource PropertyNameStyle}">
                     <!--
+
                     <DataGridTextColumn.ElementStyle>
-                        
-                        <Style TargetType="Te">
+                                                <Style TargetType="Te">
                             <Setter Property="Background" Value="WhiteSmoke"/>
                             <Style.Triggers>
                                 <Trigger Property="IsFocused" Value="True">
@@ -106,10 +139,12 @@
                     -->
                 </DataGridTextColumn>
                 <DataGridTemplateColumn Header="Property Value"  Width="*"
+                                        HeaderStyle="{StaticResource HeaderStyle}"
                                         CellStyle="{StaticResource PropertyValueStyle}"
                                         CellTemplateSelector="{StaticResource DisplayTemplateSelector}"
                                         CellEditingTemplateSelector="{StaticResource EditTemplateSelector}" />
             </DataGrid.Columns>
+                
         </DataGrid>
     </Grid>
 </UserControl>

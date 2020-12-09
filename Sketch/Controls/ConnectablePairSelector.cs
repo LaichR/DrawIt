@@ -40,8 +40,11 @@ namespace Sketch.Controls
         public void ComputePath( Point p)
         {
             List<System.Windows.Media.PathFigure> path = new List<System.Windows.Media.PathFigure>();
-            System.Windows.Media.PathSegmentCollection ls = new System.Windows.Media.PathSegmentCollection();
-            ls.Add(new System.Windows.Media.LineSegment(p, true));
+            System.Windows.Media.PathSegmentCollection ls = new System.Windows.Media.PathSegmentCollection()
+            {
+                new System.Windows.Media.LineSegment(p, true)
+            };
+           
             var pf = new System.Windows.Media.PathFigure()
             {
                 StartPoint = _start,

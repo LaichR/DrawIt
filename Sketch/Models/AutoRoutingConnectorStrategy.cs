@@ -24,10 +24,14 @@ namespace Sketch.Models
         ConnectorMoveHelper _movingState;
         double _startAngle;
         double _endAngle;
+        Point _startPointHint;
+        Point _endPointHint;
 
-        public AutoRoutingConnectorStrategy(ConnectorModel model)
+        public AutoRoutingConnectorStrategy(ConnectorModel model, Point startPointHint, Point endPointHint)
         {
             _model = model;
+            _startPointHint = startPointHint;
+            _endPointHint = endPointHint;
         }
 
         public ConnectionType ConnectionType => ConnectionType.AutoRouting;
@@ -95,11 +99,16 @@ namespace Sketch.Models
                     endDocking = nextPoint.IncomingDocking;
                     startPointRelativePosition = firstPoint.OutgoingRelativePosition;
                     endPointRelativePosition = nextPoint.IncomingRelativePosition;
+                    
+                    ulong connecotorStartPort = _model.ConnectionPortStart;
+                    ulong connectionEndPort = _model.ConnectionPortEnd;
+                    
+
                     while (computeLine)
                     {
-                        startPoint = ComputeStartPoint(firstPoint, nextPoint, ref startPointRelativePosition, ref startDocking);   
-                        endPoint = ComputeEndPoint(firstPoint, nextPoint, ref endPointRelativePosition, ref endDocking);
-                        computeLine = !CheckDocking(startPoint, endPoint, ref startDocking, ref endDocking);
+                        startPoint = ComputeStartPoint(isFirst, firstPoint, nextPoint, ref startPointRelativePosition, ref startDocking, ref connecotorStartPort);   
+                        endPoint = ComputeEndPoint(!morePoints, firstPoint, nextPoint, ref endPointRelativePosition, ref endDocking, ref connectionEndPort);
+                        computeLine = !CheckDocking(startPoint, endPoint, ref startDocking, connecotorStartPort, ref endDocking, connectionEndPort);
                     }
                     
                     firstPoint.OutgoingDocking = startDocking;
@@ -116,13 +125,18 @@ namespace Sketch.Models
                     {
                         _start = startPoint;
                         _startAngle = startAngle;
+                        _startPointHint = startPoint;
+                        _model.CanMoveStart = connecotorStartPort== 0;
+                        _model.ConnectionPortStart = connecotorStartPort;
                     }
                     
                     if(!morePoints)
                     {
                         _end = endPoint;
                         _endAngle = endAngle;
-                        
+                        _endPointHint = endPoint;
+                        _model.CanMoveEnd = connectionEndPort == 0;
+                        _model.ConnectionPortEnd = connectionEndPort;
                     }
                     middlePosIndex++;
                     firstPoint = nextPoint;
@@ -183,38 +197,44 @@ namespace Sketch.Models
             ConnectorUtilities.ComputeDockingDuringMove(rect, p, ref currentDocking, ref lastPos);
         }
 
-        Point ComputeEndPoint(IConnectable firstPoint, IConnectable nextPoint, ref double relativePos, ref ConnectorDocking docking)
+        Point ComputeEndPoint(bool isLastSegment, IConnectable firstPoint, IConnectable nextPoint, ref double relativePos, ref ConnectorDocking docking, ref ulong connectorEndPort)
         {
-            var fromCenter = ConnectorUtilities.ComputeCenter(firstPoint.Bounds);
-
-
-            Point end;
             
+            var end = _endPointHint;
             if (docking == ConnectorDocking.Undefined)
             {
-                end = nextPoint.GetPreferredConnectorEnd(fromCenter, out relativePos, out docking);
+                end = nextPoint.GetPreferredConnectorEnd(end, out relativePos, out docking, out connectorEndPort);
+                if( connectorEndPort == 0)
+                {
+                    nextPoint.GetPreferredConnectorEnd( ConnectorUtilities.ComputeCenter(firstPoint.Bounds),
+                        out relativePos, out docking, out connectorEndPort);
+                }
             }
             else
             {
-                end = nextPoint.GetConnectorPoint(docking, relativePos);
+                end = nextPoint.GetConnectorPoint(docking, relativePos, connectorEndPort);
             }
             return end;
             
         }
 
-        Point ComputeStartPoint(IConnectable firstPoint, IConnectable nextPoint, ref double startPointRelativePos, ref ConnectorDocking docking)
+        Point ComputeStartPoint(bool isFirstSegment, IConnectable firstPoint, IConnectable nextPoint, ref double startPointRelativePos, ref ConnectorDocking docking, ref ulong connectorStartPort)
         {
             
-            var toCenter = ConnectorUtilities.ComputeCenter(nextPoint.Bounds);
-            Point start;
+            var start = _startPointHint;
+
             if (docking == ConnectorDocking.Undefined)
             {
-
-                start = firstPoint.GetPreferredConnectorStart(toCenter, out startPointRelativePos, out docking);
+                start = firstPoint.GetPreferredConnectorStart(start, out startPointRelativePos, out docking, out connectorStartPort);
+                if( connectorStartPort == 0)
+                {
+                    start = ConnectorUtilities.ComputeCenter(nextPoint.Bounds);
+                    start = firstPoint.GetPreferredConnectorStart(start, out startPointRelativePos, out docking, out connectorStartPort);
+                }
             }
             else
             {
-                start = firstPoint.GetConnectorPoint(docking, startPointRelativePos);
+                start = firstPoint.GetConnectorPoint(docking, startPointRelativePos, connectorStartPort);
             }
             return start;
         }
@@ -232,7 +252,7 @@ namespace Sketch.Models
             return _routingAssistent.ExistsIntersectingBounds(r);
         }
 
-        bool CheckDocking(Point start, Point end, ref ConnectorDocking startDocking, ref ConnectorDocking endDocking)
+        bool CheckDocking(Point start, Point end, ref ConnectorDocking startDocking, ulong moveStartPort, ref ConnectorDocking endDocking, ulong moveEndPort)
         {
             bool ret;
             var lineType = (LineType)((int)startDocking << 8 | (int)endDocking);

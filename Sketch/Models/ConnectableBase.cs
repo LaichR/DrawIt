@@ -8,13 +8,13 @@ using System.Windows.Media;
 using UI.Utilities.Interfaces;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using Prism.Commands;
 using UI.Utilities;
 using Sketch.Interface;
 using System.Drawing.Text;
 using System.CodeDom;
 using Sketch.Types;
 using System.ComponentModel;
+using System.Collections.ObjectModel;
 
 namespace Sketch.Models
 {
@@ -31,14 +31,21 @@ namespace Sketch.Models
         public static readonly Brush DefaultStroke = Brushes.Black;
         public static readonly Typeface DefaultFont = new Typeface(new FontFamily("Arial"), FontStyles.Normal, FontWeights.UltraLight, FontStretches.UltraExpanded);
 
+        [PersistentField((int)ModelVersion.V_0_1, "Bounds")]
         Rect _bounds;
         
+        [PersistentField((int)ModelVersion.V_0_1, "AllowSizeChange")]
         bool _allowSizeChange;
         double _rotationAngle = 0.0;
         RotateTransform _rotateTransform = null;
-        SerializableColor _fillColor = new SerializableColor();
-        
-        
+
+        [PersistentField((int)ModelVersion.V_0_1, "Fill", true)]
+        SerializableColor _fillColor = new SerializableColor() { Color = Colors.Snow };
+
+
+        [PersistentField((int)ModelVersion.V_2_1, "Decorators")]
+        readonly ObservableCollection<DecoratorModel> _decorators = new ObservableCollection<DecoratorModel>();
+
         readonly double _fontSize = DefaultFontSize;
         Brush _stroke = DefaultStroke;
         double _strokeThickness = 1;
@@ -66,6 +73,11 @@ namespace Sketch.Models
             {
                 SetProperty<Brush>(ref _stroke, value);
             }
+        }
+
+        public ObservableCollection<DecoratorModel> Decorators
+        {
+            get => _decorators;
         }
 
         public double StrokeThickness
@@ -132,14 +144,14 @@ namespace Sketch.Models
 
         public override Geometry Geometry => _geometry;
 
-        public override void RenderAdornments(DrawingContext drawingContext)
-        {
-            // draw the lable
-            if (LabelArea != Rect.Empty)
-            {
-                RenderLabel(DisplayedLabel(), drawingContext);
-            }
-        }
+        //public override void RenderAdornments(DrawingContext drawingContext)
+        //{
+        //    // draw the lable
+        //    if (LabelArea != Rect.Empty)
+        //    {
+        //        RenderLabel(DisplayedLabel(), drawingContext);
+        //    }
+        //}
 
         [Browsable(true)]
         public Color FillColor
@@ -201,36 +213,46 @@ namespace Sketch.Models
             get => new RectangleGeometry(Bounds);
         }
 
-        public virtual Point GetConnectorPoint(ConnectorDocking docking, double relativePosition)
+        public virtual Point GetConnectorPoint(ConnectorDocking docking, double relativePosition, ulong connectorPort)
         {
+            var decorators = Decorators.Where((x) => x.Id == connectorPort);
+            if( decorators.Any())
+            {
+                var point = ConnectorUtilities.ComputeCenter(decorators.First().Bounds);
+                point.X += Bounds.Left; point.Y += Bounds.Top;
+                return point;
+            }
             return ConnectorUtilities.ComputePoint(Bounds, docking, relativePosition);
         }
 
-        public virtual Point GetPreferredConnectorStart(Point hint, out double relativePos, out ConnectorDocking docking)
+        public virtual Point GetPreferredConnectorStart(Point hint, out double relativePos, out ConnectorDocking docking, out ulong connectionPort)
         {
-            return GetConnectorPositionInfo(hint, out relativePos, out docking);
+            return GetConnectorPositionInfo(hint, out relativePos, out docking, out connectionPort);
         }
 
-        public virtual Point GetPreferredConnectorEnd(Point hint, out double relativePos, out ConnectorDocking docking)
+        public virtual Point GetPreferredConnectorEnd(Point hint, out double relativePos, out ConnectorDocking docking, out ulong connectionPort)
         {
-            return GetConnectorPositionInfo(hint, out relativePos, out docking);
+            return GetConnectorPositionInfo(hint, out relativePos, out docking, out connectionPort);
         }
 
-        protected virtual Point GetConnectorPositionInfo(Point hint, out double relativePos, out ConnectorDocking docking)
+        protected virtual Point GetConnectorPositionInfo(Point hint, out double relativePos, out ConnectorDocking docking, out ulong connectionPort)
         {
-            var center = ConnectorUtilities.ComputeCenter(Bounds);
-            if (Bounds.Contains(hint))
+            connectionPort = 0;
+
+            foreach( var decorator in Decorators)
             {
-                if (center.X != hint.X)
+                if(decorator.Bounds.Contains(hint)|| decorator.Id == connectionPort)
                 {
-                    //hint.X = hint.X - 000;
-                    hint.Y -=  500 * ConnectorUtilities.Slope(hint, center);
-                }
-                else
-                {
-                    hint.Y = 0;
+                    docking = decorator.Side; connectionPort = decorator.Id; relativePos = decorator.RelativePosition;
+                    var point = ConnectorUtilities.ComputeCenter(decorator.Bounds);
+                    point.X += Bounds.Left;
+                    point.Y += Bounds.Top;
+                    return point;
                 }
             }
+
+            var center = ConnectorUtilities.ComputeCenter(Bounds);
+
             Point p = ConnectorUtilities.Intersect(Bounds, hint, center);
             
             double pos = 0.0;
@@ -336,13 +358,13 @@ namespace Sketch.Models
 
 
 
-        public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-            info.AddValue("AllowSizeChange", AllowSizeChange);
-            info.AddValue("Bounds", Bounds);
-            info.AddValue("Fill", _fillColor.ScRgb );
-        }
+        //public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
+        //{
+        //    base.GetObjectData(info, context);
+        //    info.AddValue("AllowSizeChange", AllowSizeChange);
+        //    info.AddValue("Bounds", Bounds);
+        //    info.AddValue("Fill", _fillColor.ScRgb );
+        //}
 
         public ConnectableBase Clone()
         {
@@ -402,28 +424,28 @@ namespace Sketch.Models
 
         
 
-        protected override void RestoreFieldData(SerializationInfo info, StreamingContext context)
-        {
-            base.RestoreFieldData(info, context);
-            _fillColor = new SerializableColor();
-            _bounds = (Rect)info.GetValue("Bounds", typeof(Rect));
-            _allowSizeChange = info.GetBoolean("AllowSizeChange");
-            try
-            {
-                _fillColor.ScRgb = (float[])info.GetValue("Fill", typeof(float[]));
-            }
-            catch { }
-            _fillColor = new SerializableColor();
-            _bounds = (Rect)info.GetValue("Bounds", typeof(Rect));
-            _allowSizeChange = info.GetBoolean("AllowSizeChange");
-            try
-            {
-                _fillColor.ScRgb = (float[])info.GetValue("Fill", typeof(float[]));
-            }
-            catch { }
+        //protected override void RestoreFieldData(SerializationInfo info, StreamingContext context)
+        //{
+        //    base.RestoreFieldData(info, context);
+        //    _fillColor = new SerializableColor();
+        //    _bounds = (Rect)info.GetValue("Bounds", typeof(Rect));
+        //    _allowSizeChange = info.GetBoolean("AllowSizeChange");
+        //    try
+        //    {
+        //        _fillColor.ScRgb = (float[])info.GetValue("Fill", typeof(float[]));
+        //    }
+        //    catch { }
+        //    _fillColor = new SerializableColor();
+        //    _bounds = (Rect)info.GetValue("Bounds", typeof(Rect));
+        //    _allowSizeChange = info.GetBoolean("AllowSizeChange");
+        //    try
+        //    {
+        //        _fillColor.ScRgb = (float[])info.GetValue("Fill", typeof(float[]));
+        //    }
+        //    catch { }
 
-            //Initialize();
-        }
+        //    //Initialize();
+        //}
 
         protected override void Initialize()
         {

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows;
 using Sketch.Types;
-using Prism.Commands;
+using UI.Utilities;
 using UI.Utilities.Interfaces;
 using UI.Utilities.Behaviors;
 using Sketch.Interface;
@@ -58,10 +58,22 @@ namespace Sketch.Models
         [PersistentField((int)ModelVersion.V_0_1, "StartPointRelativePosition")]
         double _startPointRelativePosition;
 
+        [PersistentField((int)ModelVersion.V_2_1, "CanMoveStart", true)]
+        bool _canMoveStart = true;
+
+        [PersistentField((int)ModelVersion.V_2_1, "ConnectionPortStart", true)]
+        ulong _connectionPortStart = 0;
+
+        [PersistentField((int)ModelVersion.V_2_1, "ConnectionPortEnd", true)]
+        ulong _connectionPortEnd = 0;
 
         [PersistentField((int)ModelVersion.V_0_1, "EndPointRelativePosition")]
         double _endPointRelativePosition;
-        
+
+        [PersistentField((int)ModelVersion.V_2_1, "CanMoveEnd", true)]
+        bool _canMoveEnd = true;
+
+
         [PersistentField((int)ModelVersion.V_0_1, "MiddlePointRelativePosition")]
         double _middlePointRelativePosition;
 
@@ -130,6 +142,7 @@ namespace Sketch.Models
 
         protected override void RestoreFieldData(SerializationInfo info, StreamingContext context)
         {
+            
             base.RestoreFieldData(info, context);
         }
 
@@ -407,7 +420,13 @@ namespace Sketch.Models
         public double StartPointRelativePosition
         {
             get => _startPointRelativePosition;
-            set => _startPointRelativePosition = value;
+            set => SetProperty<double>(ref _startPointRelativePosition,value);
+        }
+
+        public bool CanMoveStart
+        {
+            get => _canMoveStart;
+            set => SetProperty(ref _canMoveStart, value);
         }
 
         public double EndPointRelativePosition
@@ -416,10 +435,28 @@ namespace Sketch.Models
             set => _endPointRelativePosition = value;
         }
 
+        public bool CanMoveEnd
+        {
+            get => _canMoveEnd;
+            set => SetProperty<bool>(ref _canMoveEnd, value);
+        }
+
         public double MiddlePointRelativePosition
         {
             get => _middlePointRelativePosition;
             set => _middlePointRelativePosition = value;
+        }
+
+        public ulong ConnectionPortStart
+        {
+            get => _connectionPortStart;
+            set => SetProperty(ref _connectionPortStart, value);
+        }
+
+        public ulong ConnectionPortEnd
+        {
+            get => _connectionPortEnd;
+            set => SetProperty(ref _connectionPortEnd, value);
         }
 
         public IConnectorStrategy ConnectorStrategy
@@ -428,11 +465,6 @@ namespace Sketch.Models
             {
                 return _myConnectorStrategy;
             }
-        }
-
-        public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
-        {
-            base.GetObjectData(info, context);
         }
 
         protected override void PrepareFieldBackup()
@@ -452,9 +484,7 @@ namespace Sketch.Models
 
 
         public virtual void ShowConnectorLabel( Point p, bool isConnectorStartLabel)
-        {
-           
-           
+        {  
             if (isConnectorStartLabel)
             {
                 if (ConnectorStartLabel == null)
@@ -757,8 +787,8 @@ namespace Sketch.Models
                         if (l.FillContains(p, 8, ToleranceType.Absolute)) 
                         {
                             Waypoints.Insert(i, connectable);
-                            connectable.GetPreferredConnectorEnd(start, out double relativePos, out ConnectorDocking docking);
-                            connectable.GetPreferredConnectorStart(l.EndPoint, out relativePos, out docking);
+                            connectable.GetPreferredConnectorEnd(start, out double relativePos, out ConnectorDocking docking, out ulong port);
+                            connectable.GetPreferredConnectorStart(l.EndPoint, out relativePos, out docking, out port);
                             connectable.MiddlePosition = 0.5;
                             connectable.ShapeChanged += Waypoint_ShapeChanged;
                             return;

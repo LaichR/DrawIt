@@ -149,7 +149,7 @@ namespace UI.Utilities.Controls
             else
             {
                 var src = button._image.Source as FormatConvertedBitmap;
-                if (src != null)
+                if (button._image.Source is FormatConvertedBitmap )
                 {
                     // Set the Source property to the original value.
                     button._image.Source = src.Source;

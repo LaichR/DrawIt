@@ -17,8 +17,14 @@ namespace UI.Utilities
                 System.Globalization.CultureInfo culture)
         {
             if( value is Bitmap bitmap)
-            { 
-                return new BitmapImage { Source = ToBitmapSource.Bitmap2BitmapSource(bitmap) };
+            {
+                var source = ToBitmapSource.Bitmap2BitmapSource(bitmap);
+                if ( targetType == typeof(System.Windows.Media.ImageSource ))
+                {
+                    return source;
+                }
+                var img = new BitmapImage { Source = source };
+                return img;
             }
             return null;
         }
