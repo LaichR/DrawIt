@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using Sketch.Interface;
-using Sketch.Utilities;
-using Sketch.Types;
+using Sketch.Helper;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
@@ -32,7 +31,7 @@ namespace Sketch.Models
         {
             _routingStrategy = parent;
             _model = connectorModel;
-            _moveType = Types.MoveType.MoveTypeNone;
+            _moveType = MoveType.MoveTypeNone;
             _startingFrom = new ToWaypointAdapter( _model, connectorModel.From);
             _endingAt = new ToWaypointAdapter(_model, connectorModel.To);
             List<double> middlePointInfo = new List<double>() { _model.MiddlePointRelativePosition };
@@ -69,17 +68,17 @@ namespace Sketch.Models
                     }
                     else if( index == 0 && nrOfSegments>1)
                     {
-                        _moveType = Types.MoveType.MoveStartPoint;
+                        _moveType = MoveType.MoveStartPoint;
                         //_moveStart = StartPoint;
                     }
                     else if ((index == 1 && nrOfSegments == 3)||(index ==2 && nrOfSegments==7)||(index==3))
                     {
-                        _moveType = Types.MoveType.MoveMiddlePoint;
+                        _moveType = MoveType.MoveMiddlePoint;
                     }
                     
                     else if (index == 2 || (index == 1 && nrOfSegments == 2)||(index == 6))
                     {
-                        _moveType = Types.MoveType.MoveEndPoint;
+                        _moveType = MoveType.MoveEndPoint;
                         _startPoint = _endPoint;
                     }
 
@@ -116,7 +115,7 @@ namespace Sketch.Models
         {
 
             
-            if (_moveType == Types.MoveType.MoveStartPoint)
+            if (_moveType == MoveType.MoveStartPoint)
             {
                 _startingFrom.OutgoingDocking = movePointDocking;
                 _endingAt.IncomingDocking = otherPointDocking;
@@ -132,11 +131,11 @@ namespace Sketch.Models
                 }
                 //_model.EndPointRelativePosition = ConnectorUtilities.ComputeRelativePosition(_model.To.Bounds, newOtherPointPosition, _model.EndPointDocking);
             }
-            else if (MoveType == Types.MoveType.MoveMiddlePoint)
+            else if (MoveType == MoveType.MoveMiddlePoint)
             {
                 _startingFrom.MiddlePosition = newDistance;
             }
-            else if (MoveType == Types.MoveType.MoveEndPoint)
+            else if (MoveType == MoveType.MoveEndPoint)
             {
                 _startingFrom.OutgoingDocking = otherPointDocking;
                 _endingAt.IncomingDocking = movePointDocking;

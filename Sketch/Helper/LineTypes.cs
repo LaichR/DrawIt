@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Sketch.Interface;
 
-namespace Sketch.Types
+namespace Sketch.Helper
 {
     public enum LineType
     {

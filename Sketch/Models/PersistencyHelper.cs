@@ -43,6 +43,20 @@ namespace Sketch.Models
             return false;
         }
 
+        public static int GetMaxVersion( IEnumerable<FieldInfo> fields)
+        {
+            int version = -1;
+            foreach (var f in fields)
+            {
+                PersistencyHelper.GetPersistentFieldInfo(f, out PersistentFieldAttribute info);
+                if (info.AvalailableSince > version)
+                {
+                    version = info.AvalailableSince;
+                }
+            }
+            return version;
+        }
+
         public static void BackupPersistentFields( object obj, SerializationInfo info, IEnumerable<FieldInfo> fields)
         {
             foreach (var f in fields)

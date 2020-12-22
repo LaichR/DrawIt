@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Sketch.Models;
 using Sketch.Interface;
-using Sketch.Utilities;
+using Sketch.Helper;
 using UI.Utilities;
 using System.Windows.Media;
 using System.Reflection;

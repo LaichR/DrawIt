@@ -8,7 +8,7 @@ using System.Windows.Media;
 
 namespace Sketch.Interface
 {
-    public interface ISketchItemModel: ISerializable, ISketchItemLabelProvider
+    public interface ISketchItemModel: ISerializable, ISketchItemNode
     {
 
         string LabelPropertyName
@@ -16,11 +16,6 @@ namespace Sketch.Interface
             get;
         }
 
-        bool AllowEdit
-        {
-            get;
-            set;
-        }
 
         void UpdateGeometry();
 

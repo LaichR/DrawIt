@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Sketch.Types
+namespace Sketch.Helper
 {
     public class LinkedAvlTreeNode<T> where T : IComparable
     {

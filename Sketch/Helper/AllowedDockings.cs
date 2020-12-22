@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sketch.Types
+namespace Sketch.Helper
 {
     internal static class AllowedDockings
     {

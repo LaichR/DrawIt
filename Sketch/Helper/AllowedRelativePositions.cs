@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sketch.Types
+namespace Sketch.Helper
 {
     internal static class AllowedRelativePositions
     {
-        static readonly SortedSet<RelativePosition> _south = new SortedSet<RelativePosition> { RelativePosition.S };
+        //static readonly SortedSet<RelativePosition> _south = new SortedSet<RelativePosition> { RelativePosition.S };
         static readonly SortedSet<RelativePosition> _southWest = new SortedSet<RelativePosition> { RelativePosition.SW };
         static readonly SortedSet<RelativePosition> _southEast = new SortedSet<RelativePosition> { RelativePosition.SE };
-        static readonly SortedSet<RelativePosition> _north = new SortedSet<RelativePosition> { RelativePosition.N };
+        //static readonly SortedSet<RelativePosition> _north = new SortedSet<RelativePosition> { RelativePosition.N };
         static readonly SortedSet<RelativePosition> _northWest = new SortedSet<RelativePosition> { RelativePosition.NW };
         static readonly SortedSet<RelativePosition> _northEast = new SortedSet<RelativePosition> { RelativePosition.NE };
 
@@ -23,14 +23,14 @@ namespace Sketch.Types
             {
                 RelativePosition.N, RelativePosition.NW, RelativePosition.NE
             };
-        static readonly SortedSet<RelativePosition> _anyWesternPos = new SortedSet<RelativePosition>
-            {
-                RelativePosition.W, RelativePosition.NW, RelativePosition.SW
-            };
-        static readonly SortedSet<RelativePosition> _anyEasternPos = new SortedSet<RelativePosition>
-            {
-                RelativePosition.E, RelativePosition.NE, RelativePosition.SE
-            };
+        //static readonly SortedSet<RelativePosition> _anyWesternPos = new SortedSet<RelativePosition>
+        //    {
+        //        RelativePosition.W, RelativePosition.NW, RelativePosition.SW
+        //    };
+        //static readonly SortedSet<RelativePosition> _anyEasternPos = new SortedSet<RelativePosition>
+        //    {
+        //        RelativePosition.E, RelativePosition.NE, RelativePosition.SE
+        //    };
 
         static readonly SortedSet<RelativePosition> _allButEastOrWest = new SortedSet<RelativePosition>
             {

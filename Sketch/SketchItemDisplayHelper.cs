@@ -188,6 +188,7 @@ namespace Sketch.Utilities
             ss.AddSurrogate(typeof(SketchItemContainerProxy),
                 new StreamingContext(StreamingContextStates.All),
                 new SketchItemContainerSerializationSurrogate(container));
+            
 
             IFormatter formatter = new BinaryFormatter()
             {
@@ -207,6 +208,7 @@ namespace Sketch.Utilities
             ss.AddSurrogate(typeof(SketchItemContainerProxy),
                 new StreamingContext(StreamingContextStates.All),
                 new SketchItemContainerSerializationSurrogate(container));
+
 
             IFormatter formatter = new BinaryFormatter()
             {

@@ -113,11 +113,12 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Uml\UmlActionConnector.cs" />
+    <Compile Include="Uml\UmlAwaitEventModel.cs" />
     <Compile Include="Uml\UmlActivityModel.cs" />
+    <Compile Include="Uml\UmlCombinedFragment.cs" />
     <Compile Include="Uml\UmlMemberDescription.cs" />
     <Compile Include="Uml\UmlMessageModel.cs" />
     <Compile Include="Uml\UmlLifeLine.cs" />
-    <Compile Include="Uml\UmlStereotypes.cs" />
     <Compile Include="Uml\UmlActivityDiagramEdge.cs" />
     <Compile Include="Uml\UmlTansitionModel.cs" />
     <Compile Include="Uml\UmlAssociationModel.cs" />
@@ -184,13 +185,7 @@
     <None Include="Resources\Open-file-icon.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Save-icon.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Actions-system-run-icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Save-as-icon.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\UmlFinalStateShape.png" />
@@ -227,6 +222,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\LifeLine.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\UmlAwaitEventIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\CombindedFragment.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

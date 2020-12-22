@@ -58,9 +58,12 @@
                       CanUserAddRows="True" CanUserDeleteRows="True" >
 
                 <DataGrid.Columns>
-                    <DataGridTextColumn Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Header="Name"/>
-                    <DataGridTextColumn Binding="{Binding DataType, UpdateSourceTrigger=PropertyChanged}" Header="Type"/>
-                    <DataGridCheckBoxColumn Binding="{Binding IsPublic, UpdateSourceTrigger=PropertyChanged}" Header="is public"/>
+                    <DataGridTextColumn Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                        Header="Name" Width="2*"/>
+                    <DataGridTextColumn Binding="{Binding DataType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                        Header="Type" Width="2*"/>
+                    <DataGridCheckBoxColumn Binding="{Binding IsPublic, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                            Header="is public" Width="1*"/>
                 </DataGrid.Columns>
             </DataGrid>
         </DataTemplate>
@@ -125,6 +128,22 @@
 
         </DataTemplate>
 
+        <DataTemplate DataType="{x:Type uml:UmlCombinedFragment}">
+            <Border Width="{Binding Bounds.Width}" Height="{Binding Bounds.Height}" BorderThickness="0.5" Background="Transparent" 
+                    BorderBrush="Black">
+                <SketchCtrl:GeometryBorder x:Name="Outline" BorderBrush="Black" BorderThickness="1" BorderGeometry="{Binding Geometry}"
+                    Background="{Binding Fill}" Width="{Binding Bounds.Width}" ShowShadow="True"
+                    Height="{Binding Bounds.Height}" Visibility="Visible"
+                                           VerticalAlignment="Top" HorizontalAlignment="Left" IsHitTestVisible="True">
+                    <StackPanel>
+                        
+
+                    </StackPanel>
+                </SketchCtrl:GeometryBorder>
+            </Border>
+
+        </DataTemplate>        
+        
         <DataTemplate DataType="{x:Type uml:UmlPackageModel}">
             <SketchCtrl:GeometryBorder x:Name="Outline"  BorderThickness="1" BorderBrush="{Binding Stroke}"
                     Background="{Binding Fill}" BorderGeometry="{Binding Geometry}" Visibility="Visible">
@@ -160,6 +179,17 @@
             
         </DataTemplate>
 
+        <DataTemplate DataType="{x:Type uml:UmlAwaitEventModel}">
+            <SketchCtrl:GeometryBorder BorderGeometry="{Binding Geometry}" BorderBrush="Black" BorderThickness="1"
+                                       Background="{Binding Fill}" ShowShadow="True" Visibility="Visible">
+                <StackPanel>
+                <TextBox Style="{StaticResource LabelEditorStyle}"  AcceptsReturn="False" HorizontalAlignment="Right" VerticalAlignment="Center"
+                             Width="{Binding LabelArea.Width}" 
+                             Margin="25,5,25,5"/>
+                </StackPanel>
+            </SketchCtrl:GeometryBorder>
+        </DataTemplate>
+        
         <DataTemplate DataType="{x:Type uml:UmlNoteModel}">
             
                 <SketchCtrl:GeometryBorder BorderGeometry="{Binding Geometry}" 

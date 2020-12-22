@@ -9,10 +9,8 @@ using System.Collections.ObjectModel;
 
 namespace Sketch.Interface
 {
-    public interface ISketchItemContainer : ISketchItemLabelProvider
+    public interface ISketchItemContainer : ISketchItemNode
     {
-
-
         ObservableCollection<ISketchItemModel> SketchItems
         {
             get;

@@ -1,13 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
-using Sketch.Types;
-using Sketch.Models;
-using Sketch.Interface;
-using Sketch.Utilities;
+using Sketch.Helper;
 using System.Windows;
 using System.Collections.ObjectModel;
 
@@ -144,30 +138,30 @@ namespace Sketch.Test
                 rectangles[0].X, rectangles[3].X);
             Assert.IsTrue(r > 160 && r < 200);
         }
-        void CreateRectangles(int count, LinkedAvlTree<BoundsComparer> tree,
-            List<Rect> rectangles)
-        {
-            var rand = new Random(-127);
+        //void CreateRectangles(int count, LinkedAvlTree<BoundsComparer> tree,
+        //    List<Rect> rectangles)
+        //{
+        //    var rand = new Random(-127);
             
 
             
-            for (int i = 0; i < count; i++)
-            {
-                var x = rand.NextDouble() * 2048;
-                var y = rand.NextDouble() * 1600;
-                var w = rand.NextDouble() + 150;
-                var h = rand.NextDouble() * 50;
-                var p = new Point(x, y);
-                var s = new Size(w, h);
-                var r = new Rect(p, s);
-                tree.Add(r);
-                if (tree.Count == i + 1)
-                {
-                    rectangles.Add(r);
-                }
+        //    for (int i = 0; i < count; i++)
+        //    {
+        //        var x = rand.NextDouble() * 2048;
+        //        var y = rand.NextDouble() * 1600;
+        //        var w = rand.NextDouble() + 150;
+        //        var h = rand.NextDouble() * 50;
+        //        var p = new Point(x, y);
+        //        var s = new Size(w, h);
+        //        var r = new Rect(p, s);
+        //        tree.Add(r);
+        //        if (tree.Count == i + 1)
+        //        {
+        //            rectangles.Add(r);
+        //        }
                 
-            }
+        //    }
 
-        }
+        //}
     }
 }

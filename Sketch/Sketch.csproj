@@ -124,16 +124,17 @@
     <Compile Include="Models\PersistentFieldAttribute.cs" />
     <Compile Include="Models\Sketch.cs" />
     <Compile Include="Models\SketchItemContainerSerializationSurrogate.cs" />
+    <Compile Include="Models\StructuredAttribute.cs" />
     <Compile Include="Models\ToWaypointAdapter.cs" />
     <Compile Include="Models\Waypoint.cs" />
     <Compile Include="Models\WaypointWrapper.cs" />
     <Compile Include="PropertyEditor\ColorConverter.cs" />
     <Compile Include="PropertyEditor\DoubleConverter.cs" />
+    <Compile Include="PropertyEditor\IntegerConverter.cs" />
     <Compile Include="PropertyEditor\PropertyDisplayTemplateSelector.cs" />
     <Compile Include="PropertyEditor\RectangleWrapper.cs" />
     <Compile Include="PropertyEditor\RectConverter.cs" />
     <Compile Include="PropertyEditor\PropertyEditTemplateSelector.cs" />
-    <Compile Include="PropertyEditor\IntegerConverter.cs" />
     <Compile Include="PropertyEditor\ITemplateProvider.cs" />
     <Compile Include="PropertyEditor\PropertyEditor.xaml.cs">
       <DependentUpon>PropertyEditor.xaml</DependentUpon>
@@ -144,7 +145,7 @@
     <Compile Include="PropertyEditor\RectViewer.xaml.cs">
       <DependentUpon>RectViewer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Utilities\BoundsComparer.cs" />
+    <Compile Include="Helper\BoundsComparer.cs" />
     <Compile Include="Controls\LineSegmentDecorator.cs" />
     <Compile Include="Controls\Operations\OutlineUI.MoveOperation.cs" />
     <Compile Include="Controls\Operations\RewireConnectorOperation.cs" />
@@ -189,11 +190,11 @@
     <Compile Include="Models\IConnectorStrategy.cs" />
     <Compile Include="Interface\ISketchItemContainer.cs" />
     <Compile Include="Interface\OutlineChangedEventArgs.cs" />
-    <Compile Include="Utilities\RectangleWrapper.cs" />
+    <Compile Include="Helper\RectangleWrapper.cs" />
     <Compile Include="Models\SelfConnectorLineStrategy.cs" />
     <Compile Include="Models\SketchItemFactory.cs" />
-    <Compile Include="Utilities\RoutingAssistent.cs" />
-    <Compile Include="Utilities\SketchItemDisplayHelper.cs" />
+    <Compile Include="Helper\RoutingAssistent.cs" />
+    <Compile Include="Helper\SketchItemDisplayHelper.cs" />
     <Compile Include="Models\StraightLineConnectorStrategy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -201,21 +202,20 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Types\AllowedDockings.cs" />
-    <Compile Include="Types\AllowedRelativePositions.cs" />
-    <Compile Include="Types\ComputeConnectorLine.cs" />
+    <Compile Include="Helper\AllowedDockings.cs" />
+    <Compile Include="Helper\AllowedRelativePositions.cs" />
     <Compile Include="Interface\ConnectionType.cs" />
     <Compile Include="Interface\ConnectorDocking.cs" />
-    <Compile Include="Types\ConnectorLineStyle.cs" />
-    <Compile Include="Types\EditMode.cs" />
-    <Compile Include="Types\IEditOperation.cs" />
+    <Compile Include="Helper\ConnectorLineStyle.cs" />
+    <Compile Include="Helper\EditMode.cs" />
+    <Compile Include="Controls\IEditOperation.cs" />
     <Compile Include="Interface\ISketchItemUI.cs" />
-    <Compile Include="Types\LineTypes.cs" />
-    <Compile Include="Types\LinkedAvlTree.cs" />
-    <Compile Include="Types\LinkedAvlTreeNode.cs" />
-    <Compile Include="Types\MoveType.cs" />
-    <Compile Include="Types\OutlineToolFactory.cs" />
-    <Compile Include="Types\RelativePosition.cs" />
+    <Compile Include="Helper\LineTypes.cs" />
+    <Compile Include="Helper\LinkedAvlTree.cs" />
+    <Compile Include="Helper\LinkedAvlTreeNode.cs" />
+    <Compile Include="Helper\MoveType.cs" />
+    <Compile Include="Helper\OutlineToolFactory.cs" />
+    <Compile Include="Helper\RelativePosition.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -248,13 +248,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\equal_spacing.png" />
-    <None Include="Resources\equal_spacing1.png" />
-    <None Include="Resources\equal_spacing2.png" />
     <None Include="Resources\equal_sizing.png" />
+    <Content Include="Resources\open_file.png" />
+    <Content Include="Resources\save_file_as.png" />
+    <Content Include="Resources\save_file.png" />
     <Content Include="Resources\SaveAsPicture.png" />
     <None Include="Resources\align_center.png" />
     <None Include="Resources\free_text.png" />
-    <Content Include="Resources\paint_roller.png" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Controls\ColorPicker\ColorPalette.xaml">

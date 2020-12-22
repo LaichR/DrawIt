@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Sketch.Types
+namespace Sketch.Helper
 {
     public class LinkedAvlTree<T> where T: IComparable
     {
-        object _synchRoot = new object();
+        readonly object _synchRoot = new object();
         int _count = 0;
         LinkedAvlTreeNode<T> _root = null;
 
@@ -146,9 +146,9 @@ namespace Sketch.Types
                 Console.WriteLine("null");
                 return;
             }
-            printIdent(depth); Console.WriteLine(string.Format("d: {0}", node.Data));
-            printIdent(depth); Console.Write("l:"); printNode(depth + 1, node.Left);
-            printIdent(depth); Console.Write("r:"); printNode(depth + 1, node.Right);
+            PrintIdent(depth); Console.WriteLine(string.Format("d: {0}", node.Data));
+            PrintIdent(depth); Console.Write("l:"); printNode(depth + 1, node.Left);
+            PrintIdent(depth); Console.Write("r:"); printNode(depth + 1, node.Right);
         }
 
         public int Count
@@ -159,7 +159,7 @@ namespace Sketch.Types
             }
         }
 
-        private void printIdent(int count)
+        private void PrintIdent(int count)
         {
             while (count > 0)
             {

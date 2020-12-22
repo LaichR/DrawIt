@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
-using Sketch.Types;
+using Sketch.Helper;
 
 namespace Sketch.Controls
 {
@@ -13,9 +13,9 @@ namespace Sketch.Controls
     {
         class ChangeSizeOperation : IEditOperation
         {
-            OutlineUI _ui;
+            readonly OutlineUI _ui;
             Point _start;
-            Pen _pen = new Pen(Brushes.Black, 30);
+            readonly Pen _pen = new Pen(Brushes.Black, 30);
             RelativePosition _direction;
             Rect _origialRect;
             Rect _originalUiPos;

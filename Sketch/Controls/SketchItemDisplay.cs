@@ -12,9 +12,8 @@ using System.Windows.Controls;
 using System.Windows.Shapes;
 using UI.Utilities.Interfaces;
 using Sketch.Models;
-using Sketch.Types;
 using Sketch.Interface;
-using Sketch.Utilities;
+using Sketch.Helper;
 using System.IO;
 
 namespace Sketch.Controls
@@ -65,6 +64,7 @@ namespace Sketch.Controls
         }
 
 
+
         public event EventHandler SelectedItemChanged;
 
         public ISketchItemFactory ItemFactory => _parent.ItemFactory;
@@ -91,6 +91,16 @@ namespace Sketch.Controls
                 _myLabel.UpdateGeometry();
                 _myLabel.InvalidateVisual();
             }
+        }
+
+        public bool CanEditLabel
+        {
+            get => false;
+        }
+
+        public ISketchItemNode ParentNode
+        {
+            get => _parent;
         }
 
         public IList<ISketchItemUI> MarkedItems
@@ -244,7 +254,7 @@ namespace Sketch.Controls
             newActiveOutline.IsMarkedChanged += SketchItemIsMarkedChanged;
             
             newActiveOutline.IsSelected = true;
-            //this._activeUis.Add(newActiveOutline);
+            EditMode = EditMode.Select;
         }
 
         public void RemoveVisualChild( ISketchItemModel model )
@@ -305,7 +315,7 @@ namespace Sketch.Controls
                 EditMode = EditMode.Select;
             }
 
-            if (EditMode == Types.EditMode.Insert)
+            if (EditMode == EditMode.Insert)
             {
                 BeginEdit(new AddConnectableItemOperation(this));
             }
@@ -362,8 +372,7 @@ namespace Sketch.Controls
         {
             lock( this._synchRoot)
             {
-                var ui = obj as ISketchItemUI;
-                if (ui != null)
+                if (obj is ISketchItemUI ui)
                 {
                     if (_markedUis.Contains(ui) && !args)
                     {

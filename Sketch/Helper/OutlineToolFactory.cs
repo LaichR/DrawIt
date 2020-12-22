@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UI.Utilities.Interfaces;
 
-namespace Sketch.Types
+namespace Sketch.Helper
 {
     [Serializable]
     public abstract class OutlineToolFactory

@@ -24,7 +24,7 @@ namespace Sketch.PropertyEditor
           DependencyProperty.Register("InspectedObject", typeof(object),
               typeof(PropertyEditor), new PropertyMetadata(OnInspectedObjectChanged));
 
-        PropertyEditorModel _model;
+        readonly PropertyEditorModel _model;
 
         public PropertyEditor()
         {

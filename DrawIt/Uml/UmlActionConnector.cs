@@ -25,8 +25,8 @@ namespace DrawIt.Uml
             : base(p, new Size(DefaultHeight, DefaultWidth), "A",
                  Colors.White)
         {
-            AllowEdit = true;
-            AllowSizeChange = false;
+            CanEditLabel = true;
+            CanChangeSize = false;
             StrokeThickness = 3;
             UpdateGeometry();
         }

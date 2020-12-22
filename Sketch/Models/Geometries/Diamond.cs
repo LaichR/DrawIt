@@ -30,7 +30,7 @@ namespace Sketch.Models.Geometries
 
         bool _isFilled = true;
         double _rotation = 0;
-        double _myDefaultAngle = 90.0;
+        readonly double _myDefaultAngle = 90.0;
         double _scaleX = 1;
         double _scaleY = 1;
         Vector _translation = new Vector();

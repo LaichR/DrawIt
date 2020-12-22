@@ -35,8 +35,8 @@ namespace DrawIt.Uml
                  "a note",
                  Colors.White)
         {
-            AllowSizeChange = true;
-            AllowEdit = true;
+            CanChangeSize = true;
+            CanEditLabel = true;
             Note = "a note";
 
         }

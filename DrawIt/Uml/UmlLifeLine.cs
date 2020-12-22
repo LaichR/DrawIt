@@ -6,7 +6,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Threading.Tasks;
 using UI.Utilities.Interfaces;
-using Sketch.Types;
+using Sketch.Helper;
 using Sketch.Models;
 using System.Runtime.Serialization;
 using Sketch.Interface;
@@ -34,7 +34,7 @@ namespace DrawIt.Uml
         {
             FillColor = new Color() { A = 0, R = 0xFF, G = 0xFF, B = 0xFF };
 
-            AllowSizeChange = true;
+            CanChangeSize = true;
             UpdateGeometry();
         }
 

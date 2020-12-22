@@ -5,8 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
-using Sketch.Types;
-using Sketch.Utilities;
+using Sketch.Helper;
 using Sketch.Interface;
 
 namespace Sketch.Models
@@ -106,8 +105,8 @@ namespace Sketch.Models
 
                     while (computeLine)
                     {
-                        startPoint = ComputeStartPoint(isFirst, firstPoint, nextPoint, ref startPointRelativePosition, ref startDocking, ref connecotorStartPort);   
-                        endPoint = ComputeEndPoint(!morePoints, firstPoint, nextPoint, ref endPointRelativePosition, ref endDocking, ref connectionEndPort);
+                        startPoint = ComputeStartPoint(firstPoint, nextPoint, ref startPointRelativePosition, ref startDocking, ref connecotorStartPort);   
+                        endPoint = ComputeEndPoint(firstPoint, nextPoint, ref endPointRelativePosition, ref endDocking, ref connectionEndPort);
                         computeLine = !CheckDocking(startPoint, endPoint, ref startDocking, connecotorStartPort, ref endDocking, connectionEndPort);
                     }
                     
@@ -197,7 +196,7 @@ namespace Sketch.Models
             ConnectorUtilities.ComputeDockingDuringMove(rect, p, ref currentDocking, ref lastPos);
         }
 
-        Point ComputeEndPoint(bool isLastSegment, IConnectable firstPoint, IConnectable nextPoint, ref double relativePos, ref ConnectorDocking docking, ref ulong connectorEndPort)
+        Point ComputeEndPoint(IConnectable firstPoint, IConnectable nextPoint, ref double relativePos, ref ConnectorDocking docking, ref ulong connectorEndPort)
         {
             
             var end = _endPointHint;
@@ -218,7 +217,7 @@ namespace Sketch.Models
             
         }
 
-        Point ComputeStartPoint(bool isFirstSegment, IConnectable firstPoint, IConnectable nextPoint, ref double startPointRelativePos, ref ConnectorDocking docking, ref ulong connectorStartPort)
+        Point ComputeStartPoint( IConnectable firstPoint, IConnectable nextPoint, ref double startPointRelativePos, ref ConnectorDocking docking, ref ulong connectorStartPort)
         {
             
             var start = _startPointHint;
@@ -243,8 +242,11 @@ namespace Sketch.Models
         {
             this._routingAssistent.InitalizeBoundSearchStructures(
                 _model.Connectables?.Where(
-                    (x) => x != _model.From && 
-                    x != _model.To && !(x.GetCustomAttribute<DoNotConsiderForConnectorRoutingAttribute>() != null)));
+                    (x) => /*x != _model.From && 
+                    x != _model.To &&*/ !(x.GetCustomAttribute<DoNotConsiderForConnectorRoutingAttribute>() != null)));
+            //Rect r1 = new Rect(_model.From.Bounds.X + 1, _model.From.Bounds.Y + 1, _model.From.Bounds.Width - 2, _model.From.Bounds.Height - 2);
+            //Rect r2 = new Rect(_model.To.Bounds.X + 1, _model.To.Bounds.Y + 1, _model.To.Bounds.Width - 2, _model.To.Bounds.Height - 2);
+            //this._routingAssistent.InitalizeBoundSearchStructures(new[] { r1, r2 });
         }
 
         bool ExistsIntersectingBounds(Rect r)
@@ -254,32 +256,21 @@ namespace Sketch.Models
 
         bool CheckDocking(Point start, Point end, ref ConnectorDocking startDocking, ulong moveStartPort, ref ConnectorDocking endDocking, ulong moveEndPort)
         {
-            bool ret;
-            var lineType = (LineType)((int)startDocking << 8 | (int)endDocking);
-            var mid = new Point((start.X / 2 + end.X / 2), (start.Y / 2 + end.Y / 2));
-            var r1 = MakeRect(start, mid);
-            var r2 = MakeRect(mid, end);
-            switch (lineType)
+
+            LineType lineType = (LineType)((int)startDocking << 8 | (int)endDocking);
+            var linePoints = ComputeLinePoints(start, end, lineType, 0.5, out double _0, out double _1);
+            var lineStart = linePoints.First();
+            
+            bool ret = false;
+            
+            foreach( var p in linePoints.Skip(1))
             {
-
-                case LineType.BottomTop:
-                case LineType.TopBottom:
-                    r1.X -= 3;
-                    r1.Width = 6;
-                    r2.Width = 6;
-                    r2.X = end.X-3;
-                    break;
                 
-                case LineType.LeftRight:
-                case LineType.RightLeft:
-                    r1.Y -= 3; r1.Height = 6;
-                    r2.Y = end.Y - 3; r2.Height = 6;
-                    break;
-                default:
-                    break;
+                var g = new LineGeometry(lineStart, p);
+                ret = ret || !ExistsIntersectingBounds(g.Bounds);
+                lineStart = p;
+                if (ret) break;
             }
-
-            ret = !ExistsIntersectingBounds(r1) && !ExistsIntersectingBounds(r2);
 
             if (!ret)
             {
@@ -309,11 +300,11 @@ namespace Sketch.Models
             return ret;
         }
 
-        static Rect MakeRect(Point p1, Point p2)
-        {
-            Point p = new Point(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y));
-            Size s = new Size(Math.Abs(p1.X - p2.X), Math.Abs(p1.Y - p2.Y));
-            return new Rect(p, s);
-        }
+        //static Rect MakeRect(Point p1, Point p2)
+        //{
+        //    Point p = new Point(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y));
+        //    Size s = new Size(Math.Abs(p1.X - p2.X), Math.Abs(p1.Y - p2.Y));
+        //    return new Rect(p, s);
+        //}
     }
 }

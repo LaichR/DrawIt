@@ -23,15 +23,6 @@ namespace UI.Utilities
         {
             try
             {
-                var a = (float)info.GetValue("A", typeof(float));
-                var r = (float)info.GetValue("R", typeof(float));
-                var g = (float)info.GetValue("G", typeof(float));
-                var b = (float)info.GetValue("B", typeof(float));
-                Color = new Color() { ScA = a, ScB = b, ScG = g, ScR = r };
-            }
-            catch { }
-            try
-            {
                 ScRgb = (float[])info.GetValue("Fill", typeof(float[]));
             }
             catch { }

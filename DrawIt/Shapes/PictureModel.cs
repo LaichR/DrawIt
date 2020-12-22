@@ -7,7 +7,7 @@ using UI.Utilities.Interfaces;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Sketch.Types;
+using Sketch.Helper;
 using Sketch.Models;
 using System.Runtime.Serialization;
 
@@ -29,7 +29,7 @@ namespace DrawIt.Shapes
                  fileName, Colors.Snow)
         {
             Label = fileName;
-            AllowSizeChange = true;
+            CanChangeSize = true;
             RotationAngle = 0.0;
             UpdateGeometry();
         }

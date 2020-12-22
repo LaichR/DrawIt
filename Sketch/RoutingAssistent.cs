@@ -19,7 +19,8 @@ namespace Sketch.Utilities
         LinkedAvlTree<BoundsComparer> _horizontallySortedBounds;
         LinkedAvlTree<BoundsComparer> _verticallySortedBounds;
 
-        static readonly Dictionary<LineType, ComputeLinePointsDelegateExt> _linePointsComputation = new Dictionary<LineType, ComputeLinePointsDelegateExt>()
+        static readonly Dictionary<LineType, ComputeLinePointsDelegateExt> _linePointsComputation = 
+            new Dictionary<LineType, ComputeLinePointsDelegateExt>()
         {
             {LineType.TopBottom, TopBottomLine},
             {LineType.BottomTop, BottomTopLine},
@@ -132,7 +133,7 @@ namespace Sketch.Utilities
                 if (p.Data.Item.Bounds.IntersectsWith(r))
                 {
 
-                    r.Y = p.Data.Top - 15; // the height is 10 so we have to move up 15 
+                    r.Y = p.Data.Top - 30; // the height is 10 so we have to move up 15 
                 }
                 p = p.Previous;
             }
@@ -150,7 +151,7 @@ namespace Sketch.Utilities
             {
                 if (p.Data.Item.Bounds.IntersectsWith(r))
                 {
-                    r.Y = p.Data.Bottom + 5;
+                    r.Y = p.Data.Bottom + 20;
                 }
                 p = p.Next;
             }

@@ -9,7 +9,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using Sketch.Models;
 using Sketch.Interface;
-using Sketch.Types;
+using Sketch.Helper;
 
 namespace Sketch.Controls
 {
@@ -43,7 +43,7 @@ namespace Sketch.Controls
             readonly GeometryGroup _gg = new GeometryGroup();
             Point _p0;
             readonly Point _startPoint;
-            readonly ConnectorDocking _allowableDockings;
+            //readonly ConnectorDocking _allowableDockings;
             bool _moveEndingSuccessful = true;
             public MoveConnectorOperation( ConnectorUI ui, Point p )
             {
@@ -79,14 +79,14 @@ namespace Sketch.Controls
                     if (_moveHelper.MoveType == MoveType.MoveStartPoint && _model.CanMoveStart)
                     {
                         _mouseMove = MoveStartPoint;
-                        _allowableDockings = from.AllowableDockings(false);
+                        //_allowableDockings = from.AllowableDockings(false);
                         _movingPointDocking = from.GetConnectorDocking(_moveHelper.StartPoint, false);
                         _otherPointDocking = to.GetConnectorDocking(_moveHelper.EndPoint, true);
                         _otherPointPosition = _moveHelper.EndPoint;
                     }
                     else if (_moveHelper.MoveType == MoveType.MoveEndPoint && _model.CanMoveEnd)
                     {
-                        _allowableDockings = to.AllowableDockings(true);
+                        //_allowableDockings = to.AllowableDockings(true);
                         _mouseMove = MoveEndPoint;
                         _movingPointDocking = to.GetConnectorDocking(_moveHelper.EndPoint, true);
                         _otherPointDocking = from.GetConnectorDocking(_moveHelper.StartPoint, false);
@@ -207,7 +207,7 @@ namespace Sketch.Controls
                 _moveHelper.ComputeDockingDuringMove(_moveHelper.StartingFrom.Bounds, p, ref _movingPointDocking, ref _movePointStart);
                 //var probings = InitProbings(_movingPointDocking, _otherPointDocking);
                 var otherPointPosition = _moveHelper.EndPointRelativePosition;
-                var otherPointDocking = _otherPointDocking;
+                //var otherPointDocking = _otherPointDocking;
                 if (_model.ConnectorStrategy.ConnectionType == ConnectionType.AutoRouting)
                 {
                     _otherPointPosition = ProbeOtherPosition(_movePointStart, _moveHelper.EndPoint, _movingPointDocking, _moveHelper.EndingAt.Bounds,
@@ -250,22 +250,22 @@ namespace Sketch.Controls
                     if (_moveHelper.LineType == LineType.BottomBottom)
                     {
                         var lower = Math.Max(from.Bounds.Bottom, to.Bounds.Bottom);
-                        _newMoveDistance = (e.Y - lower) / ComputeConnectorLine.NormalDistance;
+                        _newMoveDistance = (e.Y - lower) / ConnectorUtilities.NormalDistance;
                     }
                     else if (_moveHelper.LineType == LineType.TopTop)
                     {
                         var upper = Math.Min(from.Bounds.Top, to.Bounds.Top);
-                        _newMoveDistance = (upper - e.Y) / ComputeConnectorLine.NormalDistance;
+                        _newMoveDistance = (upper - e.Y) / ConnectorUtilities.NormalDistance;
                     }
                     else if (_moveHelper.LineType == LineType.LeftLeft)
                     {
                         var leftMost = Math.Min(from.Bounds.Left, to.Bounds.Left);
-                        _newMoveDistance = (leftMost - e.X) / ComputeConnectorLine.NormalDistance;
+                        _newMoveDistance = (leftMost - e.X) / ConnectorUtilities.NormalDistance;
                     }
                     else if (_moveHelper.LineType == LineType.RightRight)
                     {
                         var rightMost = Math.Max(from.Bounds.Right, to.Bounds.Right);
-                        _newMoveDistance = (e.X - rightMost) / ComputeConnectorLine.NormalDistance;
+                        _newMoveDistance = (e.X - rightMost) / ConnectorUtilities.NormalDistance;
                     }
                     else if (_moveHelper.LineType == LineType.LeftRight)
                     {
@@ -343,25 +343,27 @@ namespace Sketch.Controls
                     if (_isSelfTransition)
                     {
                         tmpDocking = movingDocking;
-                        lt = (Types.LineType)((int)ConnectorDocking.Self << 8 | (int)movingDocking);
+                        lt = (LineType)((int)ConnectorDocking.Self << 8 | (int)movingDocking);
                     }
                     else
                     {
                         lt = (LineType)((int)tmpDocking << 8 | (int)movingDocking);
                     }
                     tmpPos = ConnectorUtilities.ComputePoint(bounds, tmpDocking, relativePosition);
-
-                    var geometry = _moveHelper.GetGeometry(_gg, lt, tmpPos, start, _moveHelper.Distance);
+                    GeometryGroup tmpGeomtery = new GeometryGroup();
+                    var geometry = _moveHelper.GetGeometry(tmpGeomtery, lt, tmpPos, start, _moveHelper.Distance);
 
                     if ((_fromGeometry.FillContainsWithDetail(geometry) == IntersectionDetail.Empty &&
                          _toGeometry.FillContainsWithDetail(geometry) == IntersectionDetail.Empty))
                     {
                         changeOtherPointDocking = tmpDocking != docking;
-                        _visualizer.UpdateGeometry(geometry);
+                        _gg.Children.Clear();
+                        foreach (var g in tmpGeomtery.Children) _gg.Children.Add(g);
                         _moveEndingSuccessful = true;
                         break;
                     }
-                    System.Diagnostics.Trace.WriteLine("probe another setting");
+
+                    //System.Diagnostics.Trace.WriteLine("probe another setting");
                 }
                 if (changeOtherPointDocking)
                 {
@@ -370,6 +372,8 @@ namespace Sketch.Controls
                 }
                 return end;
             }
+
+            
 
             bool TryAdjustConnectorLine()
             {

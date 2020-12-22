@@ -12,7 +12,7 @@ using UI.Utilities;
 using Sketch.Interface;
 using System.Drawing.Text;
 using System.CodeDom;
-using Sketch.Types;
+using Sketch.Helper;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 
@@ -40,7 +40,7 @@ namespace Sketch.Models
         RotateTransform _rotateTransform = null;
 
         [PersistentField((int)ModelVersion.V_0_1, "Fill", true)]
-        SerializableColor _fillColor = new SerializableColor() { Color = Colors.Snow };
+        readonly SerializableColor _fillColor = new SerializableColor() { Color = Colors.Snow };
 
 
         [PersistentField((int)ModelVersion.V_2_1, "Decorators")]
@@ -98,6 +98,23 @@ namespace Sketch.Models
         {
             get => SketchItemFactory.ActiveFactory.GetAllowableConnctors(this.GetType());
         }
+
+        public virtual bool CanCopy
+        {
+            get => true;
+        }
+
+        public virtual bool CanSetColor
+        {
+            get => true;
+        }
+
+        public virtual bool CanChangeZorder
+        {
+            get => false;
+        }
+
+
 
         protected ConnectableBase(SerializationInfo info, StreamingContext context)
             : base(info, context) { }
@@ -202,7 +219,7 @@ namespace Sketch.Models
             }
         }
 
-        public bool AllowSizeChange
+        public bool CanChangeSize
         {
             get { return _allowSizeChange; }
             set { SetProperty<bool>(ref _allowSizeChange, value); }
@@ -451,29 +468,32 @@ namespace Sketch.Models
         {
             
             _cmdSelectColor = new DelegateCommand(SelectColor);
-            Commands = new List<ICommandDescriptor>()
+            if (CanSetColor)
             {
-                new UI.Utilities.Behaviors.CommandDescriptor
-                    {
-                        Name = "Select Color",
-                        Command = _cmdSelectColor
-                    }
-            };
+                Commands = new List<ICommandDescriptor>()
+                {
+                    new UI.Utilities.Behaviors.CommandDescriptor
+                        {
+                            Name = "Select Color",
+                            Command = _cmdSelectColor
+                        }
+                };
+            }
         }
 
 
 
-        static Color GetStopColor(Color color )
-        {
-            Color stopColor = new Color
-            {
-                A = (byte)(color.A-16),
-                R = (byte)(Colors.Wheat.R - 32),
-                G = (byte)(Colors.Wheat.G - 32),
-                B = (byte)(Colors.Wheat.B - 32),
-            };
-            return stopColor;
-        }
+        //static Color GetStopColor(Color color )
+        //{
+        //    Color stopColor = new Color
+        //    {
+        //        A = (byte)(color.A-16),
+        //        R = (byte)(Colors.Wheat.R - 32),
+        //        G = (byte)(Colors.Wheat.G - 32),
+        //        B = (byte)(Colors.Wheat.B - 32),
+        //    };
+        //    return stopColor;
+        //}
 
         #endregion
     }

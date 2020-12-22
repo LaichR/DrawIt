@@ -7,7 +7,7 @@ using System.Windows.Input;
 using System.Windows;
 using System.Windows.Controls;
 using Sketch.Models;
-using Sketch.Types;
+using Sketch.Helper;
 using Sketch.Interface;
 
 namespace Sketch.Controls
@@ -15,9 +15,9 @@ namespace Sketch.Controls
 
     internal class RewireConnectorOperation : IEditOperation
     {
-        ConnectablePairSelector _selector;
-        ISketchItemDisplay _pad;
-        ConnectorModel _connector;
+        readonly ConnectablePairSelector _selector;
+        readonly ISketchItemDisplay _pad;
+        readonly ConnectorModel _connector;
 
         public RewireConnectorOperation(ISketchItemDisplay pad, ConnectorModel model, Point p)
         {

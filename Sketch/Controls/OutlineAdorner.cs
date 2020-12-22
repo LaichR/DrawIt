@@ -10,7 +10,7 @@ using System.Windows.Documents;
 using System.Windows.Shapes;
 using System.Windows.Controls;
 using Sketch.Models;
-using Sketch.Types;
+using Sketch.Helper;
 using Sketch.Interface;
 
 namespace Sketch.Controls

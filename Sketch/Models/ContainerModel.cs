@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Runtime.Serialization;
 using Sketch.Interface;
-using Sketch.Utilities;
+using Sketch.Helper;
 using System.IO;
 
 namespace Sketch.Models

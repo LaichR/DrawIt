@@ -10,39 +10,39 @@ namespace Sketch.Models.Geometries
 {
     public class Triangle: IConnectorEnding
     {
-       
-        static readonly List<PathFigure> arrowPath = new List<PathFigure>
-        {  
-            new PathFigure{
-                StartPoint=new Point(-6,-14),
-                Segments = new System.Windows.Media.PathSegmentCollection
-                {
-                    new LineSegment(new Point(0,0), true),
-                    new LineSegment( new Point(6,-14), true)
-                },
-                IsClosed = true,
-                IsFilled = true
-            }
+        static readonly PathSegmentCollection _segments = new PathSegmentCollection()
+        {
+            new LineSegment(new Point(0,0), true),
+            new LineSegment( new Point(6,-14), true)
         };
 
+        readonly PathFigure _arrowFigure = new PathFigure {
+            StartPoint = new Point(-6, -14),
+            Segments = _segments,
+            IsClosed = true,
+            IsFilled = true
+        };
 
-        bool _isFilled = true;
+        
+        
         double _rotation = 0;
-        double _myDefaultAngle = 90.0;
+        readonly double _myDefaultAngle = 90.0;
         double _scaleX = 1;
         double _scaleY = 1;
         Vector _translation = new Vector();
         Geometry _ending = null;
 
+        
+
         public bool IsFilled
         {
             get
             {
-                return _isFilled;
+                return _arrowFigure.IsFilled;
             }
             set
             {
-                _isFilled = value;
+                _arrowFigure.IsFilled = value;
             }
         }
 
@@ -107,6 +107,7 @@ namespace Sketch.Models.Geometries
                 }
                 return _ending;
             }
+
         }
 
         private void ComputeGeometry()
@@ -115,9 +116,8 @@ namespace Sketch.Models.Geometries
             var rotationAngle = _rotation - _myDefaultAngle;
            t.Children.Add(new ScaleTransform(_scaleX, _scaleY));
            t.Children.Add(new RotateTransform(rotationAngle,0,0));
-           t.Children.Add(new TranslateTransform(_translation.X, _translation.Y));
-            
-           _ending = new PathGeometry(arrowPath, FillRule.Nonzero, t);
+           t.Children.Add(new TranslateTransform(_translation.X, _translation.Y)); 
+           _ending = new PathGeometry(new[] { _arrowFigure }, FillRule.Nonzero, t);
         }
     }
 }

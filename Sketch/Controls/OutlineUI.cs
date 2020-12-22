@@ -12,7 +12,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using UI.Utilities;
 using UI.Utilities.Interfaces;
-using Sketch.Types;
+using Sketch.Helper;
 using Sketch.Models;
 using Sketch.Interface;
 
@@ -41,9 +41,9 @@ namespace Sketch.Controls
             DependencyProperty.Register("Geometry", typeof(Geometry), typeof(OutlineUI),
             new PropertyMetadata(OnGeometryChanged));
 
-        public static readonly DependencyProperty AllowSizeChangeProperty =
-            DependencyProperty.Register("AllowSizeChange", typeof(bool), typeof(OutlineUI),
-            new PropertyMetadata(OnAllowSizeChangeChanged));
+        public static readonly DependencyProperty CanChangeSizeProperty =
+            DependencyProperty.Register("CanChangeSize", typeof(bool), typeof(OutlineUI),
+            new PropertyMetadata(OnCanChangeSizeChanged));
 
         public static readonly DependencyProperty ContextMenuDeclarationProperty =
             DependencyProperty.Register("ContextMenuDeclaration", typeof(IList<ICommandDescriptor>), typeof(OutlineUI),
@@ -55,11 +55,11 @@ namespace Sketch.Controls
         bool _isNotifyingMarkingChanged;
         RelativePosition _mouseMoveHitResult;
         
-        ConnectableBase _model;
-        ISketchItemDisplay _parent;
-        SketchPad _sketchPad;
-        OutlineAdorner _adorner;
-        DecoratorAdorner _decoratorAdorner;
+        readonly ConnectableBase _model;
+        readonly ISketchItemDisplay _parent;
+        readonly SketchPad _sketchPad;
+        readonly OutlineAdorner _adorner;
+        readonly DecoratorAdorner _decoratorAdorner;
         bool _isShadowAdornderAdded;
         bool _isDecoratorAdornerAdded;
         StackPanel _myTools;
@@ -89,9 +89,12 @@ namespace Sketch.Controls
                 this.DataContext = model;
                 this.SetBinding(LabelProperty, model.LabelPropertyName);
 
-                var boundsBinding = new Binding(nameof(Bounds));
-                boundsBinding.Mode = BindingMode.OneWay;
-                //boundsBinding.IsAsync = true;
+                var boundsBinding = new Binding(nameof(Bounds))
+                {
+                    Mode = BindingMode.OneWay
+                };
+                
+               
 
                 this.SetBinding(BoundsProperty, boundsBinding);
                 this.SetBinding(GeometryProperty, nameof(Geometry));
@@ -104,39 +107,18 @@ namespace Sketch.Controls
                 _decoratorAdorner = new DecoratorAdorner(this, parent);
                 
 
-                var isSelecteBinding = new Binding("IsSelected");
-                isSelecteBinding.Mode = BindingMode.TwoWay;
+                var isSelecteBinding = new Binding("IsSelected") { Mode = BindingMode.TwoWay };
+                
                 this.SetBinding(IsSelectedProperty, isSelecteBinding);
 
-                var isMarkedBinding = new Binding("IsMarked");
-                isMarkedBinding.Mode = BindingMode.TwoWay;
+                var isMarkedBinding = new Binding("IsMarked"){ Mode = BindingMode.TwoWay };
+                
                 this.SetBinding(IsMarkedProperty, isMarkedBinding);
 
-                this.SetBinding(AllowSizeChangeProperty, "AllowSizeChange");
+                this.SetBinding(CanChangeSizeProperty, nameof(CanChangeSize));
 
-                var commands = model.Commands;
-                if (commands != null && commands.Count > 0)
-                {
-
-                    ContextMenu = OutlineHelper.InitContextMenu(commands);
-                    if (_model.IsSerializable)
-                    {
-                        ContextMenu.Items.Add(
-                            new MenuItem()
-                            {
-                                Header = "Copy",
-                                Command = new DelegateCommand(() =>
-                                {
-                                    var newElem = _model.Clone();
-                                    var t = new TranslateTransform(
-                                        ConnectableBase.DefaultWidth / 4,
-                                        ConnectableBase.DefaultHeight / 4);
-                                    newElem.Move(t);
-                                    _parent.SketchItems.Add(newElem);
-                                })
-                            });
-                    }
-                }
+                InitContextMenu(model);
+                
             }
             else
             {
@@ -210,10 +192,10 @@ namespace Sketch.Controls
             set { SetValue(GeometryProperty, value); }
         }
 
-        public bool AllowSizeChange
+        public bool CanChangeSize
         {
-            get { return (bool)GetValue(AllowSizeChangeProperty); }
-            set { SetValue(AllowSizeChangeProperty, value); }
+            get { return (bool)GetValue(CanChangeSizeProperty); }
+            set { SetValue(CanChangeSizeProperty, value); }
         }
 
 
@@ -291,8 +273,7 @@ namespace Sketch.Controls
             {
                 base.OnRender(drawingContext);
             }
-            var r = _model.Bounds;
-           
+            
             drawingContext.PushClip(_privateClip);
             _model.RenderAdornments(drawingContext);
             //ClipToBounds = false;
@@ -369,7 +350,7 @@ namespace Sketch.Controls
                         if (hitResult == _mouseMoveHitResult)
                         {
                             if (_mouseMoveHitResult != RelativePosition.Undefined
-                                && _model.AllowSizeChange)
+                                && _model.CanChangeSize)
                             {
                                 RegisterHandler(new ChangeSizeOperation(this, e));
 
@@ -387,8 +368,8 @@ namespace Sketch.Controls
 
         void InitTools( IEnumerable<ICommandDescriptor> commands)
         {
-            _myTools = new StackPanel();
-            _myTools.Orientation = Orientation.Vertical;
+            _myTools = new StackPanel() { Orientation = Orientation.Vertical };
+            
             foreach( var cd in commands)
             {
                 _myTools.Children.Add(
@@ -558,6 +539,75 @@ namespace Sketch.Controls
             return _visualBrush;
         }
 
+        void InitContextMenu(ConnectableBase model)
+        {
+            RuntimeCheck.Contract.Requires<ArgumentNullException>(model != null, "InitContextMenu() requires valide model");
+            var commands = model.Commands;
+            if (commands != null && commands.Count > 0)
+            {
+
+                ContextMenu = OutlineHelper.InitContextMenu(commands);
+                if (_model.CanCopy && _model.IsSerializable)
+                {
+                    ContextMenu.Items.Add(
+                        new MenuItem()
+                        {
+                            Header = "Copy",
+                            Command = new DelegateCommand(() =>
+                            {
+                                var newElem = _model.Clone();
+                                var t = new TranslateTransform(
+                                    ConnectableBase.DefaultWidth / 4,
+                                    ConnectableBase.DefaultHeight / 4);
+                                newElem.Move(t);
+                                _parent.SketchItems.Add(newElem);
+                            })
+                        });
+                }
+                if (_model.CanChangeZorder)
+                {
+
+                    var z = Canvas.GetZIndex(this);
+                    ContextMenu.Items.Add(
+                        new MenuItem()
+                        {
+                            Header = "Bring to front",
+                            Command = new DelegateCommand(() =>
+                            {
+                                GetMinMaxZ(out int minZ, out int maxZ);
+                                Canvas.SetZIndex(this, maxZ + 1);
+                            })
+                        });
+                    ContextMenu.Items.Add(
+                        new MenuItem()
+                        {
+                            Header = "Send to back",
+                            Command = new DelegateCommand(() =>
+                            {
+                                GetMinMaxZ(out int minZ, out int maxZ);
+                                Canvas.SetZIndex(this, minZ - 1);
+                            })
+                        });
+                }
+            }
+
+        }
+
+        void GetMinMaxZ(out int minZ, out int maxZ)
+        {
+            minZ = int.MaxValue;
+            maxZ = int.MinValue;
+            foreach (var sibling in this._parent.Canvas.Children.OfType<ISketchItemUI>())
+            {
+                if (this.Bounds.IntersectsWith(sibling.Model.Geometry.Bounds))
+                {
+                    var otherZ = Canvas.GetZIndex(sibling.Shape);
+                    if (otherZ > maxZ) maxZ = otherZ;
+                    if (otherZ < minZ) minZ = otherZ;
+                }
+            }
+        }
+
         private static void OnLabelChanged(DependencyObject source,
              DependencyPropertyChangedEventArgs e)
         {
@@ -645,14 +695,14 @@ namespace Sketch.Controls
             gadgetUI.Shape.InvalidateVisual();
         }
 
-        private static void OnAllowSizeChangeChanged(DependencyObject source,
+        private static void OnCanChangeSizeChanged(DependencyObject source,
              DependencyPropertyChangedEventArgs e)
         {
 
             OutlineUI gadget = source as OutlineUI;
             if (e.NewValue != e.OldValue)
             {
-                if (gadget.AllowSizeChange)
+                if (gadget.CanChangeSize)
                 {
                     gadget._adorner.MouseDown += gadget.HandleShadowMouseDown;
                 }

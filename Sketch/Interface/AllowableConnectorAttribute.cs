@@ -7,10 +7,13 @@ using System.Drawing;
 
 namespace Sketch.Interface
 {
+    /// <summary>
+    /// Allows to specify which connectors can be used to connect a specific sketch shape
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class AllowableConnectorAttribute: Attribute
     {
-        Type _allowableConnectorType;
+        readonly Type _allowableConnectorType;
 
         public AllowableConnectorAttribute(Type cls)
         {

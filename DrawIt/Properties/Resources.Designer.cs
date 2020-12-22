@@ -83,6 +83,16 @@ namespace DrawIt.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap CombindedFragment {
+            get {
+                object obj = ResourceManager.GetObject("CombindedFragment", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap image {
             get {
                 object obj = ResourceManager.GetObject("image", resourceCulture);
@@ -113,26 +123,6 @@ namespace DrawIt.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Save_as_icon {
-            get {
-                object obj = ResourceManager.GetObject("Save_as_icon", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Save_icon {
-            get {
-                object obj = ResourceManager.GetObject("Save_icon", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap UmlActionConnectorShape {
             get {
                 object obj = ResourceManager.GetObject("UmlActionConnectorShape", resourceCulture);
@@ -156,6 +146,16 @@ namespace DrawIt.Properties {
         internal static System.Drawing.Bitmap UmlAssociationShape {
             get {
                 object obj = ResourceManager.GetObject("UmlAssociationShape", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap UmlAwaitEventIcon {
+            get {
+                object obj = ResourceManager.GetObject("UmlAwaitEventIcon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

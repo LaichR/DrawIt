@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
-using Sketch.Types;
+using Sketch.Helper;
 using Sketch.Models;
 using Sketch.Interface;
 using Sketch.Models.Geometries;

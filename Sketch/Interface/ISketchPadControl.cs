@@ -11,9 +11,15 @@ namespace Sketch.Interface
     {
         void ExportDiagram(string fileName);
         
-        void SaveFile(string fileName, bool silent);
+        void SaveFile(string fileName);
 
         void OpenFile(string fileName);
+
+        //double Scaling
+        //{
+        //    get;
+        //    set;
+        //}
 
         void AlignLeft();
 

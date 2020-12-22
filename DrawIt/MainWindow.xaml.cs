@@ -27,15 +27,14 @@ namespace DrawIt
     /// </summary>
     public partial class MainWindow : Window
     {
-        
-        ApplicationViewModel _model;
+
+        readonly ApplicationViewModel _model;
         Sketch.Controls.ColorPicker.ColorPalette _palette;
         TreeViewItem _focusedItem;
 
         public MainWindow()
         {
             InitializeComponent();
-
 
 
             _model = new ApplicationViewModel(); 
@@ -114,5 +113,21 @@ namespace DrawIt
                 _focusedItem = item;
             }
         }
+
+        private void Expander_Expanded(object sender, RoutedEventArgs e)
+        {
+            var col = MainGrid.ColumnDefinitions[0];
+            col.Width = new GridLength(2, GridUnitType.Star);
+            MainGrid.ColumnDefinitions[1].Width = new GridLength(5, GridUnitType.Pixel);
+            MainGrid.ColumnDefinitions[2].Width = new GridLength(5, GridUnitType.Star);
+            
+        }
+
+        private void Expander_Collapsed(object sender, RoutedEventArgs e)
+        {
+            MainGrid.ColumnDefinitions[0].Width = new GridLength(25, GridUnitType.Pixel);
+            MainGrid.ColumnDefinitions[2].Width = new GridLength(10, GridUnitType.Star);
+        }
+
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using Sketch.Interface;
+using Sketch.Helper;
 
 namespace Sketch.Models
 {
@@ -18,7 +19,7 @@ namespace Sketch.Models
         //    Point _start;
         //    double _distance;
         //    Types.MoveType _moveType;
-            
+
 
         //    public MovingState(SelfConnectorStrategy parent, Point p)
         //    {
@@ -30,7 +31,7 @@ namespace Sketch.Models
         //        var start = pf.StartPoint;
         //        Point end = start;
         //        nrOfSegments = pf.Segments.Count;
-                
+
         //        foreach (var ps in pf.Segments)
         //        {
         //            var ls = ps as LineSegment;
@@ -74,11 +75,11 @@ namespace Sketch.Models
         //    }
 
         //    public System.Windows.Media.Geometry GetGeometry(
-        //        GeometryGroup gg, Types.LineType lineType, Point start, Point end, double distance)
+        //        GeometryGroup gg, LineType lineType, Point start, Point end, double distance)
         //    {
         //        _distance = distance;
-        //        lineType = (Types.LineType)(((int)ConnectorDocking.Self << 8) | ((int)lineType & 0xFF));               
-               
+        //        lineType = (LineType)(((int)ConnectorDocking.Self << 8) | ((int)lineType & 0xFF));               
+
         //        _parent.ComputePath(lineType, start, end, _distance);
         //        gg.Children.Clear();
         //        var pf = _parent._myPath.First();
@@ -152,7 +153,7 @@ namespace Sketch.Models
         //                {
         //                    currentDocking = ConnectorDocking.Left;
         //                    newPos.X = left;
-                           
+
         //                }
         //                else
         //                {
@@ -229,7 +230,7 @@ namespace Sketch.Models
         //        get { return ConnectionType.StrightLine ; }
         //    }
 
-        //    public Types.LineType LineType
+        //    public LineType LineType
         //    {
         //        get
         //        {
@@ -253,14 +254,14 @@ namespace Sketch.Models
 
 
 
-        ConnectorModel _model;
+        readonly ConnectorModel _model;
         Point _start;
         Point _end;
         double _startAngle;
         double _endAngle;
 
 
-        List<System.Windows.Media.PathFigure> _myPath = new List<System.Windows.Media.PathFigure>();
+        readonly List<System.Windows.Media.PathFigure> _myPath = new List<System.Windows.Media.PathFigure>();
 
         public SelfConnectorStrategy(ConnectorModel connectorModel)
         {
@@ -369,7 +370,7 @@ namespace Sketch.Models
             }
         }
 
-        void ComputePath( Types.LineType lineType , Point start, Point end, double distance)
+        void ComputePath( LineType lineType , Point start, Point end, double distance)
         {
             _myPath.Clear();
             _myPath.Add(
@@ -403,22 +404,22 @@ namespace Sketch.Models
             return point;
          }
 
-        static Types.LineType GetLineTypeFromDocking( ConnectorDocking startPointDocking)
+        static LineType GetLineTypeFromDocking( ConnectorDocking startPointDocking)
         {
-            Types.LineType lt = Types.LineType.Undefined;
+            LineType lt = LineType.Undefined;
             switch (startPointDocking)
             {
                 case ConnectorDocking.Bottom:
-                    lt = Types.LineType.SelfBottom;
+                    lt = LineType.SelfBottom;
                     break;
                 case ConnectorDocking.Top:
-                    lt = Types.LineType.SelfTop;
+                    lt = LineType.SelfTop;
                     break;
                 case ConnectorDocking.Left:
-                    lt = Types.LineType.SelfLeft;
+                    lt = LineType.SelfLeft;
                     break;
                 case ConnectorDocking.Right:
-                    lt = Types.LineType.SelfRight;
+                    lt = LineType.SelfRight;
                     break;
                 default:
                     break;
@@ -426,45 +427,45 @@ namespace Sketch.Models
             return lt;
         }
 
-        static Point GetMiddlePoint( Types.LineType lineType, Point start, Point end, double distance )
+        static Point GetMiddlePoint( LineType lineType, Point start, Point end, double distance )
         {
             switch( lineType)
             {
-                case Types.LineType.SelfBottom:
+                case LineType.SelfBottom:
                     return new Point((start.X + end.X) / 2.0, start.Y + distance * 150);
-                case Types.LineType.SelfTop:
+                case LineType.SelfTop:
                     return new Point((start.X + end.X) / 2.0, start.Y - distance * 150);
-                case Types.LineType.SelfLeft:
+                case LineType.SelfLeft:
                     return new Point(start.X - distance*150, (start.Y + end.Y)/2.0);
-                case Types.LineType.SelfRight:
+                case LineType.SelfRight:
                     return new Point(start.X+ distance * 150, start.Y - distance * 150);
                 default:
                     throw new NotSupportedException(string.Format("linetype {0} is not supported", lineType));
             }
         }
 
-        public IEnumerable<Point> ComputeLinePoints(Point start, Point end, Types.LineType lineType, double middlePosition, out double startAngle, out double endAngle)
+        public IEnumerable<Point> ComputeLinePoints(Point start, Point end, LineType lineType, double middlePosition, out double startAngle, out double endAngle)
         {
             
             switch (lineType)
             {
-                case Types.LineType.SelfTop:
-                case Types.LineType.TopTop:
+                case LineType.SelfTop:
+                case LineType.TopTop:
                     var lp = TopTopBottomBottomPath(start, end, 1.0, middlePosition);
                     startAngle = 270; endAngle = 90;
                     return lp;
-                case Types.LineType.SelfBottom:
-                case Types.LineType.BottomBottom:
+                case LineType.SelfBottom:
+                case LineType.BottomBottom:
                     lp = TopTopBottomBottomPath(start, end, -1.0, middlePosition);
                     startAngle = 90; endAngle = 270;
                     return lp;
-                case Types.LineType.SelfLeft:
-                case Types.LineType.LeftLeft:
+                case LineType.SelfLeft:
+                case LineType.LeftLeft:
                     lp = LeftLeftRightRight(start, end, 1.0, middlePosition);
                     startAngle = 180; endAngle = 0;
                     return lp;
-                case Types.LineType.SelfRight:
-                case Types.LineType.RightRight:
+                case LineType.SelfRight:
+                case LineType.RightRight:
                     lp = LeftLeftRightRight(start, end, -1.0, middlePosition);
                     startAngle = 0; endAngle = 180;
                     return lp;

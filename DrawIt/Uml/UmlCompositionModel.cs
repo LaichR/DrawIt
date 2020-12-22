@@ -8,10 +8,10 @@ using System.Runtime.Serialization;
 using System.Windows.Media;
 using Sketch;
 using Sketch.Interface;
-using Sketch.Types;
+using Sketch.Helper;
 using Sketch.Models;
 using Sketch.Models.Geometries;
-
+using System.ComponentModel;
 
 namespace DrawIt.Uml
 {
@@ -19,6 +19,10 @@ namespace DrawIt.Uml
     [AllowableConnectorTarget(typeof(UmlClassModel))]
     public class UmlCompositionModel: ConnectorModel
     {
+
+        [PersistentField((int)ModelVersion.V_2_2, nameof(IsDirected), true)]
+        bool _isDirected = true;
+
         public UmlCompositionModel(ConnectionType type, IBoundedItemModel from, IBoundedItemModel to,
             Point connectorStartHint, Point connectorEndHint,
             ISketchItemContainer container)
@@ -32,6 +36,17 @@ namespace DrawIt.Uml
             UpdateGeometry();
         }
 
+        [Browsable(true)]
+        public bool IsDirected
+        {
+            get => _isDirected;
+            set
+            {
+                SetProperty<bool>(ref _isDirected, value);
+                UpdateGeometry();
+            }
+        }
+
         public override void UpdateGeometry()
         {
             base.UpdateGeometry();
@@ -42,11 +57,14 @@ namespace DrawIt.Uml
                 Rotation = ConnectorStrategy.StartAngle,
             }.Ending);
 
-            geometry.Children.Add(new Arrow
+            if (_isDirected)
             {
-                Translation = new Vector(ConnectorStrategy.ConnectionEnd.X, ConnectorStrategy.ConnectionEnd.Y),
-                Rotation = ConnectorStrategy.EndAngle
-            }.Ending);
+                geometry.Children.Add(new Arrow
+                {
+                    Translation = new Vector(ConnectorStrategy.ConnectionEnd.X, ConnectorStrategy.ConnectionEnd.Y),
+                    Rotation = ConnectorStrategy.EndAngle
+                }.Ending);
+            }
         }
 
         protected override void Initialize()

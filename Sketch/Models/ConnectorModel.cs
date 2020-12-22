@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows;
-using Sketch.Types;
+using Sketch.Helper;
 using UI.Utilities;
 using UI.Utilities.Interfaces;
 using UI.Utilities.Behaviors;
@@ -42,9 +42,10 @@ namespace Sketch.Models
         public static readonly System.Windows.Media.Pen HittestPen = new System.Windows.Media.Pen()
         {
             Brush = System.Windows.Media.Brushes.Transparent,
-            Thickness = ComputeConnectorLine.LineWidth,
+            Thickness = ConnectorUtilities.LineWidth,
         };
 
+        readonly List<IConnectorEnding> _endings = new List<IConnectorEnding>();
         readonly PathGeometry _path = new PathGeometry();
         readonly GeometryGroup _geometry = new GeometryGroup();
 
@@ -92,10 +93,10 @@ namespace Sketch.Models
         [PersistentField((int)ModelVersion.V_2_1, "Waypoints")]
         readonly ObservableCollection<IWaypoint> _waypoints = new ObservableCollection<IWaypoint> ();
 
-        [PersistentField((int)ModelVersion.V_0_1, "Container")]
-        SketchItemContainerProxy _containerProxy;
-        ISketchItemContainer _container;          // if i want to prevent two overlaying connections, 
-                                                  // i need to have some knowledge about other connections
+        //[PersistentField((int)ModelVersion.V_0_1, "Container")]
+        //SketchItemContainerProxy _containerProxy;
+        //ISketchItemContainer _container;          // if i want to prevent two overlaying connections, 
+        //                                          // i need to have some knowledge about other connections
 
         [PersistentField((int)ModelVersion.V_0_1, "From")]
         ConnectableBase _from;
@@ -128,7 +129,7 @@ namespace Sketch.Models
             ISketchItemContainer container)
         //:base(new Guid())
         {
-            _container = container;
+            ParentNode = container;
             _connectionType = type;
             MiddlePointRelativePosition = 0.5;
             From = from;
@@ -313,10 +314,10 @@ namespace Sketch.Models
         }
 
         public IEnumerable<ConnectorModel> SiblingConnections => 
-            _container?.SketchItems.OfType<ConnectorModel>().Where((x)=> x != this);
+            (ParentNode as ISketchItemContainer)?.SketchItems.OfType<ConnectorModel>().Where((x)=> x != this);
 
         public IEnumerable<ConnectableBase> Connectables =>
-            _container?.SketchItems.OfType<ConnectableBase>();
+            (ParentNode as ISketchItemContainer)?.SketchItems.OfType<ConnectableBase>();
 
         public IList<ICommandDescriptor> ContextMenuDeclaration
         {
@@ -467,16 +468,10 @@ namespace Sketch.Models
             }
         }
 
-        protected override void PrepareFieldBackup()
-        {
-            base.PrepareFieldBackup();
-            _containerProxy = new SketchItemContainerProxy(this._container);
-        }
 
         protected override void FieldDataRestored()
         {
             base.FieldDataRestored();
-            _container = _containerProxy.Container;
             Point pStart = ConnectorUtilities.ComputePoint(From.Bounds, StartPointDocking, StartPointRelativePosition);
             Point pEnd = ConnectorUtilities.ComputePoint(To.Bounds, EndPointDocking, EndPointRelativePosition);
             _myConnectorStrategy = ConnectorUtilities.GetConnectionType(this, _connectionType, pStart, pEnd);
@@ -542,6 +537,11 @@ namespace Sketch.Models
                 _geometry.Children.Add(_path);
                 ConnectorStartLabel?.UpdateGeometry();
             }
+        }
+
+        public IList<IConnectorEnding> Endings
+        {
+            get => _endings;
         }
 
         Point GetLabelPosition(bool isStartpointLabel)
@@ -822,6 +822,6 @@ namespace Sketch.Models
             _waypointIndex = -1;
         }
 
-
+        
     }
 }

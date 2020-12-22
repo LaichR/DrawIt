@@ -124,6 +124,9 @@
   <data name="CallActionIndicator" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\CallActionIndicator.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="CombindedFragment" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CombindedFragment.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="image" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -133,12 +136,6 @@
   <data name="Open_file_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Open-file-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Save_as_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Save-as-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Save_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Save-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="UmlActionConnectorShape" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\UmlActionConnectorShape.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -147,6 +144,9 @@
   </data>
   <data name="UmlAssociationShape" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\UmlAssociationShape.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UmlAwaitEventIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UmlAwaitEventIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="UmlChoiceShape" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\umlchoiceshape.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

@@ -27,12 +27,8 @@ namespace Sketch.Models
         readonly ConnectorModel _connector;
         readonly bool _isStartpointLabel;
         readonly bool _showLabelConnection;
-        System.Windows.Point _labelPosition;
         
         LineGeometry _linkToConnector;
-        //FormattedText _formattedText;
-        
-        List<UI.Utilities.Interfaces.ICommandDescriptor> _tools = new List<UI.Utilities.Interfaces.ICommandDescriptor>();
 
         public ConnectorLabelModel(ConnectorModel connector, bool isStartPointLabel, bool showLabelConnection, Point labelPosition)
             :base(labelPosition, 
@@ -40,13 +36,12 @@ namespace Sketch.Models
                  connector.GetLabel(isStartPointLabel), Colors.Snow )
         {
             _connector = connector;
-            _connector.PropertyChanged += _connector_PropertyChanged;
-            _labelPosition = labelPosition;
+            _connector.PropertyChanged += Connector_PropertyChanged;
             _isStartpointLabel = isStartPointLabel;
             _showLabelConnection = showLabelConnection;
-            AllowSizeChange = false;
+            CanChangeSize = false;
             StrokeThickness = 0.2;
-            FillColor = Color.FromArgb(0x31, 0xFF, 0xFA, 0xFA);
+            FillColor = Color.FromArgb(0x31, 0xFF, 0xFA, 0xFA); 
             UpdateGeometry();
         }
 
@@ -55,7 +50,7 @@ namespace Sketch.Models
             get => false;
         }
 
-        void _connector_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void Connector_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if( e.PropertyName == nameof(Label) || e.PropertyName == nameof(Geometry) )
             {
@@ -127,7 +122,6 @@ namespace Sketch.Models
         public override void Move(Transform translation)
         {
             base.Move(translation);
-            _labelPosition = Bounds.TopLeft;
             
             UpdateGeometry();
         }
@@ -192,10 +186,10 @@ namespace Sketch.Models
             }
         }
 
-        Point ComputeTextPosition( Point pos)
-        {
-            return new Point(pos.X + 10, pos.Y + 8);
-        }
+        //Point ComputeTextPosition( Point pos)
+        //{
+        //    return new Point(pos.X + 10, pos.Y + 8);
+        //}
 
         static FormattedText ComputeFormattedText( string label )
         {

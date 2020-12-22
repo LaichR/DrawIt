@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using Sketch;
-using Sketch.Types;
+using Sketch.Helper;
 using Sketch.Models;
 using Sketch.Interface;
 using Sketch.Models.Geometries;
@@ -22,12 +22,14 @@ namespace DrawIt.Uml
     [AllowableConnectorTarget(typeof(UmlClassModel))]
     public class UmlDependencyModel: ConnectorModel
     {
+        static readonly double[] _dashPattern = new double[] { 4, 2 };
+
         public UmlDependencyModel( ConnectionType type, IBoundedItemModel from, IBoundedItemModel to,
             Point connectorStartHint, Point connectorEndHint,
             ISketchItemContainer container)
             : base(type, from, to, connectorStartHint, connectorEndHint, container)
         {
-            StrokeDashArray = new DoubleCollection(new double[] { 2, 2 });
+            StrokeDashArray = new DoubleCollection(_dashPattern);
         }
 
         protected UmlDependencyModel(SerializationInfo info, StreamingContext context) : base(info, context) 
@@ -36,20 +38,18 @@ namespace DrawIt.Uml
         public override void UpdateGeometry()
         {
             base.UpdateGeometry();
-            var geometry = Geometry as GeometryGroup;
-                
-            geometry.Children.Add(new Arrow
-                {
-                    Translation = new Vector(ConnectorStrategy.ConnectionEnd.X, ConnectorStrategy.ConnectionEnd.Y),
-                    Rotation = ConnectorStrategy.EndAngle
-                }.Ending);
-             
+            Endings.Clear();
+            Endings.Add(new Arrow
+            {
+                Translation = new Vector(ConnectorStrategy.ConnectionEnd.X, ConnectorStrategy.ConnectionEnd.Y),
+                Rotation = ConnectorStrategy.EndAngle
+            });
         }
 
         protected override void Initialize()
         {
             base.Initialize();
-            StrokeDashArray = new DoubleCollection(new double[] { 2, 2 });
+            StrokeDashArray = new DoubleCollection(_dashPattern);
         }
 
 

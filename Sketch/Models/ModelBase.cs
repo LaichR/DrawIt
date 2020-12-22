@@ -17,7 +17,7 @@ using System.Runtime.CompilerServices;
 namespace Sketch.Models
 {
     [Serializable]
-    public abstract class ModelBase : INotifyPropertyChanged, IHierarchicalNode, ISketchItemModel
+    public abstract class ModelBase : INotifyPropertyChanged, ISketchItemModel
     {
 
         //FontFamily _labelFont;
@@ -42,6 +42,11 @@ namespace Sketch.Models
         IList<ICommandDescriptor> _commands;
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        ISketchItemNode _parent;
+
+        [PersistentField((int)ModelVersion.V_2_1, "Parent")]
+        SketchItemContainerProxy _proxy;
 
         ////public Guid Id
         //{
@@ -143,7 +148,7 @@ namespace Sketch.Models
             set { SetProperty<Rect>(ref _labelArea, value); }
         }
 
-        public bool AllowEdit
+        public bool CanEditLabel
         {
             get => _editModeOn; 
             set {  SetProperty<bool>( ref _editModeOn, value);}
@@ -174,14 +179,15 @@ namespace Sketch.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        public virtual IHierarchicalNode Parent
+        public virtual ISketchItemNode ParentNode
         {
-            get { return null; }
+            get { return _parent; }
+            protected set { _parent = value; }  
         }
 
         public void EnterEditMode()
         {
-            AllowEdit = true;
+            CanEditLabel = true;
         }
 
         protected virtual void RestoreFieldData(SerializationInfo info, StreamingContext context)
@@ -240,7 +246,13 @@ namespace Sketch.Models
 
 
         protected abstract void Initialize();
-        protected virtual void FieldDataRestored() { }
-        protected virtual void PrepareFieldBackup() { }
+        protected virtual void FieldDataRestored() 
+        {
+            _parent = _proxy.Container;
+        }
+        protected virtual void PrepareFieldBackup() 
+        {
+            _proxy = new SketchItemContainerProxy(_parent as ISketchItemContainer );
+        }
     }
 }

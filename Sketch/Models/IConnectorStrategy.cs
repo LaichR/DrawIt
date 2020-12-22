@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using Sketch.Interface;
-using Sketch.Types;
+using Sketch.Helper;
 
 namespace Sketch.Models
 {

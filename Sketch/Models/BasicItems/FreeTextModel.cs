@@ -75,7 +75,7 @@ namespace Sketch.Models.BasicItems
             : base(p, new Size(DefaultWidth, DefaultHeight), "a text",
                  Colors.White)
         {
-            AllowSizeChange = true;
+            CanChangeSize = true;
         }
 
         protected FreeTextModel(SerializationInfo info, StreamingContext context):base(info, context) 

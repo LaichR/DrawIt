@@ -7,7 +7,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Navigation;
 using Sketch.Interface;
-using Sketch.Types;
+using Sketch.Helper;
 
 namespace Sketch.Models
 {

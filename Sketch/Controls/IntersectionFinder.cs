@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.ComponentModel;
-using Sketch.Types;
+using Sketch.Helper;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -113,7 +113,7 @@ namespace Sketch.Controls
         }
 
         //bool _isRendering = false;
-        object synchRoot = new object();
+        readonly object synchRoot = new object();
         Intersection[] _intersections = new Intersection[0];
 
         private const int INTERSECTION_RECTANGLE = 5;
@@ -122,7 +122,7 @@ namespace Sketch.Controls
         LinkedAvlTree<ScanLine> _verticalScan = null;// new LinkedAvlTree<ScanLine>();
 
         int lineSegments = 0;
-        SketchItemDisplay _sketchDisplay;
+        readonly SketchItemDisplay _sketchDisplay;
 
 
         public IntersectionFinder(UIElement sketchPad) : base(sketchPad)

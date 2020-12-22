@@ -8,15 +8,18 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using Sketch.Controls;
 using Sketch.Interface;
-using Sketch.Types;
+using Sketch.Helper;
 
 namespace Sketch.Models
 {
     public static class ConnectorUtilities
     {
-        internal static readonly Pen ConnectorPen = new Pen(Brushes.White, ComputeConnectorLine.LineWidth);
+        public const double NormalDistance = 50.0;
+        public const double LineWidth = 10.0;
 
+        internal static readonly Pen ConnectorPen = new Pen(Brushes.White, LineWidth);
         public static readonly Vector HorizontalVector = new Vector(100, 0);
+
         
 
         public static PathFigure GetPathFigureFromPoints( IEnumerable<Point> linePoints )
@@ -323,7 +326,8 @@ namespace Sketch.Models
         }
 
 
-        internal static bool HitLineSegment(Point p, PathFigure pathFigure, out int index, out Point start, out Point end)
+        internal static bool HitLineSegment(Point p, PathFigure pathFigure, out int index, 
+            out Point start, out Point end)
         {
             LineGeometry lineGeometry = new LineGeometry();
             start = pathFigure.StartPoint;

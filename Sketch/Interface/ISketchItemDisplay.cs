@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Sketch.Types;
+using Sketch.Helper;
 
 
 namespace Sketch.Interface

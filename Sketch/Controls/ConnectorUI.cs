@@ -6,7 +6,7 @@ using UI.Utilities.Interfaces;
 using UI.Utilities.Behaviors;
 
 using Sketch.Models;
-using Sketch.Types;
+using Sketch.Helper;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -75,6 +75,7 @@ namespace Sketch.Controls
         IEditOperation _currentOperationHandler;
         int _lineWidth;
         Brush _lineBrush;
+        readonly Pen _linePen = new Pen();
         static readonly Brush _selectedLineBrush = new SolidColorBrush(Colors.Blue) { Opacity = 0.5 };
         static readonly Pen _hitTestPen = new Pen() { Thickness = 20 };
 
@@ -133,12 +134,13 @@ namespace Sketch.Controls
 
                 this.Visibility = System.Windows.Visibility.Visible;
                 this.Stroke = Brushes.White;
+                this.Fill = Brushes.White;
 
 
                 this.StrokeThickness = 1;// ComputeConnectorLine.LineWidth;
                 _myGeometry = _model.Geometry;
 
-                AddAdorner();
+                TryAddAdorner();
                 this.SetBinding(GeometryProperty, "Geometry");
             }
             else
@@ -378,34 +380,35 @@ namespace Sketch.Controls
             OnMouseLeftButtonDown(e);
         }
 
-        void AddAdorner()
+        void TryAddAdorner()
         {
-            var adornderlayer = AdornerLayer.GetAdornerLayer(this);
-            if (adornderlayer == null) return;
-            
-            adornderlayer.Add(_myAdorner);
-            _addornerAdded = true;
+            if (!_addornerAdded)
+            {
+                var adornderlayer = AdornerLayer.GetAdornerLayer(this);
+                if (adornderlayer == null) return;
+
+                adornderlayer.Add(_myAdorner);
+                _addornerAdded = true;
+            }
         }
 
         protected override void OnRender(DrawingContext drawingContext)
         {
+            
+            
             base.OnRender(drawingContext);
+            foreach( var r in _model.Endings )
+            {
+                drawingContext.DrawGeometry(Fill, _linePen, r.Ending);
+            }
             _model.RenderAdornments(drawingContext);
         }
 
         private void  UpdateGeometry()
         {
+            TryAddAdorner();
             _model.UpdateGeometry();
-            
-            //InvalidateVisual();
             _parent.ShowIntersections();
-
-
-
-            if (!_addornerAdded)
-            {
-                AddAdorner();
-            }
             _myAdorner.InvalidateVisual();
         }
 
@@ -523,8 +526,15 @@ namespace Sketch.Controls
                 _lineBrush = Brushes.Black;
                 Fill = Brushes.Black;
             }
+            if (_model.FillEndings == false)
+            {
+                Fill = Brushes.White;
+            }
             StrokeThickness = _lineWidth;
             Stroke = _lineBrush;
+            
+            _linePen.Brush = Stroke;
+            _linePen.Thickness = StrokeThickness;
 
             SelectionChanged?.Invoke(this, IsSelected);
           
@@ -549,6 +559,11 @@ namespace Sketch.Controls
         private void OnWaypoint_DragDelta(object sender, DragDeltaEventArgs e)
         {
             
+        }
+
+        private void MyGeometry_Changed(object sender, EventArgs args)
+        {
+            InvalidateVisual();
         }
 
         private static void OnSelectedChanged(DependencyObject source,
@@ -704,18 +719,21 @@ namespace Sketch.Controls
              DependencyPropertyChangedEventArgs e)
         {
             
-            var me = source as ConnectorUI;
-            if (me != null && e.OldValue != e.NewValue)
+            if (source is ConnectorUI me  && e.OldValue != e.NewValue)
             {
+                if (e.OldValue is Geometry oldGeometry)
+                {
+                    oldGeometry.Changed -= me.MyGeometry_Changed;
+                }
                 me._myGeometry = e.NewValue as Geometry;
                 me.RefModel?.UpdateGeometry();
+                me._myGeometry.Changed += me.MyGeometry_Changed;
+                me._myAdorner?.InvalidateVisual();
             }
-            if (me._myAdorner != null)
-            {
-                me._myAdorner.InvalidateVisual();
-            }
-
+            
+          
         }
+
 
         private static ICommandDescriptor CreateAddWaypointMenuItem(ConnectorUI ui)
         {

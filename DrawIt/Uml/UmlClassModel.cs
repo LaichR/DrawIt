@@ -23,13 +23,14 @@ namespace DrawIt.Uml
     public class UmlClassModel: ContainerModel
     {
         new const int DefaultWidth = 150;
-        new const int DefaultHeight = 75;
+        new const int DefaultHeight = 70;
 
-        [PersistentField((int)ModelVersion.V_2_1, "Members", true)]
+        [PersistentField((int)ModelVersion.V_2_2, "Members", true)]
         readonly ObservableCollection<UmlMemberDescription> _members = new ObservableCollection<UmlMemberDescription>();
 
         static UmlClassModel()
         {
+            
             Sketch.PropertyEditor.PropertyEditTemplateSelector.RegisterDataTemplate(typeof(ObservableCollection<UmlMemberDescription>), "ClassMembersTemplate");
             Sketch.PropertyEditor.PropertyDisplayTemplateSelector.RegisterDataTemplate(typeof(ObservableCollection<UmlMemberDescription>), "ClassMembersTemplate");
         }
@@ -37,26 +38,42 @@ namespace DrawIt.Uml
         public UmlClassModel(Point p)
             : base(p, new Size(DefaultWidth, DefaultHeight)) 
         {
-            AllowSizeChange = true;
-            AllowEdit = true;
+            CanChangeSize = true;
+            CanEditLabel = true;
             Label = "new class";
             RotationAngle = 0.0;
-            _members.CollectionChanged += members_CollectionChanged; ;
+            _members.CollectionChanged += Members_CollectionChanged; ;
             //UpdateGeometry();
         }
 
-        private void members_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            //if( e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
-            //{
-            //    e.NewItems
-            //}
-            //else if(e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
-            //{
 
-            //}
+
+        private void Members_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            {
+                foreach( var meberDescription in e.NewItems.OfType<UmlMemberDescription>() )
+                {
+                    meberDescription.PropertyChanged += MeberDescription_PropertyChanged;
+                }
+            }
+            else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+            {
+                foreach (var meberDescription in e.OldItems.OfType<UmlMemberDescription>())
+                {
+                    meberDescription.PropertyChanged -= MeberDescription_PropertyChanged;
+                }
+            }
 
             RaisePropertyChanged(nameof(MemberList));
+        }
+
+        private void MeberDescription_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if( e.PropertyName == nameof(UmlMemberDescription.IsPublic))
+            {
+                RaisePropertyChanged(nameof(MemberList));
+            }
         }
 
         [Browsable(true)]
@@ -77,10 +94,7 @@ namespace DrawIt.Uml
         }
 
 
-        protected UmlClassModel(SerializationInfo info, StreamingContext context) : base(info, context) 
-        {
-            
-        }
+        protected UmlClassModel(SerializationInfo info, StreamingContext context) : base(info, context) {}
 
         public override void UpdateGeometry()
         {
@@ -91,10 +105,17 @@ namespace DrawIt.Uml
             myGeometry.Transform = Rotation;
         }
 
-       
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        protected override void FieldDataRestored()
         {
-            base.GetObjectData(info, context);
+            base.FieldDataRestored();
+            foreach( var m in Members)
+            {
+                m.PropertyChanged += MeberDescription_PropertyChanged;
+            }
+            Members.CollectionChanged += Members_CollectionChanged;
+
         }
+
+
     }
 }

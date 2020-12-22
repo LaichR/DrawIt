@@ -13,5 +13,6 @@ namespace Sketch.Models
         V_1_1 = 1,
         V_2_0 = 2,
         V_2_1 = 3,
+        V_2_2 = 4,
     };
 }

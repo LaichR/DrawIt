@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:com="clr-namespace:System.ComponentModel;assembly=System"
              xmlns:local="clr-namespace:Sketch.PropertyEditor"
              xmlns:ColPic="clr-namespace:Sketch.Controls.ColorPicker"
              mc:Ignorable="d" 
@@ -39,7 +40,7 @@
             </Border>
         </Border>
         <DataGrid Grid.Row="1" Grid.Column="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="5,0,5,0"
-                  ItemsSource="{Binding ObjectProperties}"
+                  ItemsSource="{Binding ObjectProperties}" MinColumnWidth="100"
                   AutoGenerateColumns="False">
             <DataGrid.Resources>
                 <Style x:Key="ValueEditStyle" TargetType="TextBlock">
@@ -123,7 +124,8 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Property Name" Binding="{Binding DisplayName}" IsReadOnly="True" 
                                     HeaderStyle="{StaticResource HeaderStyle}"
-                                    CellStyle="{StaticResource PropertyNameStyle}">
+                                    CellStyle="{StaticResource PropertyNameStyle}"
+                                    Width="2*" MinWidth="100">
                     <!--
 
                     <DataGridTextColumn.ElementStyle>
@@ -138,7 +140,7 @@
                     </DataGridTextColumn.ElementStyle>
                     -->
                 </DataGridTextColumn>
-                <DataGridTemplateColumn Header="Property Value"  Width="*"
+                <DataGridTemplateColumn Header="Property Value"  Width="5*" MinWidth="200"
                                         HeaderStyle="{StaticResource HeaderStyle}"
                                         CellStyle="{StaticResource PropertyValueStyle}"
                                         CellTemplateSelector="{StaticResource DisplayTemplateSelector}"

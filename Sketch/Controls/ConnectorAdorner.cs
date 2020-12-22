@@ -36,7 +36,7 @@ namespace Sketch.Controls
             this.Visibility = System.Windows.Visibility.Visible;
             this._model.PropertyChanged += OnModelPropertyChanged;
             
-            IsHitTestVisible = true;
+            IsHitTestVisible = _model.IsSelected||_model.IsMarked;
             ui.InvalidateVisual();
         }
 
@@ -59,6 +59,7 @@ namespace Sketch.Controls
                 _waypointRadius = NormalRadidius;
             }
 
+            IsHitTestVisible = isSelected;
             _myFillBrush = _myLineBrush;
 
             _myPen = new Pen(_myLineBrush, _lineWidht);
@@ -143,12 +144,10 @@ namespace Sketch.Controls
 
         void OnModelPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if( e.PropertyName == "IsSelected" )
+            if( e.PropertyName == nameof(ConnectorModel.IsSelected) ||
+                e.PropertyName == nameof(ConnectorModel.IsMarked) )
             {
-                Refresh(_model.IsSelected);
-                this.IsHitTestVisible = _model.IsSelected;
-                
-                
+                Refresh(_model.IsSelected|| _model.IsMarked);   
             }
         }
 

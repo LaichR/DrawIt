@@ -12,7 +12,7 @@ namespace Sketch.Controls
 {
     internal class NopHandler : IEditOperation
     {
-        ISketchItemDisplay _pad;
+        readonly ISketchItemDisplay _pad;
 
         public NopHandler(ISketchItemDisplay pad)
         {

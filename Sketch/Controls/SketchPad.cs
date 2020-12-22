@@ -12,9 +12,8 @@ using System.Windows.Documents;
 using System.Windows.Controls;
 using UI.Utilities.Interfaces;
 using Sketch.Models;
-using Sketch.Types;
 using Sketch.Interface;
-using Sketch.Utilities;
+using Sketch.Helper;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows.Data;
@@ -26,6 +25,10 @@ namespace Sketch.Controls
     {
         public static readonly RoutedEvent SelectedItemChangedEvent = EventManager.RegisterRoutedEvent(
             "SelectedItemChanged", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(SketchPad));
+
+        public static readonly DependencyProperty ScalingProperty =
+            DependencyProperty.Register("Scaling", typeof(double),
+                typeof(SketchPad), new PropertyMetadata(OnScalingChanged));
 
         public static readonly DependencyProperty LabelProperty =
             DependencyProperty.Register("Label", typeof(string),
@@ -56,18 +59,37 @@ namespace Sketch.Controls
             typeof(SketchPad),
             new PropertyMetadata(OnEditModeChanged));
 
+        public static readonly DependencyProperty ZoomDepthProperty =
+            DependencyProperty.Register("ZoomDepth", typeof(int),
+                typeof(SketchPad));
+
         public const double GridSize = 6;
 
-        double _xScaling;
-        double _yScaling;
+        //double _xScaling;
+        //double _yScaling;
+        
+        double _initialWidht = double.NaN;
+        double _initialHeigh = double.NaN;
+
         ISketchItemDisplay _rootDisplay;
         readonly Stack<ISketchItemDisplay> _displayStack = new Stack<ISketchItemDisplay>();
 
        
         public SketchPad():base()
         {
-            EditMode = Types.EditMode.Insert;
+            EditMode = EditMode.Select;
+            //this.RenderTransform = new ScaleTransform(0.6, 0.6);
             //SketchItemFactory.ActiveFactory = new SketchItemFactory();
+        }
+
+        public bool CanEditLabel
+        {
+            get => true;
+        }
+
+        public ISketchItemNode ParentNode
+        {
+            get => null;
         }
 
 
@@ -109,6 +131,12 @@ namespace Sketch.Controls
             set => SetValue(LabelProperty, value);
         }
 
+        public double Scaling
+        {
+            get => (double)GetValue(ScalingProperty);
+            set => SetValue(LabelProperty, value);
+        }
+
         public ISketchItemModel SelectedItem
         {
             get => GetValue(SelectedItemProperty) as ISketchItemModel;
@@ -126,6 +154,13 @@ namespace Sketch.Controls
             get => (Sketch.Models.Sketch)GetValue(SketchPropery);
             set => SetValue(SketchPropery, value);
         }
+
+        public int ZoomDepth
+        {
+            get => (int)GetValue(ZoomDepthProperty);
+            set => SetValue(ZoomDepthProperty, value);
+        }
+
 
         public ISketchItemFactory ItemFactory => Sketch.SketchItemFactory;
 
@@ -160,7 +195,7 @@ namespace Sketch.Controls
                 var topMost = _displayStack.Peek();
                 if( topMost.SelectedItem?.Model is ContainerModel)
                 {
-                    EditMode = EditMode.Insert;
+                    EditMode = EditMode.Select;
                     var container = topMost.SelectedItem.Model as ISketchItemContainer;
                     topMost.ClearSelection();
                     topMost.EndEdit();
@@ -173,6 +208,7 @@ namespace Sketch.Controls
                     this.Children.Add(display);
                     Display_SelectedItemChanged(this, EventArgs.Empty);
                     EditMode = EditMode.Select;
+                    ZoomDepth += 1;
                 }
             }
         }
@@ -193,6 +229,7 @@ namespace Sketch.Controls
                     
                     topMost = _displayStack.Peek();
                     this.Children.Add(topMost.Canvas);
+                    ZoomDepth -= 1;
                 }
                 
                 topMost.SelectedItemChanged += Display_SelectedItemChanged;
@@ -261,17 +298,17 @@ namespace Sketch.Controls
         private static void OnLogicalWidthChanged(DependencyObject source,
             DependencyPropertyChangedEventArgs e)
         {
-            SketchPad pad = source as SketchPad;
-            var newLogicalWidth = (double)e.NewValue;
-            pad._xScaling = newLogicalWidth / pad.Width;
+            //SketchPad pad = source as SketchPad;
+            //var newLogicalWidth = (double)e.NewValue;
+            //pad._xScaling = newLogicalWidth / pad.Width;
         }
 
         private static void OnLogicalHeightChanged(DependencyObject source,
             DependencyPropertyChangedEventArgs e)
         {
-            SketchPad pad = source as SketchPad;
-            var newLogicalHeight = (double)e.NewValue;
-            pad._yScaling = newLogicalHeight / pad.Height;
+            //SketchPad pad = source as SketchPad;
+            //var newLogicalHeight = (double)e.NewValue;
+            //pad._yScaling = newLogicalHeight / pad.Height;
         }
 
         private static void OnLabelChanged(DependencyObject source,
@@ -284,6 +321,27 @@ namespace Sketch.Controls
                 pad._rootDisplay.Label = e.NewValue.ToString();
             }
             
+        }
+
+        private static void OnScalingChanged(DependencyObject source,
+            DependencyPropertyChangedEventArgs e)
+        {
+            if( source is SketchPad pad)
+            {
+                var scaling = (double)e.NewValue;
+                pad.RenderTransform = new ScaleTransform(scaling, scaling);
+                if( double.IsNaN(pad._initialHeigh))
+                {
+                    pad._initialHeigh = pad.Height;
+                }
+                if( double.IsNaN(pad._initialWidht))
+                {
+                    pad._initialWidht = pad.Width;
+                }
+                pad.Width = pad._initialWidht*scaling; pad.Height = pad._initialHeigh * scaling;
+               
+                //pad.RenderTransformOrigin = new Point(0, 0);
+            }
         }
 
         private static void OnEditModeChanged(DependencyObject source,
@@ -324,7 +382,7 @@ namespace Sketch.Controls
             }
         }
 
-        public void SaveFile(string fileName, bool silent)
+        public void SaveFile(string fileName)
         {
             using(var stream = new FileStream(fileName, FileMode.OpenOrCreate))
             {

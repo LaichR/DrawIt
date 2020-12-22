@@ -6,12 +6,23 @@ using System.Threading.Tasks;
 
 namespace Sketch.Interface
 {
-    public interface ISketchItemLabelProvider
+    public interface ISketchItemNode
     {
+        ISketchItemNode ParentNode
+        {
+            get;
+        }
+
         string Label
         {
             get;
             set;
         }
+
+        bool CanEditLabel
+        {
+            get;
+        }
+
     }
 }

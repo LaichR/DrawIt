@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sketch.Types
+namespace Sketch.Helper
 {
     /// <summary>
     /// This enum describes the relative position between two connectable gadgets; the names refer always to the relative position

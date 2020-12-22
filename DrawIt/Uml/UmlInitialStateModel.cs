@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using UI.Utilities.Interfaces;
-using Sketch.Types;
+using Sketch.Helper;
 using Sketch.Models;
 using System.Runtime.Serialization;
 using Sketch.Interface;
@@ -26,8 +26,8 @@ namespace DrawIt.Uml
         public UmlInitialStateModel(Point p)
             :base(p, new Size(DefaultHeight, DefaultWidth), "Initial-State", Colors.Black)
         {
-            AllowEdit = false;
-            AllowSizeChange = false;
+            CanEditLabel = false;
+            CanChangeSize = false;
             LabelArea = Rect.Empty;
             IsSelected = true;
         }

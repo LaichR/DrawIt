@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using UI.Utilities.Interfaces;
-using Sketch.Types;
+using Sketch.Helper;
 using Sketch.Models;
 using System.Runtime.Serialization;
 using Sketch.Interface;
@@ -39,7 +39,7 @@ namespace DrawIt.Uml
             : base(p, new Size( DefaultWidth, DefaultHeight)) 
         {
             IsSelected = true;
-            AllowSizeChange = true;
+            CanChangeSize = true;
             Label = "new action";
             RotationAngle = 0.0;
             Commands = GetUmlActivityModelCommands();
@@ -87,7 +87,6 @@ namespace DrawIt.Uml
             myGeometry.Children.Add(new RectangleGeometry(
                 new Rect(0,0, Bounds.Width, Bounds.Height), DefaultRoundingEdgeRadius, DefaultRoundingEdgeRadius));
             myGeometry.Transform = Rotation;
-            
         }
 
         [Browsable(true)]

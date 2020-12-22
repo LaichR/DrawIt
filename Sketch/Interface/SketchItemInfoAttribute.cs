@@ -11,9 +11,9 @@ namespace Sketch.Interface
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public class SketchItemInfoAttribute : Attribute
     {
-        string _name;
-        string _brief;
-        Bitmap _bitmap;
+        readonly string _name;
+        readonly string _brief;
+        readonly Bitmap _bitmap;
         public SketchItemInfoAttribute(string name, string brief, Bitmap bitmap)
         {
             _name = name;

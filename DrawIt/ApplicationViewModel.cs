@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Sketch.Types;
+using Sketch.Helper;
 using System.Windows.Input;
 using UI.Utilities;
 using DrawIt.Uml;
@@ -18,6 +18,7 @@ namespace DrawIt
         //DelegateCommand _cmdEditMode;
 
         readonly DelegateCommand _cmdSave;
+        readonly DelegateCommand _cmdSaveAs;
         readonly DelegateCommand _cmdOpen;
         readonly DelegateCommand _cmdSavePng;
 
@@ -32,15 +33,19 @@ namespace DrawIt
         readonly DelegateCommand _cmdZoomIn;
         readonly DelegateCommand _cmdZoomOut;
 
-        Dictionary<Type, System.Windows.Input.Cursor> _registeredCursors = new Dictionary<Type, Cursor>();
+        readonly Dictionary<Type, System.Windows.Input.Cursor> _registeredCursors = new Dictionary<Type, Cursor>();
 
         bool _isEditMode;
         bool _isInsertMode;
+        int _zoomDepth;
+        
+        double _scaling;
+
         //string _label = "No Name";
         EditMode _editMode;
         object _selectedItem;
         readonly Sketch.Models.Sketch _sketch;
-        System.Windows.Input.Cursor _editCursor;
+        readonly System.Windows.Input.Cursor _editCursor;
 
         static readonly System.Drawing.Bitmap _insertPackage = Properties.Resources.UmlPackageShape;
         static readonly System.Drawing.Bitmap _insertState = Properties.Resources.UmlStateShape;
@@ -74,10 +79,12 @@ namespace DrawIt
             };
             _factory.PropertyChanged += Factory_PropertyChanged;
             
-            _editMode = global::Sketch.Types.EditMode.Insert;
+            _editMode = global::Sketch.Helper.EditMode.Insert;
             _isInsertMode = true;
             _isEditMode = false;
             _editCursor = Cursors.Arrow;
+            _scaling = 1.0;
+
             //_cursorBitmap = Properties.Resources.UmlClassShape;
             //_insertCursor = UI.Utilities.BitmapToCursor.CreateCursor(_bmp, 1, 1);
             //_insertCursor = Cursors.Cross;
@@ -91,6 +98,7 @@ namespace DrawIt
 
             _deleteEntry = new DelegateCommand(DoDeleteEntries);
             _cmdSave = new DelegateCommand(SaveDrawing);
+            _cmdSaveAs = new DelegateCommand(SaveDrawingAs);
             _cmdOpen = new DelegateCommand(OpenDrawing);
             _cmdSavePng = new DelegateCommand(SavePng);
             _cmdAlignLeft = new DelegateCommand(this.Sketch.AlignLeft);
@@ -99,8 +107,8 @@ namespace DrawIt
             _cmdSameVerticalSpace = new DelegateCommand(this.Sketch.SetEqualVerticalSpacing);
             _cmdSameWidth = new DelegateCommand(this.Sketch.SetToSameWidth);
 
-            _cmdZoomIn = new DelegateCommand(this.Sketch.ZoomIn);
-            _cmdZoomOut = new DelegateCommand(this.Sketch.ZoomOut);
+            _cmdZoomIn = new DelegateCommand(this.Sketch.ZoomIn, ()=> SelectedItem is Sketch.Models.ContainerModel );
+            _cmdZoomOut = new DelegateCommand(this.Sketch.ZoomOut, ()=> ZoomDepth > 0);
             
             
 
@@ -109,14 +117,20 @@ namespace DrawIt
                 new UI.Utilities.Behaviors.CommandDescriptor
                 {
                     Command = _cmdOpen,
-                    Bitmap = DrawIt.Properties.Resources.Open_file_icon,
+                    Bitmap = global::Sketch.Properties.Resources.open_file,
                     Name = "Open"
                 },
                 new UI.Utilities.Behaviors.CommandDescriptor
                 {
                     Command = _cmdSave,
-                    Bitmap = DrawIt.Properties.Resources.Save_as_icon,
-                    Name = "Save as.."
+                    Bitmap = global::Sketch.Properties.Resources.save_file,
+                    Name = "Save"
+                },
+                new UI.Utilities.Behaviors.CommandDescriptor
+                {
+                    Command = _cmdSaveAs,
+                    Bitmap = global::Sketch.Properties.Resources.save_file_as,
+                    Name = "Save as .."
                 },
                 new UI.Utilities.Behaviors.CommandDescriptor
                 {
@@ -240,6 +254,22 @@ namespace DrawIt
             }
         }
 
+        public double Scaling
+        {
+            get => _scaling;
+            set
+            {
+                SetProperty<double>(ref _scaling, value);
+                RaisePropertyChanged(nameof(SketchScalePercentage));
+            }
+        }
+
+        public int SketchScalePercentage
+        {
+            get => (int)Math.Round(_scaling * 100.0);
+            set => Scaling = value / 100.0;
+        }
+
         public ICommand ZoomIn => _cmdZoomIn;
 
         public ICommand DeleteEntries
@@ -253,19 +283,44 @@ namespace DrawIt
         public string Label
         {
             get => _sketch.Label;
-            set => _sketch.Label = value;
+            set
+            {
+                _sketch.Label = value;
+                RaisePropertyChanged(nameof(Label));
+            }
         }
 
         public object SelectedItem
         {
             get => _selectedItem;
-            set => SetProperty<object>(ref _selectedItem, value);
+            set
+            {
+                SetProperty<object>(ref _selectedItem, value);
+                _cmdZoomIn.RaiseCanExecuteChanged();
+            }
+        }
+
+        public int ZoomDepth
+        {
+            get => _zoomDepth;
+            set
+            {
+                _zoomDepth = value;
+                _cmdZoomOut.RaiseCanExecuteChanged();
+            }
         }
 
         public EditMode EditMode
         {
             get { return _editMode; }
-            set { SetProperty<EditMode>(ref _editMode, value); RaisePropertyChanged("Cursor"); }
+            set { 
+                
+                SetProperty<EditMode>(ref _editMode, value);
+                _isInsertMode = _editMode == EditMode.Insert;
+                _isEditMode = _editMode == EditMode.Select;
+                RaisePropertyChanged(nameof(IsInsertMode));
+                RaisePropertyChanged(nameof(IsEditMode));
+                RaisePropertyChanged("Cursor"); }
         }
 
         public bool IsInsertMode
@@ -273,7 +328,7 @@ namespace DrawIt
             get { return _isInsertMode; }
             set { SetProperty<bool>(ref _isInsertMode, value);
                 //IsEditMode = !_isInsertMode;
-                EditMode = value? global::Sketch.Types.EditMode.Insert: global::Sketch.Types.EditMode.Select;
+                EditMode = value? global::Sketch.Helper.EditMode.Insert: global::Sketch.Helper.EditMode.Select;
                 
             }
         }
@@ -315,7 +370,7 @@ namespace DrawIt
             get { return _isEditMode; }
             set { SetProperty<bool>(ref _isEditMode, value);
                 IsInsertMode = !_isEditMode;
-                EditMode = value ? global::Sketch.Types.EditMode.Select : global::Sketch.Types.EditMode.Insert;
+                EditMode = value ? global::Sketch.Helper.EditMode.Select : global::Sketch.Helper.EditMode.Insert;
 
             }
         }
@@ -330,21 +385,31 @@ namespace DrawIt
             Sketch.DeleteMarked();
         }
 
+        void SaveDrawingAs()
+        {
+            _fileName = SaveFile("");
+        }
+
         void SaveDrawing()
         {
-            bool silent = true;
-            if (string.IsNullOrEmpty(_fileName))
+            _fileName = SaveFile(_fileName);
+        }
+
+        string SaveFile(string fName )
+        {
+            var newName = fName;
+            if (string.IsNullOrEmpty(fName))
             {
                 var dlg = new Microsoft.Win32.SaveFileDialog();
                 var result = dlg.ShowDialog();
                 if (result != true)
                 {
-                    return; // cancel operation
+                    return ""; // cancel operation
                 }
-                silent = false;
-                _fileName = dlg.FileName;
+                newName = dlg.FileName;
             }
-            Sketch.SaveFile(_fileName, silent);
+            Sketch.SaveFile(newName);
+            return newName;
         }
 
         void OpenDrawing()

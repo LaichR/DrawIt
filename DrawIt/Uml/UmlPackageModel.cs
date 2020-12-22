@@ -25,7 +25,7 @@ namespace DrawIt.Uml
             : base(p, new Size( DefaultWidth, DefaultHeight)) 
         {
             IsSelected = true;
-            AllowSizeChange = true;
+            CanChangeSize = true;
             Label = "new package";
             UpdateGeometry();
         }

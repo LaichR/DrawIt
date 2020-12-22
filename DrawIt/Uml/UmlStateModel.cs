@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using UI.Utilities.Interfaces;
-using Sketch.Types;
+using Sketch.Helper;
 using Sketch.Models;
 using System.Runtime.Serialization;
 using Sketch.Interface;
@@ -28,7 +28,7 @@ namespace DrawIt.Uml
             
             
             IsSelected = true;
-            AllowSizeChange = true;
+            CanChangeSize = true;
             Label = "new state";
 
         }
@@ -57,8 +57,8 @@ namespace DrawIt.Uml
         {
             get
             {
-                var outline = new System.Windows.Media.RectangleGeometry(Bounds, DefaultRoundingEdgeRadius, DefaultRoundingEdgeRadius);
-                outline.Transform = Rotation;
+                var outline = new System.Windows.Media.RectangleGeometry(Bounds, DefaultRoundingEdgeRadius, DefaultRoundingEdgeRadius)
+                { Transform = Rotation };
                 return outline;
             }
         }

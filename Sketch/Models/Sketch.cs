@@ -34,13 +34,22 @@ namespace Sketch.Models
             set => SetProperty<string>(ref _label, value); 
         }
 
+        public bool CanEditLabel
+        {
+            get => true;
+        }
+
+        public ISketchItemNode ParentNode
+        {
+            get => this;
+        }
+
         public ISketchItemFactory SketchItemFactory
         {
             get => _sketchItemFactory;
             set
             {
                 SetProperty<ISketchItemFactory>(ref _sketchItemFactory, value);
-                
             }
         }
 
@@ -100,9 +109,9 @@ namespace Sketch.Models
             SketchLoaded?.Invoke(this, EventArgs.Empty);
         }
 
-        public void SaveFile(string fileName, bool silent)
+        public void SaveFile(string fileName)
         {
-            _control?.SaveFile(fileName, silent);
+            _control?.SaveFile(fileName);
         }
 
         public void ZoomIn()

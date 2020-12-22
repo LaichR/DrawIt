@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Sketch.Types;
 using Sketch.Models;
-using Sketch.Utilities;
+using Sketch.Helper;
 using System.Windows;
 
 namespace Sketch.Test

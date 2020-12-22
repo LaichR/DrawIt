@@ -11,7 +11,7 @@ using UI.Utilities;
 using UI.Utilities.Interfaces;
 using UI.Utilities.Behaviors;
 using Sketch;
-using Sketch.Types;
+using Sketch.Helper;
 using Sketch.Models;
 using DrawIt.Shapes;
 using DrawIt.Properties;
@@ -49,12 +49,15 @@ namespace DrawIt.Uml
             RegisterSketchItemInCategory(category, typeof(UmlFinalStateModel),"Final State", "Add a final state", Properties.Resources.UmlFinalStateShape);
             RegisterSketchItemInCategory(category, typeof(UmlActionConnector), "Connector", "Add an ActionConnector", Properties.Resources.UmlActionConnectorShape);
             RegisterSketchItemInCategory(category, typeof(UmlActivityModel), "Action", "Add an Action", Properties.Resources.UmlActionShape);
+            RegisterSketchItemInCategory(category, typeof(UmlAwaitEventModel), "Wait for", "Add a new event listener", Properties.Resources.UmlAwaitEventIcon);
             RegisterSketchItemInCategory(category, typeof(UmlActivityDiagramEdge), "Activity Diagram Edge", "Add edge to next action or activity", Properties.Resources.UmlAssociationShape);
 
             category = "Sequence Diagram";
             RegisterSketchItemInCategory(category,typeof(UmlMessageModel), "Message", "Add a Message", Properties.Resources.UmlAssociationShape);
             RegisterSketchItemInCategory(category, typeof(UmlLifeLineModel), "Life line", "Add an object life line", Properties.Resources.LifeLine);
-            
+            RegisterSketchItemInCategory(category, typeof(UmlCombinedFragment), "Combinded Fragement", "Add combinded fragment", Properties.Resources.CombindedFragment);
+
+
 
             category = "State Diagram";
             RegisterSketchItemInCategory(category, typeof(UmlNoteModel), "Note", "Add a note", Properties.Resources.UmlNoteShape);

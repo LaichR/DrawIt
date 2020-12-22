@@ -6,7 +6,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Threading.Tasks;
 using UI.Utilities.Interfaces;
-using Sketch.Types;
+using Sketch.Helper;
 using Sketch.Models;
 using System.Runtime.Serialization;
 using Sketch.Interface;
@@ -27,7 +27,7 @@ namespace DrawIt.Uml
                  "Choice", Colors.Snow)
         {
             
-            AllowSizeChange = false;
+            CanChangeSize = false;
             
         }
 

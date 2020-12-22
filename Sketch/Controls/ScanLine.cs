@@ -9,10 +9,10 @@ namespace Sketch.Controls
 {
     class ScanLine : IComparable
     {
-        double _scanPos = 0;
-        List<LineSegmentDecorator> _horizontalLines = new List<LineSegmentDecorator>();
-        List<LineSegmentDecorator> _verticalLines = new List<LineSegmentDecorator>();
-        ConnectorUI _connector;
+        readonly double _scanPos = 0;
+        readonly List<LineSegmentDecorator> _horizontalLines = new List<LineSegmentDecorator>();
+        readonly List<LineSegmentDecorator> _verticalLines = new List<LineSegmentDecorator>();
+        readonly ConnectorUI _connector;
 
         public ScanLine(double x)
         {
