@@ -20,7 +20,7 @@ namespace DrawIt.Uml
     [AllowableConnectorTarget(typeof(UmlActionConnector))]
     public class UmlTransitionModel: ConnectorModel
     {
-        public UmlTransitionModel( ConnectionType type, IBoundedItemModel from, IBoundedItemModel to,
+        public UmlTransitionModel( ConnectionType type, IBoundedSketchItemModel from, IBoundedSketchItemModel to,
             Point connectorStartHint, Point connectorEndHint,
             ISketchItemContainer container)
             :base(type, from, to, connectorStartHint, connectorEndHint, container)

@@ -24,9 +24,9 @@ namespace Sketch.Interface
         void UnregisterConnectorItemSelectedNotification(EventHandler handler);
 
 
-        IBoundedItemModel CreateConnectableSketchItem(Type cls, Point p);
+        IBoundedSketchItemModel CreateConnectableSketchItem(Type cls, Point p, ISketchItemContainer container);
         
-        IConnectorItemModel CreateConnector(Type cls, IBoundedItemModel from, IBoundedItemModel to, 
+        IConnectorItemModel CreateConnector(Type cls, IBoundedSketchItemModel from, IBoundedSketchItemModel to, 
             Point startPointHint, Point endPointHint,
             ISketchItemContainer container );
 

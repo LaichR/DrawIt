@@ -50,7 +50,8 @@ namespace Sketch.Models
             }
             set
             {
-                _createConnectorEnd = (point) => { var end = value(point); LastCalled = DateTime.Now; return end; };
+                _createConnectorEnd = (point, container) => { var end = value(point, container); 
+                    LastCalled = DateTime.Now; return end; };
             }
         }
 

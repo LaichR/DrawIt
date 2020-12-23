@@ -1,29 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
-using Prism.Mvvm;
-using Prism.Commands;
-using UI.Utilities;
-using UI.Utilities.Interfaces;
-using UI.Utilities.Behaviors;
-using Sketch;
-using Sketch.Helper;
-using Sketch.Models;
-using DrawIt.Shapes;
-using DrawIt.Properties;
-using Sketch.Interface;
+﻿using Sketch.Models;
 using Sketch.Models.BasicItems;
 
 namespace DrawIt.Uml
 {
-   
-        
 
-        class UmlShapeFactory : SketchItemFactory
+
+
+    class UmlShapeFactory : SketchItemFactory
         {
 
 

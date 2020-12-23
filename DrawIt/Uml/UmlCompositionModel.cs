@@ -23,7 +23,7 @@ namespace DrawIt.Uml
         [PersistentField((int)ModelVersion.V_2_2, nameof(IsDirected), true)]
         bool _isDirected = true;
 
-        public UmlCompositionModel(ConnectionType type, IBoundedItemModel from, IBoundedItemModel to,
+        public UmlCompositionModel(ConnectionType type, IBoundedSketchItemModel from, IBoundedSketchItemModel to,
             Point connectorStartHint, Point connectorEndHint,
             ISketchItemContainer container)
             : base(type, from, to, connectorStartHint, connectorEndHint, container)

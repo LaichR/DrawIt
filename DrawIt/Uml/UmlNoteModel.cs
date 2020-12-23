@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
-using Sketch.Models;
 using System.Runtime.Serialization;
 using System.ComponentModel;
+using Sketch.Models;
+using Sketch.Interface;
 
 namespace DrawIt.Uml
 {
@@ -30,8 +31,8 @@ namespace DrawIt.Uml
         //readonly PathFigure[] _notePath = new PathFigure[1];
         
 
-        public UmlNoteModel(Point p )
-            :base(p, new Size(DefaultWidth, DefaultHeight), 
+        public UmlNoteModel(Point p, ISketchItemContainer container )
+            :base(p, container, new Size(DefaultWidth, DefaultHeight), 
                  "a note",
                  Colors.White)
         {

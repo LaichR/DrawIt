@@ -42,7 +42,7 @@ namespace Sketch.Models
         }
 
         public static IEnumerable<ConnectorModel> GetConnectorsWithSameEndpoints(IEnumerable<ConnectorModel> siblings, 
-            IBoundedItemModel from, IBoundedItemModel to, Point start, Point end)
+            IBoundedSketchItemModel from, IBoundedSketchItemModel to, Point start, Point end)
         {
             List<ConnectorModel> sameEndpoints = new List<ConnectorModel>();
             if (siblings != null)
@@ -81,8 +81,8 @@ namespace Sketch.Models
             {
                 case ConnectionType.AutoRouting:
                     return CreateAutoRoutingConnector(parent, s, e);
-                case ConnectionType.RoutingWithWaypoint:
-                    return CreateRoutingWithWaypointsConnector(parent, s, e);
+                //case ConnectionType.RoutingWithWaypoint:
+                //    return CreateRoutingWithWaypointsConnector(parent, s, e);
                 case ConnectionType.StrightLine:
                     return CreateStrightLineConnector(parent, s, e);
                 default:
@@ -306,12 +306,12 @@ namespace Sketch.Models
             return new StraightLineConnectorStrategy(connectorModel, start, end);
         }
 
-        static IConnectorStrategy CreateRoutingWithWaypointsConnector( ConnectorModel _0,
-            Point _1, Point _2)
-        {
-            return null;//new RoutingConnectorWithWaypointsStrategy(model, startHint, endHint);
+        //static IConnectorStrategy CreateRoutingWithWaypointsConnector( ConnectorModel _0,
+        //    Point _1, Point _2)
+        //{
+        //    return null;//new RoutingConnectorWithWaypointsStrategy(model, startHint, endHint);
             
-        }
+        //}
 
         public static double RoundToGrid(double number)
         {

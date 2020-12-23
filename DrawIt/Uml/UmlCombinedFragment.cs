@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
-using Sketch;
+using Sketch.Interface;
 using Sketch.Models;
 
 namespace DrawIt.Uml
@@ -30,7 +30,7 @@ namespace DrawIt.Uml
         //Point _textPosition = new Point();
         //bool _boundsChanging;
 
-        public UmlCombinedFragment(Point location) : base(location, new Size(150,50),  $"{_default}", DefaultColor)
+        public UmlCombinedFragment(Point location, ISketchItemContainer container) : base(location, container, new Size(150,50),  $"{_default}", DefaultColor)
         {
             CanChangeSize = true;
             CanEditLabel = false;

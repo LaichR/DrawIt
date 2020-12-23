@@ -199,7 +199,7 @@ namespace DrawIt
             if (e.PropertyName == nameof(SketchItemFactory.SelectedItemBitmap))
             {
                 if (Sketch.SketchItemFactory.SelectedForCreation != null &&
-                    Sketch.SketchItemFactory.SelectedForCreation.GetInterface("IBoundedItemModel") != null)
+                    Sketch.SketchItemFactory.SelectedForCreation.GetInterface(nameof(IBoundedSketchItemModel)) != null)
                 {
                     IsInsertMode = true;
                 }

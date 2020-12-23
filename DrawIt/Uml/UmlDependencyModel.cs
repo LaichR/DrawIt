@@ -24,7 +24,7 @@ namespace DrawIt.Uml
     {
         static readonly double[] _dashPattern = new double[] { 4, 2 };
 
-        public UmlDependencyModel( ConnectionType type, IBoundedItemModel from, IBoundedItemModel to,
+        public UmlDependencyModel( ConnectionType type, IBoundedSketchItemModel from, IBoundedSketchItemModel to,
             Point connectorStartHint, Point connectorEndHint,
             ISketchItemContainer container)
             : base(type, from, to, connectorStartHint, connectorEndHint, container)

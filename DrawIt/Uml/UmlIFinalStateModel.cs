@@ -1,8 +1,10 @@
-﻿using Sketch.Models;
+﻿
 using System;
 using System.Runtime.Serialization;
 using System.Windows;
 using System.Windows.Media;
+using Sketch.Models;
+using Sketch.Interface;
 
 namespace DrawIt.Uml
 {
@@ -18,8 +20,8 @@ namespace DrawIt.Uml
 
         EllipseGeometry _inner;
         CombinedGeometry _outer;
-        public UmlFinalStateModel(Point p)
-            : base(p, new Size(DefaultHeight, DefaultWidth), "Final-State",
+        public UmlFinalStateModel(Point p, ISketchItemContainer container)
+            : base(p, container, new Size(DefaultHeight, DefaultWidth), "Final-State",
                  Colors.Black)
         {
             CanEditLabel = false;

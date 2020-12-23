@@ -7,6 +7,10 @@ using System.Windows;
 
 namespace Sketch.Interface
 {
+    /// <summary>
+    /// This interface describes everything that is needed define an Command on the UI to create a new
+    /// connectable sketch item.
+    /// </summary>
     public interface IBoundedItemFactory
     {
         DateTime LastCalled

@@ -8,12 +8,13 @@ namespace Sketch.Interface
 {
     
     /// <summary>
-    /// This defines where the endpoint of the connector is docked on the shape
+    /// This defines where the start and end points of the connector are docked on the border of the shape
+    /// 
     /// </summary>
     [Flags]
     public enum ConnectorDocking
     {
-        Undefined = 0, // the connector is new
+        Undefined = 0, // the connector is new and not yet attached to a sketch item
         Top =     0x1,
         Right = 0x2,
         Bottom = 0x4,

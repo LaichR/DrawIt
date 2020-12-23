@@ -21,8 +21,8 @@ namespace DrawIt.Uml
         new public static readonly double DefaultHeight = 34;
         new public static readonly double DefaultWidth = 36;
 
-        public UmlChoiceModel(Point p )
-            :base(p, new Size(UmlChoiceModel.DefaultWidth,
+        public UmlChoiceModel(Point p, ISketchItemContainer container )
+            :base(p, container, new Size(UmlChoiceModel.DefaultWidth,
                 UmlChoiceModel.DefaultHeight),
                  "Choice", Colors.Snow)
         {

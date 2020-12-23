@@ -44,10 +44,9 @@ namespace Sketch.Controls
             var factory = _pad.ItemFactory;
             if (factory.SelectedForCreation != null &&
                 factory.SelectedForCreation.GetInterface(
-                    typeof(IBoundedItemModel).Name) != null)
+                    nameof(IBoundedSketchItemModel)) != null)
             {
-                var cm = factory.CreateConnectableSketchItem(factory.SelectedForCreation,
-                    p);
+                var cm = factory.CreateConnectableSketchItem(factory.SelectedForCreation, p, _pad);
                 if (cm != null)
                 {
                     _pad.TakeSnapshot();

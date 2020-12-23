@@ -23,8 +23,8 @@ namespace DrawIt.Uml
 
         //EllipseGeometry _geometry;
 
-        public UmlInitialStateModel(Point p)
-            :base(p, new Size(DefaultHeight, DefaultWidth), "Initial-State", Colors.Black)
+        public UmlInitialStateModel(Point p, ISketchItemContainer container)
+            :base(p, container, new Size(DefaultHeight, DefaultWidth), "Initial-State", Colors.Black)
         {
             CanEditLabel = false;
             CanChangeSize = false;

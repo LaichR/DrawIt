@@ -21,8 +21,8 @@ namespace DrawIt.Uml
         FormattedText _formattedLabel;
         Point _textPosition = new Point();
 
-        public UmlActionConnector(Point p)
-            : base(p, new Size(DefaultHeight, DefaultWidth), "A",
+        public UmlActionConnector(Point p, ISketchItemContainer container)
+            : base(p, container, new Size(DefaultHeight, DefaultWidth), "A",
                  Colors.White)
         {
             CanEditLabel = true;

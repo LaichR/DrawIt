@@ -119,12 +119,12 @@ namespace Sketch.Models
         DelegateCommand _cmdUpdateTo;
 
         
-        IBoundedItemModel _backup;
+        IBoundedSketchItemModel _backup;
         Action _restoreAction;
 
 
         public ConnectorModel(ConnectionType type,
-            IBoundedItemModel from, IBoundedItemModel to,
+            IBoundedSketchItemModel from, IBoundedSketchItemModel to,
             System.Windows.Point connectorStartHint, System.Windows.Point connectorEndHint,
             ISketchItemContainer container)
         //:base(new Guid())
@@ -394,13 +394,13 @@ namespace Sketch.Models
             UpdateGeometry();
         }
 
-        public IBoundedItemModel From
+        public IBoundedSketchItemModel From
         {
             get { return _from; }
             set { SetProperty<ConnectableBase>(ref _from, value as ConnectableBase); }
         }
 
-        public IBoundedItemModel To
+        public IBoundedSketchItemModel To
         {
             get { return _to; }
             set { SetProperty<ConnectableBase>(ref _to, value as ConnectableBase); }
@@ -484,7 +484,7 @@ namespace Sketch.Models
             {
                 if (ConnectorStartLabel == null)
                 {
-                    var labelModel = new ConnectorLabelModel(this, true, ShowLableHaderConnection, p);
+                    var labelModel = new ConnectorLabelModel(this, ParentNode as ISketchItemContainer, true, ShowLableHaderConnection, p);
                     ConnectorStartLabel = labelModel;
                     _isLabelShown = true;
                 }
@@ -493,7 +493,7 @@ namespace Sketch.Models
             {
                 if (ConnectorEndLabel == null)
                 {
-                    var labelModel = new ConnectorLabelModel(this, false, ShowLableHaderConnection, p);
+                    var labelModel = new ConnectorLabelModel(this, ParentNode as ISketchItemContainer, false, ShowLableHaderConnection, p);
                     ConnectorEndLabel = labelModel;
                     _isEndpointLabelShown = true;
                 }

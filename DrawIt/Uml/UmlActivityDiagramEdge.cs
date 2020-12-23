@@ -19,7 +19,7 @@ namespace DrawIt.Uml
     [AllowableConnectorTarget(typeof(UmlActionConnector))]
     public class UmlActivityDiagramEdge : ConnectorModel
     {
-        public UmlActivityDiagramEdge( ConnectionType type, IBoundedItemModel from, IBoundedItemModel to,
+        public UmlActivityDiagramEdge( ConnectionType type, IBoundedSketchItemModel from, IBoundedSketchItemModel to,
             Point connectorStartHint, Point connectorEndHint,
             ISketchItemContainer container)
             : base(type, from, to, connectorStartHint, connectorEndHint, container)

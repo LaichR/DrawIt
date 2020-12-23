@@ -27,8 +27,8 @@ namespace DrawIt.Uml
         LineGeometry _lifeLine;
 
 
-        public UmlLifeLineModel(Point p )
-            :base(p, new Size(UmlLifeLineModel.DefaultWidth,
+        public UmlLifeLineModel(Point p, ISketchItemContainer container )
+            :base(p, container, new Size(UmlLifeLineModel.DefaultWidth,
                 UmlLifeLineModel.DefaultHeight),
                  "Object Life Line", Colors.Snow)
         {

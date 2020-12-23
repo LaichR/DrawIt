@@ -24,7 +24,7 @@ namespace Sketch.Controls
             _connector = model;
             _pad = pad;
 
-            IBoundedItemModel ending = model.To;
+            IBoundedSketchItemModel ending = model.To;
             if (ending == null)
             {
                 ending = model.From;

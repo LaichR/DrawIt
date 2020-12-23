@@ -166,7 +166,7 @@
     <Compile Include="Interface\AllowableConnectorAttribute.cs" />
     <Compile Include="Interface\IBoundedItemFactory.cs" />
     <Compile Include="Interface\IConnectorItemModel.cs" />
-    <Compile Include="Interface\IBoundedItemModel.cs" />
+    <Compile Include="Interface\IBoundedSketchItemModel.cs" />
     <Compile Include="Interface\ISketchItemLabelProvider.cs" />
     <Compile Include="Interface\ISketchItemDisplay.cs" />
     <Compile Include="Interface\ISketchItemModel.cs" />

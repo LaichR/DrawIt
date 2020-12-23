@@ -18,7 +18,7 @@ namespace DrawIt.Uml
 
        
 
-        public UmlMessageModel( ConnectionType type, IBoundedItemModel from, IBoundedItemModel to,
+        public UmlMessageModel( ConnectionType type, IBoundedSketchItemModel from, IBoundedSketchItemModel to,
             Point connectorStartHint, Point connectorEndHint,
             ISketchItemContainer container)
             : base(ConnectionType.StrightLine, from, to, connectorStartHint, connectorEndHint, container)

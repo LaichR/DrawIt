@@ -16,7 +16,7 @@ namespace Sketch.Models.BasicItems
     public class StrightLineConnector : ConnectorModel
         
     {
-        public StrightLineConnector(ConnectionType type, IBoundedItemModel from, IBoundedItemModel to,
+        public StrightLineConnector(ConnectionType type, IBoundedSketchItemModel from, IBoundedSketchItemModel to,
             Point connectorStartHint, Point connectorEndHint,
             ISketchItemContainer container)
             : base(ConnectionType.StrightLine, from, to, connectorStartHint, connectorEndHint, container)

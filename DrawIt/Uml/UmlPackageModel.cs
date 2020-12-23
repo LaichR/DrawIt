@@ -21,8 +21,8 @@ namespace DrawIt.Uml
         new const int DefaultWidth = 150;
         new const int DefaultHeight = 95;
         
-        public UmlPackageModel( Point p )
-            : base(p, new Size( DefaultWidth, DefaultHeight)) 
+        public UmlPackageModel( Point p, ISketchItemContainer container )
+            : base(p, container, new Size( DefaultWidth, DefaultHeight)) 
         {
             IsSelected = true;
             CanChangeSize = true;

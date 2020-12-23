@@ -22,8 +22,8 @@ namespace DrawIt.Uml
 
         static readonly double DefaultRoundingEdgeRadius = DefaultHeight / 3; 
 
-        public UmlStateModel(Point p)
-            : base(p, new Size( DefaultWidth, DefaultHeight)) 
+        public UmlStateModel(Point p, ISketchItemContainer container)
+            : base(p, container, new Size( DefaultWidth, DefaultHeight)) 
         {
             
             

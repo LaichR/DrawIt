@@ -35,8 +35,8 @@ namespace DrawIt.Uml
             Sketch.PropertyEditor.PropertyDisplayTemplateSelector.RegisterDataTemplate(typeof(ObservableCollection<UmlMemberDescription>), "ClassMembersTemplate");
         }
 
-        public UmlClassModel(Point p)
-            : base(p, new Size(DefaultWidth, DefaultHeight)) 
+        public UmlClassModel(Point p, ISketchItemContainer container)
+            : base(p, container, new Size(DefaultWidth, DefaultHeight)) 
         {
             CanChangeSize = true;
             CanEditLabel = true;

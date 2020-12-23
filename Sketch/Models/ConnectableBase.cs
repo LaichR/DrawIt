@@ -19,7 +19,7 @@ using System.Collections.ObjectModel;
 namespace Sketch.Models
 {
 
-    public abstract class ConnectableBase: ModelBase, IBoundedItemModel
+    public abstract class ConnectableBase: ModelBase, IBoundedSketchItemModel
     {
 
         public static readonly double DefaultWidth = 100;
@@ -53,10 +53,11 @@ namespace Sketch.Models
         DelegateCommand _cmdSelectColor;
         readonly GeometryGroup _geometry = new GeometryGroup();
 
-        public ConnectableBase(Point pos, Size size, 
+        public ConnectableBase(Point pos, ISketchItemContainer container, Size size, 
             string label,
             Color color) 
         {
+            ParentNode = container;
             IsSelected = true;
             Label = label;
             FillColor = color;

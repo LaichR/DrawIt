@@ -18,7 +18,7 @@ namespace Sketch.Interface
         public AllowableConnectorAttribute(Type cls)
         {
             RuntimeCheck.Contract.Requires(cls != null, "Connector type must not be null");
-            RuntimeCheck.Contract.Requires(cls.GetInterface("IConnectorItemModel") != null, "Connector type needs to implement the Interface IConnectorItemModel");
+            RuntimeCheck.Contract.Requires(cls.GetInterface(nameof(IConnectorItemModel)) != null, "Connector type needs to implement the Interface IConnectorItemModel");
             _allowableConnectorType = cls;
         }
 

@@ -310,7 +310,7 @@ namespace Sketch.Controls
         {
             var factory = ItemFactory;
             if ( factory.SelectedForCreation == null||
-                 factory.SelectedForCreation.GetInterface("IBoundedModelItem") == null)
+                 factory.SelectedForCreation.GetInterface(nameof(IBoundedSketchItemModel)) == null)
             {
                 EditMode = EditMode.Select;
             }

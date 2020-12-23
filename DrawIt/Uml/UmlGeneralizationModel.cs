@@ -20,7 +20,7 @@ namespace DrawIt.Uml
     [AllowableConnectorTarget(typeof(UmlClassModel))]
     public class UmlGeneralizationModel: ConnectorModel
     {
-        public UmlGeneralizationModel( ConnectionType type, IBoundedItemModel from, IBoundedItemModel to,
+        public UmlGeneralizationModel( ConnectionType type, IBoundedSketchItemModel from, IBoundedSketchItemModel to,
             Point connectorStartHint, Point connectorEndHint,
             ISketchItemContainer container)
             : base(type, from, to, connectorStartHint, connectorEndHint, container)

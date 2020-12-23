@@ -9,6 +9,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Sketch.Helper;
 using Sketch.Models;
+using Sketch.Interface;
 using System.Runtime.Serialization;
 
 namespace DrawIt.Shapes
@@ -24,8 +25,8 @@ namespace DrawIt.Shapes
         BitmapImage _myImage;
         Brush _fill;
 
-        public PictureModel( System.Windows.Point p, string fileName)
-            :base(p, new Size(PictureModel.DefaultWidth, PictureModel.DefaultHeight),
+        public PictureModel( System.Windows.Point p, ISketchItemContainer container, string fileName)
+            :base(p, container, new Size(PictureModel.DefaultWidth, PictureModel.DefaultHeight),
                  fileName, Colors.Snow)
         {
             Label = fileName;

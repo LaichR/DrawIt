@@ -107,7 +107,7 @@ namespace Sketch.Controls
 
                                if (angle < 0) angle += 360.0;
 
-                               var connectable = fac.CreateConnectableItem(moveDown);
+                               var connectable = fac.CreateConnectableItem(moveDown, _pad);
                                
                                if( angle >= 0 && angle < 45)
                                {

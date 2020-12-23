@@ -27,8 +27,8 @@ namespace DrawIt.Uml
         new static readonly double DefaultHeight = 40;
          
 
-        public UmlAwaitEventModel(Point p)
-            : base(p, new Size( DefaultWidth, DefaultHeight), "await event", ConnectableBase.DefaultColor ) 
+        public UmlAwaitEventModel(Point p, ISketchItemContainer container)
+            : base(p, container, new Size( DefaultWidth, DefaultHeight), "await event", ConnectableBase.DefaultColor ) 
         {
             IsSelected = true;
             CanChangeSize = true;

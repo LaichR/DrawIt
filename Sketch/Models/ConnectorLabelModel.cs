@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using Sketch.Interface;
 
 namespace Sketch.Models
 {
@@ -30,8 +31,8 @@ namespace Sketch.Models
         
         LineGeometry _linkToConnector;
 
-        public ConnectorLabelModel(ConnectorModel connector, bool isStartPointLabel, bool showLabelConnection, Point labelPosition)
-            :base(labelPosition, 
+        public ConnectorLabelModel(ConnectorModel connector, ISketchItemContainer container, bool isStartPointLabel, bool showLabelConnection, Point labelPosition)
+            :base(labelPosition, container,
                  ComputeSizeOfBounds(connector.GetLabel(isStartPointLabel)), 
                  connector.GetLabel(isStartPointLabel), Colors.Snow )
         {

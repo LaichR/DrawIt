@@ -36,7 +36,7 @@ namespace Sketch.Models
 
         public void AddType(Type cls)
         {
-            if (cls.GetInterface("IBoundedItemModel") != null)
+            if (cls.GetInterface(nameof(IBoundedSketchItemModel)) != null)
             {
                 if (_types.Contains(cls)) return;
                 _types.Add(cls);
@@ -66,14 +66,15 @@ namespace Sketch.Models
 
         static readonly Type[] boundedItemfactorOpParam = new Type[]
         {
-            typeof(System.Windows.Point)
+            typeof(System.Windows.Point),
+            typeof(ISketchItemContainer)
         };
 
         static readonly Type[] connectorItemfactorOpParam = new Type[]
         {
             typeof(ConnectionType),
-            typeof(IBoundedItemModel),
-            typeof(IBoundedItemModel),
+            typeof(IBoundedSketchItemModel),
+            typeof(IBoundedSketchItemModel),
             typeof(Point),
             typeof(Point),
             typeof(ISketchItemContainer)
@@ -175,7 +176,7 @@ namespace Sketch.Models
 
         public IList<ICommandDescriptor> Palette
             => new List<ICommandDescriptor>(_paletteCommands.Where(
-                (x)=>x.Key.GetInterface("IBoundedItemModel") != null)
+                (x)=>x.Key.GetInterface(nameof(IBoundedSketchItemModel)) != null)
                     .Select((x)=>x.Value).OrderBy((x) => x.Name));
 
         public IList<ISketchItemGroup> ItemGroups
@@ -183,18 +184,18 @@ namespace Sketch.Models
             get => new List<ISketchItemGroup>(_sketchItemGroups.Values);
         }
 
-        public IBoundedItemModel CreateConnectableSketchItem(Type cls, System.Windows.Point p)
+        public IBoundedSketchItemModel CreateConnectableSketchItem(Type cls, System.Windows.Point p, ISketchItemContainer container)
         {
 
             if (_createBoundedItem.TryGetValue(cls, out CreateBoundedSketchItemDelegate factoryOp))
             {
-                return factoryOp(p);
+                return factoryOp(p, container);
             }
             throw new KeyNotFoundException(string.Format("No factory operation registered for class {0}", cls.Name));
         }
 
         public IConnectorItemModel CreateConnector(Type cls,
-            IBoundedItemModel from, IBoundedItemModel to, 
+            IBoundedSketchItemModel from, IBoundedSketchItemModel to, 
             Point startPointHint, Point endPointHint,
             ISketchItemContainer container)
         {
@@ -264,13 +265,13 @@ namespace Sketch.Models
             {
                 commandDescriptor = CreatePaletteCommandDescriptor(sketchItemType, menuLabel, menuBrief, toolsBitmap);
                 _paletteCommands[sketchItemType] = commandDescriptor;
-                if (sketchItemType.GetInterface("IBoundedItemModel") != null)
+                if (sketchItemType.GetInterface(nameof(IBoundedSketchItemModel)) != null)
                 {
                     var factory = CreateFactoryOp<CreateBoundedSketchItemDelegate>(sketchItemType, boundedItemfactorOpParam);
                     _createBoundedItem[sketchItemType] = factory;
                     CreateAndRegisterAllowalbleConnectors(sketchItemType);
                 }
-                else if (sketchItemType.GetInterface("IConnectorItemModel") != null)
+                else if (sketchItemType.GetInterface(nameof(IConnectorItemModel)) != null)
                 {
                     var factory = CreateFactoryOp<CreateConnectorDelegate>(sketchItemType, connectorItemfactorOpParam);
                     _createConnectorItem[sketchItemType] = factory;

@@ -35,8 +35,8 @@ namespace DrawIt.Uml
         [PersistentField((int)ModelVersion.V_0_1, "Postcondition")]
         string _postcondition = "";
 
-        public UmlActivityModel(Point p)
-            : base(p, new Size( DefaultWidth, DefaultHeight)) 
+        public UmlActivityModel(Point p, ISketchItemContainer container)
+            : base(p, container, new Size( DefaultWidth, DefaultHeight)) 
         {
             IsSelected = true;
             CanChangeSize = true;

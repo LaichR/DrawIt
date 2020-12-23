@@ -71,8 +71,8 @@ namespace Sketch.Models.BasicItems
 
         Typeface _typeface = DefaultFont;
 
-        public FreeTextModel(Point p)
-            : base(p, new Size(DefaultWidth, DefaultHeight), "a text",
+        public FreeTextModel(Point p, ISketchItemContainer container)
+            : base(p, container, new Size(DefaultWidth, DefaultHeight), "a text",
                  Colors.White)
         {
             CanChangeSize = true;

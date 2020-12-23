@@ -20,8 +20,8 @@ namespace Sketch.Models
         byte[] _childDataBuffer;
         ObservableCollection<ISketchItemModel> _children = new ObservableCollection<ISketchItemModel>();
         
-        public ContainerModel(Point location, Size size )
-            :base(location, size, "new container", ConnectableBase.DefaultColor)
+        public ContainerModel(Point location, ISketchItemContainer container,Size size )
+            :base(location, container, size, "new container", ConnectableBase.DefaultColor)
         {
             _children.CollectionChanged += SketchItemsChanged;
         }
