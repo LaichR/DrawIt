@@ -10,7 +10,9 @@ using UI.Utilities.Interfaces;
 
 namespace Sketch.Interface
 {
-
+    /// <summary>
+    /// Abstract factory for Connectable Items and Connectors. 
+    /// </summary>
     public interface ISketchItemFactory
     {
         Type SelectedForCreation

@@ -7,6 +7,10 @@ using UI.Utilities.Interfaces;
 
 namespace Sketch.Interface
 {
+    /// <summary>
+    /// Allows to create a palette of actions that create items that belong to the same group or categorie.
+    /// Like this it becomes possible to create groups within the SketchItemFactory
+    /// </summary>
     public interface ISketchItemGroup
     {
         string Name

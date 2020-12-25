@@ -1,4 +1,4 @@
-﻿using Sketch.Controls;
+﻿using Sketch.View;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +12,10 @@ using Sketch.Helper;
 
 namespace Sketch.Interface
 {
+    /// <summary>
+    /// A SketchItemDisplay is used to display various sketch Items on a canvas and to provide
+    /// the basic manipulations.
+    /// </summary>
     public interface ISketchItemDisplay: ISketchItemContainer, IDisposable
     {
         Canvas Canvas

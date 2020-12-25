@@ -8,6 +8,13 @@ using System.Runtime.Serialization;
 
 namespace Sketch.Interface
 {
+    /// <summary>
+    /// Connectable items interact to some extend with the user when creating new connections from one item to another 
+    /// or when moving and resizing an item. The changes of the an item need to be broadcasted to all linked connectors.
+    /// 
+    /// This interface provides the required functions and events to do so. 
+    /// 
+    /// </summary>
     public interface IConnectable : IBoundsProvider, ISerializable
     {
         /// <summary>
@@ -18,7 +25,7 @@ namespace Sketch.Interface
         /// <param name="incoming">indicates if this information is related
         /// to incoming or outgoing connections
         /// </param>
-        /// <returns>Bitmap containing the queried constraints</returns>
+        /// <returns>Bitmask containing the queried constraints</returns>
         ConnectorDocking AllowableDockings(bool incoming);
 
         Point GetPreferredConnectorStart(Point hint, out double relativePosition, out ConnectorDocking docking, out ulong connectorPort);

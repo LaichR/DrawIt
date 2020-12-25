@@ -15,9 +15,9 @@ using System.Windows.Shapes;
 
 
 using Sketch;
-using Sketch.Controls;
+using Sketch.View;
 using Sketch.Interface;
-using Sketch.Controls.ColorPicker;
+using Sketch.View.ColorPicker;
 using Sketch.Models;
 
 namespace DrawIt
@@ -29,7 +29,7 @@ namespace DrawIt
     {
 
         readonly ApplicationViewModel _model;
-        Sketch.Controls.ColorPicker.ColorPalette _palette;
+        Sketch.View.ColorPicker.ColorPalette _palette;
         TreeViewItem _focusedItem;
 
         public MainWindow()
@@ -58,7 +58,7 @@ namespace DrawIt
             var tb = new ToolBar();
             tb.VerticalAlignment = System.Windows.VerticalAlignment.Top;
             
-            _palette = new Sketch.Controls.ColorPicker.ColorPalette();
+            _palette = new Sketch.View.ColorPicker.ColorPalette();
             _palette.ConnectModel(_model.Sketch);
             tb.Items.Add(_palette);
             

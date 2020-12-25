@@ -4,10 +4,10 @@
         xmlns:uiu ="clr-namespace:UI.Utilities;assembly=UI.Utilities"
         xmlns:uic ="clr-namespace:UI.Utilities.Controls;assembly=UI.Utilities"
         xmlns:uib ="clr-namespace:UI.Utilities.Behaviors;assembly=UI.Utilities"
-        xmlns:control ="clr-namespace:Sketch.Controls;assembly=Sketch" 
+        xmlns:control ="clr-namespace:Sketch.View;assembly=Sketch" 
         xmlns:model ="clr-namespace:Sketch.Models;assembly=Sketch" 
         xmlns:si ="clr-namespace:Sketch.Interface;assembly=Sketch"
-        xmlns:colorpicker ="clr-namespace:Sketch.Controls.ColorPicker;assembly=Sketch" 
+        xmlns:colorpicker ="clr-namespace:Sketch.View.ColorPicker;assembly=Sketch" 
         xmlns:pe="clr-namespace:Sketch.PropertyEditor;assembly=Sketch"
         Title="Drawing " Height="350" Width="952.463" SizeToContent="WidthAndHeight">
     <Window.Resources>

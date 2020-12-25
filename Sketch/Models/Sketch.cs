@@ -8,7 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using Sketch.Controls.ColorPicker;
+using Sketch.View.ColorPicker;
 using Sketch.Interface;
 
 namespace Sketch.Models

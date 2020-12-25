@@ -9,6 +9,9 @@ using System.Windows.Shapes;
 
 namespace Sketch.Interface
 {
+    /// <summary>
+    /// Base interface of all view elements. The view elements are defined in the namespace Sketch.View. 
+    /// </summary>
     public interface ISketchItemUI: IDisposable
     {
         bool IsSelected

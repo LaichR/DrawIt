@@ -1,0 +1,41 @@
+﻿<UserControl x:Class="Sketch.View.ColorPicker.ColorPalette"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="35" d:DesignWidth="330" Height="24">
+            
+    <Grid Margin="0,0,0,0">
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,0.2" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Button  Width="16" Height="16" Command="{Binding SelectRed}">
+                <Canvas Background="Red" Width="8" Height="8" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </Button>
+            <Button  Width="16" Height="16" Command="{Binding SelectOrange}">
+                <Canvas Background="Orange" Width="8" Height="8" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </Button>
+            <Button  Width="16" Height="16" Command="{Binding SelectYellow}">
+                <Canvas Background="Yellow" Width="8" Height="8" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </Button>
+            <Button  Width="16" Height="16" Command="{Binding SelectGreen}">
+                <Canvas Background="Green" Width="8" Height="8" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </Button>
+            <Button  Width="16" Height="16" Command="{Binding SelectBlue}">
+                <Canvas Background="Blue" Width="8" Height="8" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </Button>
+            <Button  Width="24" Height="16" Margin="10,0,0,0" Command="{Binding SelectDefaultColor}">
+                <Canvas Background="{Binding DefaultBrush}" Width="20" Height="8" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </Button>
+            <Button Background="LightGray"  Height="16"  Command="{Binding EditDefaultColor}">
+                <TextBlock Text="..." FontWeight="ExtraBold" Foreground="Black" VerticalAlignment="Top" FontSize="8"/>
+            </Button>
+            <Button  Width="24" Height="16" Margin="10,0,0,0" Command="{Binding SelectCustomColor}">
+                <Canvas Background="{Binding CustomBrush}"  Width="20" Height="8" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </Button>
+            <Button Background="LightGray"  Height="16"  Command="{Binding EditCustomColor}">
+                <TextBlock Text="..." FontWeight="ExtraBold" Foreground="Black" VerticalAlignment="Top" FontSize="8"/>
+            </Button>
+
+        </StackPanel>
+    </Grid>
+</UserControl>

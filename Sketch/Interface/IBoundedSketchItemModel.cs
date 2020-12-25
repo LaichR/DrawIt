@@ -10,7 +10,12 @@ using System.Windows.Media;
 
 namespace Sketch.Interface
 {
-
+    /// <summary>
+    /// This delegate reflects the signature that is used to create any new BoundedSketchItem
+    /// </summary>
+    /// <param name="p"></param>
+    /// <param name="container"></param>
+    /// <returns></returns>
     public delegate IBoundedSketchItemModel CreateBoundedSketchItemDelegate(Point p, ISketchItemContainer container);
 
     /// <summary>

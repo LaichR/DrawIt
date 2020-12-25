@@ -11,7 +11,7 @@ using System.Runtime.Serialization;
 using Sketch.Interface;
 using Sketch.Models;
 using System.Windows.Controls;
-using Sketch.Controls;
+using Sketch.View;
 
 
 namespace Sketch.Helper

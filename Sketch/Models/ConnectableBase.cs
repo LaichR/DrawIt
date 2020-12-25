@@ -427,7 +427,7 @@ namespace Sketch.Models
         }
         void SelectColor()
         {
-            var dlg = new Controls.ColorPicker.ColorPickerDialog()
+            var dlg = new View.ColorPicker.ColorPickerDialog()
             {
                 StartingColor = _fillColor.Color
             };

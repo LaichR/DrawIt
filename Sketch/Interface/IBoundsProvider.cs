@@ -7,6 +7,9 @@ using System.Windows;
 
 namespace Sketch.Interface
 {
+    /// <summary>
+    /// This interface allows to implment algorithms on anything that a bound. Rectabgles can be wrapped easily as well.
+    /// </summary>
     public interface IBoundsProvider
     {
         Rect Bounds

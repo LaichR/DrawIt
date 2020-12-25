@@ -92,23 +92,22 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\ColorPicker\ColorPalette.xaml.cs">
+    <Compile Include="View\ColorPicker\ColorPalette.xaml.cs">
       <DependentUpon>ColorPalette.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\ColorPicker\ColorPaletteModel.cs" />
-    <Compile Include="Controls\ColorPicker\ColorPicker.cs" />
-    <Compile Include="Controls\ColorPicker\ColorPickerDialog.xaml.cs" />
-    <Compile Include="Controls\ColorPicker\IColorSelectionTarget.cs" />
-    <Compile Include="Controls\ColorPicker\SupportingClasses.cs" />
-    <Compile Include="Controls\ConnectorMoveVisualizer.cs" />
-    <Compile Include="Controls\ConnectorAdorner.cs" />
-    <Compile Include="Controls\ConnectorUI.cs" />
-    <Compile Include="Controls\ConnectablePairSelector.cs" />
-    <Compile Include="Controls\DecoratorAdorner.cs" />
-    <Compile Include="Controls\IntersectionFinder.cs" />
-    <Compile Include="Controls\GeometryBorder.cs" />
-    <Compile Include="Controls\Operations\ConnectorUI.WaypointMoveOperation.cs" />
-    <Compile Include="Interface\IDecoratable.cs" />
+    <Compile Include="View\ColorPicker\ColorPaletteModel.cs" />
+    <Compile Include="View\ColorPicker\ColorPicker.cs" />
+    <Compile Include="View\ColorPicker\ColorPickerDialog.xaml.cs" />
+    <Compile Include="View\ColorPicker\IColorSelectionTarget.cs" />
+    <Compile Include="View\ColorPicker\SupportingClasses.cs" />
+    <Compile Include="View\ConnectorMoveVisualizer.cs" />
+    <Compile Include="View\ConnectorAdorner.cs" />
+    <Compile Include="View\ConnectorUI.cs" />
+    <Compile Include="View\ConnectablePairSelector.cs" />
+    <Compile Include="View\DecoratorAdorner.cs" />
+    <Compile Include="View\IntersectionFinder.cs" />
+    <Compile Include="View\GeometryBorder.cs" />
+    <Compile Include="View\Operations\ConnectorUI.WaypointMoveOperation.cs" />
     <Compile Include="Interface\ISketchItemGroup.cs" />
     <Compile Include="Interface\ISketchPadControl.cs" />
     <Compile Include="Interface\IConnectable.cs" />
@@ -146,28 +145,28 @@
       <DependentUpon>RectViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="Helper\BoundsComparer.cs" />
-    <Compile Include="Controls\LineSegmentDecorator.cs" />
-    <Compile Include="Controls\Operations\OutlineUI.MoveOperation.cs" />
-    <Compile Include="Controls\Operations\RewireConnectorOperation.cs" />
-    <Compile Include="Controls\Operations\SelectUisOperation.cs" />
-    <Compile Include="Controls\OutlineHelper.cs" />
-    <Compile Include="Controls\ScanLine.cs" />
-    <Compile Include="Controls\SketchItemDisplay.cs" />
-    <Compile Include="Controls\SketchItemDisplayLabel.cs" />
-    <Compile Include="Controls\SketchPad.cs" />
-    <Compile Include="Controls\OutlineAdorner.cs" />
-    <Compile Include="Controls\OutlineUI.cs" />
-    <Compile Include="Controls\Operations\ConnectorUI.MoveConnectorOperation.cs" />
-    <Compile Include="Controls\Operations\AddConnectorOperation.cs" />
-    <Compile Include="Controls\Operations\AddBoundedtemOperation.cs" />
-    <Compile Include="Controls\Operations\OutlineUI.ChangeSizeOperation.cs" />
-    <Compile Include="Controls\Operations\Nop.cs" />
+    <Compile Include="View\LineSegmentDecorator.cs" />
+    <Compile Include="View\Operations\OutlineUI.MoveOperation.cs" />
+    <Compile Include="View\Operations\RewireConnectorOperation.cs" />
+    <Compile Include="View\Operations\SelectUisOperation.cs" />
+    <Compile Include="View\OutlineHelper.cs" />
+    <Compile Include="View\ScanLine.cs" />
+    <Compile Include="View\SketchItemDisplay.cs" />
+    <Compile Include="View\SketchItemDisplayLabel.cs" />
+    <Compile Include="View\SketchPad.cs" />
+    <Compile Include="View\OutlineAdorner.cs" />
+    <Compile Include="View\OutlineUI.cs" />
+    <Compile Include="View\Operations\ConnectorUI.MoveConnectorOperation.cs" />
+    <Compile Include="View\Operations\AddConnectorOperation.cs" />
+    <Compile Include="View\Operations\AddBoundedtemOperation.cs" />
+    <Compile Include="View\Operations\OutlineUI.ChangeSizeOperation.cs" />
+    <Compile Include="View\Operations\Nop.cs" />
     <Compile Include="Interface\AllowableConnectorTarget.cs" />
     <Compile Include="Interface\AllowableConnectorAttribute.cs" />
     <Compile Include="Interface\IBoundedItemFactory.cs" />
     <Compile Include="Interface\IConnectorItemModel.cs" />
     <Compile Include="Interface\IBoundedSketchItemModel.cs" />
-    <Compile Include="Interface\ISketchItemLabelProvider.cs" />
+    <Compile Include="Interface\ISketchItemNode.cs" />
     <Compile Include="Interface\ISketchItemDisplay.cs" />
     <Compile Include="Interface\ISketchItemModel.cs" />
     <Compile Include="Interface\ISketchItemFactory.cs" />
@@ -208,7 +207,7 @@
     <Compile Include="Interface\ConnectorDocking.cs" />
     <Compile Include="Helper\ConnectorLineStyle.cs" />
     <Compile Include="Helper\EditMode.cs" />
-    <Compile Include="Controls\IEditOperation.cs" />
+    <Compile Include="View\IEditOperation.cs" />
     <Compile Include="Interface\ISketchItemUI.cs" />
     <Compile Include="Helper\LineTypes.cs" />
     <Compile Include="Helper\LinkedAvlTree.cs" />
@@ -257,11 +256,11 @@
     <None Include="Resources\free_text.png" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Controls\ColorPicker\ColorPalette.xaml">
+    <Page Include="View\ColorPicker\ColorPalette.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\ColorPicker\ColorPickerDialog.xaml">
+    <Page Include="View\ColorPicker\ColorPickerDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -9,6 +9,10 @@ using System.Collections.ObjectModel;
 
 namespace Sketch.Interface
 {
+    /// <summary>
+    /// I SketchItem container is a SketchItemNode that provides a observable collection of SketchItems
+    /// 
+    /// </summary>
     public interface ISketchItemContainer : ISketchItemNode
     {
         ObservableCollection<ISketchItemModel> SketchItems

@@ -8,6 +8,10 @@ using System.Windows.Media;
 
 namespace Sketch.Interface
 {
+    /// <summary>
+    /// This is the base interface for all model elements. The model elements are defined in the namespace Sketch.Models.
+    /// They are in fact the view models of the application.
+    /// </summary>
     public interface ISketchItemModel: ISerializable, ISketchItemNode
     {
 
