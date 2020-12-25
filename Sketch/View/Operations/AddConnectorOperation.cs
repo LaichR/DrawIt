@@ -71,7 +71,7 @@ namespace Sketch.View
             
             if (sketchItemUI != null)
             {
-                Point endPointHint = moveDown;// e.GetPosition(sketchItemUI.Shape);
+                Point endPointHint = PlacementHelper.RoundToGrid(moveDown);// e.GetPosition(sketchItemUI.Shape);
                 if (sketchItemUI.Model is ConnectableBase)
                 {
                     var to = sketchItemUI.Model as ConnectableBase;
@@ -121,12 +121,10 @@ namespace Sketch.View
                                }
                                else if( angle >= 135 && angle < 225 )
                                {
-                                   dy = -GetDefaultHeight(connectable) / 2;
-                                   
+                                   dy = -GetDefaultHeight(connectable) / 2;   
                                }
                                else
                                {
-                                   
                                    dx = -GetDefaultWidth(connectable) / 2;
                                }
 

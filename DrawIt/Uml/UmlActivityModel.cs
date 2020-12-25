@@ -42,7 +42,7 @@ namespace DrawIt.Uml
             CanChangeSize = true;
             Label = "new action";
             RotationAngle = 0.0;
-            Commands = GetUmlActivityModelCommands();
+            //Commands = GetUmlActivityModelCommands();
         }
 
 
@@ -227,18 +227,18 @@ namespace DrawIt.Uml
             Decorators.Add(p);
         }
 
-        List<ICommandDescriptor> GetUmlActivityModelCommands()
-        {
-            List<ICommandDescriptor> commands = new List<ICommandDescriptor>
-            {
-                new CommandDescriptor()
-                {
-                    Name = "Add Input Port",
-                    Command = new DelegateCommand(()=>AddInputPort())
-                }
-            };
-            return commands;
-        }
+        //List<ICommandDescriptor> GetUmlActivityModelCommands()
+        //{
+        //    List<ICommandDescriptor> commands = new List<ICommandDescriptor>
+        //    {
+        //        new CommandDescriptor()
+        //        {
+        //            Name = "Add Input Port",
+        //            Command = new DelegateCommand(()=>AddInputPort())
+        //        }
+        //    };
+        //    return commands;
+        //}
 
     }
 }

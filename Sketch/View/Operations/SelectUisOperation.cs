@@ -10,7 +10,7 @@ using System.Windows.Shapes;
 using System.Windows.Media;
 using Sketch.Interface;
 using Sketch.Models;
-
+using Sketch.Helper;
 
 namespace Sketch.View
 {
@@ -36,16 +36,16 @@ namespace Sketch.View
             switch (e.Key)
             {
                 case Key.Left:
-                    MoveMarked(-1 * SketchPad.GridSize, 0);
+                    MoveMarked(-1 * PlacementHelper.GridSize, 0);
                     break;
                 case Key.Right:
-                    MoveMarked(1 * SketchPad.GridSize, 0);
+                    MoveMarked(1 * PlacementHelper.GridSize, 0);
                     break;
                 case Key.Up:
-                    MoveMarked(0, -1 * SketchPad.GridSize);
+                    MoveMarked(0, -1 * PlacementHelper.GridSize);
                     break;
                 case Key.Down:
-                    MoveMarked(0, 1 * SketchPad.GridSize);
+                    MoveMarked(0, 1 * PlacementHelper.GridSize);
                     break;
                 default:
                     e.Handled = false;

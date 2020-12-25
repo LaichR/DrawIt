@@ -550,7 +550,7 @@ namespace Sketch.View
 
         void AddWaypoint()
         {
-            Point pos = RoundToGrid(_lastContextMenuPosition);
+            Point pos = PlacementHelper.RoundToGrid(_lastContextMenuPosition);
 
             var marker = new Waypoint( pos);
             _model.AddWaypoint(marker);
@@ -745,15 +745,7 @@ namespace Sketch.View
             return descriptor;
         }
 
-        internal static Point RoundToGrid(Point p)
-        {
-            return new Point(RoundToGrid(p.X), RoundToGrid(p.Y));
-        }
-
-        internal static double RoundToGrid(double val)
-        {
-            return Math.Round(val / SketchPad.GridSize) * SketchPad.GridSize;
-        }
+        
 
         public void Dispose(){}
     }

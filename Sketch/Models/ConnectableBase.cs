@@ -367,7 +367,7 @@ namespace Sketch.Models
                 LabelArea = ComputeLabelArea(DisplayedLabel()); // the label area is relative to the 
             }
             
-            Bounds = newBounds;
+            Bounds = PlacementHelper.RoundToGrid(newBounds);
             UpdateGeometry();
             NotifyShapeChanged( ref oldBounds, ref newBounds);
         }
@@ -388,7 +388,17 @@ namespace Sketch.Models
         {
             using (var inputStream = new System.IO.MemoryStream())
             {
-                IFormatter formatter = new BinaryFormatter();
+                var ss = new SurrogateSelector();
+                ss.AddSurrogate(typeof(SketchItemContainerProxy),
+                    new StreamingContext(StreamingContextStates.All),
+                    new SketchItemContainerSerializationSurrogate(ParentNode as ISketchItemContainer));
+
+                IFormatter formatter = new BinaryFormatter()
+                {
+                    SurrogateSelector = ss
+                };
+
+
                 formatter.Serialize(inputStream, this);
                 var data = inputStream.ToArray();
                 using (var outputStream = new System.IO.MemoryStream(data))

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Sketch.Interface;
 using System.Windows.Input;
 using System.Windows.Media;
+using Sketch.Helper;
 
 namespace Sketch.View
 {
@@ -43,8 +44,8 @@ namespace Sketch.View
             
                 Point p = e.GetPosition(_ui._parent.Canvas);
 
-                p.X = Math.Round(p.X / SketchPad.GridSize) * SketchPad.GridSize;
-                p.Y = Math.Round(p.Y / SketchPad.GridSize) * SketchPad.GridSize;
+                p = PlacementHelper.RoundToGrid(p);
+                
 
                 var v = Point.Subtract(p, _startPoint);
                 _startPoint = p;

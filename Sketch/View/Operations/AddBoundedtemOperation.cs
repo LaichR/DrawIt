@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Sketch.Models;
 using Sketch.Interface;
+using Sketch.Helper;
 
 namespace Sketch.View
 {
@@ -39,8 +40,8 @@ namespace Sketch.View
             _pad.Canvas.Focus();
             var p = e.GetPosition(_pad.Canvas);
 
-            p.X = (p.X / SketchPad.GridSize) * SketchPad.GridSize;
-            p.Y = (p.Y / SketchPad.GridSize) * SketchPad.GridSize;
+            p = PlacementHelper.RoundToGrid(p);
+            
             var factory = _pad.ItemFactory;
             if (factory.SelectedForCreation != null &&
                 factory.SelectedForCreation.GetInterface(

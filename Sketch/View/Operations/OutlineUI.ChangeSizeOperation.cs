@@ -27,8 +27,8 @@ namespace Sketch.View
             {
                 var p = e.GetPosition(parent_._parent.Canvas);
                 var relP = e.GetPosition(parent_);
-                _start.X = RoundToGrid(p.X);
-                _start.Y = RoundToGrid(p.Y);
+                _start = PlacementHelper.RoundToGrid(p);
+                
 
                 _ui = parent_;
                 _origialRect = _ui.Bounds;
@@ -146,9 +146,8 @@ namespace Sketch.View
 
             Transform ComputeResizeTransformation(Point p)
             {
-                p.X = RoundToGrid(p.X);
-                p.Y = RoundToGrid(p.Y);
-
+                p = PlacementHelper.RoundToGrid(p);
+                
                 var rect = _origialRect;
                 var rot = _ui._model.Geometry.Transform as RotateTransform;
                 var angle = 0.0;
@@ -275,10 +274,7 @@ namespace Sketch.View
                 //return null;
             }
 
-            double RoundToGrid(double val)
-            {
-                return Math.Round(Math.Round(val / SketchPad.GridSize) * SketchPad.GridSize, 2);
-            }
+            
         }
     }
 }

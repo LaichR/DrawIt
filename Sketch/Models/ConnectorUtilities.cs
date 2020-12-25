@@ -233,7 +233,7 @@ namespace Sketch.Models
             
             if (p.Y == r.Top || p.Y == r.Bottom)
             {
-                p.X = RoundToGrid(r.Left + relativePosition * r.Width);
+                p.X = PlacementHelper.RoundToGrid(r.Left + relativePosition * r.Width);
                 if (p.Y == r.Bottom)
                     return ConnectorDocking.Bottom;
                 return ConnectorDocking.Top;
@@ -241,7 +241,7 @@ namespace Sketch.Models
 
             if (p.X == r.Left || p.X == r.Right)
             {
-                p.Y = RoundToGrid(r.Top + relativePosition * r.Height);
+                p.Y = PlacementHelper.RoundToGrid(r.Top + relativePosition * r.Height);
                 if (p.X == r.Right) return ConnectorDocking.Right;
                 return ConnectorDocking.Left;
             }
@@ -253,16 +253,16 @@ namespace Sketch.Models
             switch(docking)
             {
                 case ConnectorDocking.Top:
-                    return new Point(RoundToGrid(r.Left + relativePosition * r.Width), r.Top -1);
+                    return new Point( PlacementHelper.RoundToGrid(r.Left + relativePosition * r.Width), r.Top -1);
                 case ConnectorDocking.Right:
-                    return new Point(r.Right +1, RoundToGrid(r.Top + relativePosition*r.Height) );
+                    return new Point(r.Right +1, PlacementHelper.RoundToGrid(r.Top + relativePosition*r.Height) );
                 case ConnectorDocking.Bottom:
-                    return new Point(RoundToGrid(r.Left + relativePosition * r.Width), r.Bottom + 1);
+                    return new Point(PlacementHelper.RoundToGrid(r.Left + relativePosition * r.Width), r.Bottom + 1);
                 case ConnectorDocking.Left:
-                    return new Point(r.Left-1, RoundToGrid(r.Top + relativePosition*r.Height) );
+                    return new Point(r.Left-1, PlacementHelper.RoundToGrid(r.Top + relativePosition*r.Height) );
                     
                 default:
-                    return new Point(RoundToGrid(r.Left + relativePosition * r.Width), r.Top);
+                    return new Point(PlacementHelper.RoundToGrid(r.Left + relativePosition * r.Width), r.Top);
                     
             }
         }
@@ -313,17 +313,7 @@ namespace Sketch.Models
             
         //}
 
-        public static double RoundToGrid(double number)
-        {
-            return Math.Round(number /  SketchPad.GridSize) * SketchPad.GridSize;
-        }
-
-        public static Point RoundToGrid(Point p)
-        {
-            p.X = RoundToGrid(p.X);
-            p.Y = RoundToGrid(p.Y);
-            return p;
-        }
+        
 
 
         internal static bool HitLineSegment(Point p, PathFigure pathFigure, out int index, 

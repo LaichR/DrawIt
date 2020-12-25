@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using Sketch.Helper;
 
 namespace Sketch.Models
 {
@@ -148,7 +149,7 @@ namespace Sketch.Models
             Rect oldRect = _bounds;
             var location = translation.Transform(_bounds.Location);
             // make sure that the middle is aligned to the grid!
-            location = ConnectorUtilities.RoundToGrid(location);
+            location = PlacementHelper.RoundToGrid(location);
             _bounds.Location = location;
             ShapeChanged?.Invoke(this, new OutlineChangedEventArgs(oldRect, _bounds));
         }

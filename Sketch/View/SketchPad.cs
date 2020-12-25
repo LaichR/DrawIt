@@ -63,7 +63,7 @@ namespace Sketch.View
             DependencyProperty.Register("ZoomDepth", typeof(int),
                 typeof(SketchPad));
 
-        public const double GridSize = 6;
+        //public const double GridSize = 6;
 
         //double _xScaling;
         //double _yScaling;

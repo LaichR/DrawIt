@@ -167,9 +167,8 @@ namespace Sketch.View
             {
                 Point p = e.GetPosition(_ui._parent.Canvas);
 
-                p.X = Math.Round(p.X / SketchPad.GridSize) * SketchPad.GridSize;
-                p.Y = Math.Round(p.Y / SketchPad.GridSize) * SketchPad.GridSize;
-
+                p = PlacementHelper.RoundToGrid(p);
+                
                 var v = Point.Subtract(_p0, p);
                 _p0 = p;
                 _mouseMove(p);

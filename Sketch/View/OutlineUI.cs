@@ -296,7 +296,7 @@ namespace Sketch.View
         protected override void OnMouseMove(MouseEventArgs e)
         {
             e.Handled = false;
-            var p = RoundToGrid( e.GetPosition(this));
+            var p = PlacementHelper.RoundToGrid( e.GetPosition(this));
             
             if (_currentOperationHandler == null)
             {
@@ -336,7 +336,7 @@ namespace Sketch.View
                 if (e.LeftButton == MouseButtonState.Pressed 
                     && e.RightButton == MouseButtonState.Released)
                 {
-                    Point p = RoundToGrid( e.GetPosition(this._parent.Canvas));
+                    Point p = PlacementHelper.RoundToGrid( e.GetPosition(this._parent.Canvas));
                     var hitResult = _adorner.HitShadowBorder(p);
                     SetMouseCursor(hitResult);
                     // toggle on mouse press
@@ -720,16 +720,7 @@ namespace Sketch.View
 
         }
 
-        internal static Point RoundToGrid(Point p)
-        {
-            return new Point(RoundToGrid(p.X), RoundToGrid(p.Y));
-        }
-
-        internal static double RoundToGrid(double val)
-        {
-            return Math.Round(val / SketchPad.GridSize) * SketchPad.GridSize;
-        }
-
+     
         public void Dispose(){}
     }
 }
