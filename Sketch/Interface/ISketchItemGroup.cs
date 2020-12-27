@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UI.Utilities.Interfaces;
+using Sketch.Helper.Binding;
 
 namespace Sketch.Interface
 {

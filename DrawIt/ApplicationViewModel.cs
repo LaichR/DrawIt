@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using Sketch.Helper;
 using System.Windows.Input;
-using UI.Utilities;
+using Sketch.Helper.Binding;
 using DrawIt.Uml;
 using DrawIt.Shapes;
 using Sketch.Interface;
 using System.Windows.Controls;
-using UI.Utilities.Interfaces;
+using Sketch.View.CustomControls;
+using Sketch.Helper.UiUtilities;
 using Sketch.Models;
 
 namespace DrawIt
@@ -56,9 +57,9 @@ namespace DrawIt
 
 
         //readonly ObservableCollection<ISketchItemModel> _sketchItems = new ObservableCollection<ISketchItemModel>();
-        readonly List<UI.Utilities.Interfaces.ICommandDescriptor> _fileTools;
-        readonly List<UI.Utilities.Interfaces.ICommandDescriptor> _alignTools;
-        readonly List<UI.Utilities.Interfaces.ICommandDescriptor> _zoomTools;
+        readonly List<ICommandDescriptor> _fileTools;
+        readonly List<ICommandDescriptor> _alignTools;
+        readonly List<ICommandDescriptor> _zoomTools;
 
         readonly List<string> _supportedDiagrams = new List<string>()
         {
@@ -86,14 +87,14 @@ namespace DrawIt
             _scaling = 1.0;
 
             //_cursorBitmap = Properties.Resources.UmlClassShape;
-            //_insertCursor = UI.Utilities.BitmapToCursor.CreateCursor(_bmp, 1, 1);
+            //_insertCursor = BitmapToCursor.CreateCursor(_bmp, 1, 1);
             //_insertCursor = Cursors.Cross;
-            _registeredCursors.Add(typeof(UmlClassModel), UI.Utilities.BitmapToCursor.CreateCursor(_insertClass, 1, 1));
-            _registeredCursors.Add(typeof(UmlStateModel), UI.Utilities.BitmapToCursor.CreateCursor(_insertState, 1, 1));
-            _registeredCursors.Add(typeof(UmlNoteModel), UI.Utilities.BitmapToCursor.CreateCursor(_insertNote, 1, 1));
-            _registeredCursors.Add(typeof(UmlPackageModel), UI.Utilities.BitmapToCursor.CreateCursor(_insertPackage, 1, 1));
-            _registeredCursors.Add(typeof(UmlChoiceModel), UI.Utilities.BitmapToCursor.CreateCursor(_insertChoice, 1, 1));
-            _registeredCursors.Add(typeof(PictureModel), UI.Utilities.BitmapToCursor.CreateCursor(_insertPicture, 1, 1));
+            _registeredCursors.Add(typeof(UmlClassModel), BitmapToCursor.CreateCursor(_insertClass, 1, 1));
+            _registeredCursors.Add(typeof(UmlStateModel), BitmapToCursor.CreateCursor(_insertState, 1, 1));
+            _registeredCursors.Add(typeof(UmlNoteModel), BitmapToCursor.CreateCursor(_insertNote, 1, 1));
+            _registeredCursors.Add(typeof(UmlPackageModel), BitmapToCursor.CreateCursor(_insertPackage, 1, 1));
+            _registeredCursors.Add(typeof(UmlChoiceModel), BitmapToCursor.CreateCursor(_insertChoice, 1, 1));
+            _registeredCursors.Add(typeof(PictureModel), BitmapToCursor.CreateCursor(_insertPicture, 1, 1));
 
 
             _deleteEntry = new DelegateCommand(DoDeleteEntries);
@@ -112,27 +113,27 @@ namespace DrawIt
             
             
 
-            _fileTools = new List<UI.Utilities.Interfaces.ICommandDescriptor>
+            _fileTools = new List<ICommandDescriptor>
             {
-                new UI.Utilities.Behaviors.CommandDescriptor
+                new CommandDescriptor
                 {
                     Command = _cmdOpen,
                     Bitmap = global::Sketch.Properties.Resources.open_file,
                     Name = "Open"
                 },
-                new UI.Utilities.Behaviors.CommandDescriptor
+                new CommandDescriptor
                 {
                     Command = _cmdSave,
                     Bitmap = global::Sketch.Properties.Resources.save_file,
                     Name = "Save"
                 },
-                new UI.Utilities.Behaviors.CommandDescriptor
+                new CommandDescriptor
                 {
                     Command = _cmdSaveAs,
                     Bitmap = global::Sketch.Properties.Resources.save_file_as,
                     Name = "Save as .."
                 },
-                new UI.Utilities.Behaviors.CommandDescriptor
+                new CommandDescriptor
                 {
                     Command = _cmdSavePng,
                     Bitmap = global::Sketch.Properties.Resources.SaveAsPicture,
@@ -140,33 +141,33 @@ namespace DrawIt
                 }
             };
 
-            _alignTools = new List<UI.Utilities.Interfaces.ICommandDescriptor>
+            _alignTools = new List<ICommandDescriptor>
             {
-                 new UI.Utilities.Behaviors.CommandDescriptor
+                 new CommandDescriptor
                 {
                     Command = _cmdAlignLeft,
                     Bitmap = global::Sketch.Properties.Resources.left_align,
                     Name = "align left"
                 },
-                 new UI.Utilities.Behaviors.CommandDescriptor
+                 new CommandDescriptor
                 {
                     Command = _cmdAlignCenter,
                     Bitmap = global::Sketch.Properties.Resources.align_center,
                     Name = "align center"
                 },
-                new UI.Utilities.Behaviors.CommandDescriptor
+                new CommandDescriptor
                 {
                     Command = _cmdAlignTop,
                     Bitmap = global::Sketch.Properties.Resources.top_align,
                     Name = "align top"
                 },
-                new UI.Utilities.Behaviors.CommandDescriptor
+                new CommandDescriptor
                 {
                     Command = _cmdSameWidth,
                     Bitmap = global::Sketch.Properties.Resources.equal_sizing,
                     Name = "same width"
                 },
-                new UI.Utilities.Behaviors.CommandDescriptor
+                new CommandDescriptor
                 {
                     Command = _cmdSameVerticalSpace,
                     Bitmap = global::Sketch.Properties.Resources.equal_spacing,
@@ -175,16 +176,16 @@ namespace DrawIt
 
             };
 
-            _zoomTools = new List<UI.Utilities.Interfaces.ICommandDescriptor>()
+            _zoomTools = new List<ICommandDescriptor>()
             {
-                new UI.Utilities.Behaviors.CommandDescriptor
+                new CommandDescriptor
                 {
                     Command = _cmdZoomIn,
                     Bitmap = DrawIt.Properties.Resources.ZoomIn,
                     Name = "Zoom In"
                 },
 
-                new UI.Utilities.Behaviors.CommandDescriptor
+                new CommandDescriptor
                 {
                     Command = _cmdZoomOut,
                     Bitmap = DrawIt.Properties.Resources.ZoomOut,
@@ -230,7 +231,7 @@ namespace DrawIt
 
 
 
-        internal IList<UI.Utilities.Interfaces.ICommandDescriptor> FileTools
+        internal IList<ICommandDescriptor> FileTools
         {
             get
             {
@@ -238,7 +239,7 @@ namespace DrawIt
             }
         }
 
-        internal IList<UI.Utilities.Interfaces.ICommandDescriptor> AlignmentTools
+        internal IList<ICommandDescriptor> AlignmentTools
         {
             get
             {
@@ -246,7 +247,7 @@ namespace DrawIt
             }
         }
 
-        internal IList<UI.Utilities.Interfaces.ICommandDescriptor> ZoomTools
+        internal IList<ICommandDescriptor> ZoomTools
         {
             get
             {
@@ -348,7 +349,7 @@ namespace DrawIt
                         {
                             if (_factory.SelectedItemBitmap != null)
                             {
-                                insertCursor = UI.Utilities.BitmapToCursor.CreateCursor(_factory.SelectedItemBitmap, 1, 1);
+                                insertCursor = BitmapToCursor.CreateCursor(_factory.SelectedItemBitmap, 1, 1);
                                 _registeredCursors.Add(Sketch.SketchItemFactory.SelectedForCreation, insertCursor);
                             }
                         }

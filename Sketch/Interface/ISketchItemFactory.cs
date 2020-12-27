@@ -5,7 +5,7 @@ using System.Text;
 using Sketch.Models;
 using Sketch.Helper;
 using System.Windows;
-using UI.Utilities.Interfaces;
+using Sketch.Helper.Binding;
 
 
 namespace Sketch.Interface

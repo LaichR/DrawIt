@@ -6,13 +6,12 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Runtime.Serialization;
-using UI.Utilities.Interfaces;
 using Sketch.Interface;
 using System.ComponentModel;
-using RuntimeCheck;
 using System.Reflection;
 using System.Windows.Navigation;
 using System.Runtime.CompilerServices;
+using Sketch.Helper.Binding;
 
 namespace Sketch.Models
 {

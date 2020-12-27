@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
 using System.Runtime.Serialization;
-using UI.Utilities;
+using Sketch.Helper.UiUtilities;
 
 namespace Sketch.Models
 {

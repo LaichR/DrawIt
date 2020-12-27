@@ -1,10 +1,7 @@
 ﻿
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using UI.Utilities;
-using UI.Utilities.Interfaces;
-using UI.Utilities.Behaviors;
-
+using Sketch.Helper.Binding;
 using Sketch.Models;
 using Sketch.Helper;
 using System;

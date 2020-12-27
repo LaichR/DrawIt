@@ -5,16 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
-using UI.Utilities.Interfaces;
 using Sketch.Helper;
 using Sketch.Models;
 using System.Runtime.Serialization;
 using Sketch.Interface;
-using System.Windows.Media.Imaging;
-using UI.Utilities;
-using UI.Utilities.Behaviors;
 using System.ComponentModel;
-using System.Reflection;
 using System.Collections.Specialized;
 
 namespace DrawIt.Uml

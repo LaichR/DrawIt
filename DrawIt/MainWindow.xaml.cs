@@ -15,7 +15,9 @@ using System.Windows.Shapes;
 
 
 using Sketch;
+using Sketch.Helper.Binding;
 using Sketch.View;
+using Sketch.View.CustomControls;
 using Sketch.Interface;
 using Sketch.View.ColorPicker;
 using Sketch.Models;
@@ -67,13 +69,13 @@ namespace DrawIt
 
        
 
-        void InitTools(IEnumerable<UI.Utilities.Interfaces.ICommandDescriptor> commands)
+        void InitTools(IEnumerable<ICommandDescriptor> commands)
         {
             var tb = new ToolBar();
             tb.VerticalAlignment = System.Windows.VerticalAlignment.Top;
             foreach (var cm in commands)
             {
-                tb.Items.Add(new UI.Utilities.Controls.ToolbarButton { Command = cm.Command, ImageBitmap = cm.Bitmap, ToolTip = cm.Name });
+                tb.Items.Add(new ToolbarButton { Command = cm.Command, ImageBitmap = cm.Bitmap, ToolTip = cm.Name });
             }
             ToolbarPanel.Children.Add(tb);
         }

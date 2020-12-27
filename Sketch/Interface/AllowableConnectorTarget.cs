@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using Sketch.Helper.RuntimeCheck;
 
 namespace Sketch.Interface
 {
@@ -17,8 +18,8 @@ namespace Sketch.Interface
 
         public AllowableConnectorTargetAttribute(Type cls)
         {
-            RuntimeCheck.Contract.Requires(cls != null, "Connector type must not be null");
-            RuntimeCheck.Contract.Requires(cls.GetInterface(nameof(IBoundedSketchItemModel)) != null, "Connector type needs to implement the Interface IConnectorItemModel");
+            Contract.Requires(cls != null, "Connector type must not be null");
+            Contract.Requires(cls.GetInterface(nameof(IBoundedSketchItemModel)) != null, "Connector type needs to implement the Interface IConnectorItemModel");
             _allowableConnectorType = cls;
         }
 

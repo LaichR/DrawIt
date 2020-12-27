@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Sketch.View.ColorPicker;
 using Sketch.Interface;
+using Sketch.Helper.RuntimeCheck;
 
 namespace Sketch.Models
 {
@@ -126,7 +127,7 @@ namespace Sketch.Models
 
         internal void RegisterControlImplementation(ISketchPadControl control)
         {
-            RuntimeCheck.Contract.Requires<ArgumentNullException>(control != null, "control must not be null");
+            Contract.Requires<ArgumentNullException>(control != null, "control must not be null");
             _control = control;
         }
 

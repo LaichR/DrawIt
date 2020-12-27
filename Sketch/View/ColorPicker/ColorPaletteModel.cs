@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
-using UI.Utilities;
 using Sketch.Helper;
+using Sketch.Helper.Binding;
 
 namespace Sketch.View.ColorPicker
 {

@@ -9,7 +9,8 @@ using System.Windows.Controls;
 using Sketch.Models;
 using Sketch.Interface;
 using Sketch.Helper;
-using UI.Utilities;
+using Sketch.Helper.Binding;
+using Sketch.Helper.UiUtilities;
 using System.Windows.Media;
 using System.Reflection;
 
@@ -96,7 +97,7 @@ namespace Sketch.View
                 {
                     _pad.Canvas.ContextMenu.Items.Add(new MenuItem()
                     {
-                        Icon = new UI.Utilities.Controls.BitmapImage { ImageBitmap = fac.Bitmap },
+                        Icon = new BitmapImage { ImageBitmap = fac.Bitmap },
                         Header = new Label() { Content = fac.Name },
                         ToolTip = fac.ToolTip,
                         Command = new DelegateCommand(() =>

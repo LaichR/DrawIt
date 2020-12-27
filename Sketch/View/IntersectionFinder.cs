@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 using Sketch.Helper;
+using Sketch.Helper.RuntimeCheck;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -128,7 +129,7 @@ namespace Sketch.View
         public IntersectionFinder(UIElement sketchPad) : base(sketchPad)
         {
             _sketchDisplay = AdornedElement as SketchItemDisplay;
-            RuntimeCheck.Assert.True(_sketchDisplay != null, "Invalid sketchpad");
+            Assert.True(_sketchDisplay != null, "Invalid sketchpad");
             IsHitTestVisible = false;
             Visibility = Visibility.Visible;
 

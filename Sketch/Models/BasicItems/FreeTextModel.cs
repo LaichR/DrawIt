@@ -11,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Converters;
 using Sketch.Interface;
 using Sketch.Models;
-using UI.Utilities;
+using Sketch.Helper.UiUtilities;
 
 namespace Sketch.Models.BasicItems
 {

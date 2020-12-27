@@ -8,9 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using UI.Utilities;
-using UI.Utilities.Behaviors;
-using UI.Utilities.Interfaces;
+using Sketch.Helper.Binding;
 using System.Linq.Expressions;
 using LinqExp = System.Linq.Expressions.Expression;
 using System.Runtime.Hosting;
@@ -19,6 +17,7 @@ using Sketch.Models;
 using Bitmap = System.Drawing.Bitmap;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Sketch.Helper.RuntimeCheck;
 
 namespace Sketch.Models
 {
@@ -144,7 +143,7 @@ namespace Sketch.Models
 
         public void SetInitialSelection(Type t)
         {
-            RuntimeCheck.Contract.Requires<ArgumentNullException>(t != null, "Initial selection must not be null");
+            Contract.Requires<ArgumentNullException>(t != null, "Initial selection must not be null");
             _selectedType = t;
         }
 
@@ -308,7 +307,7 @@ namespace Sketch.Models
         T CreateFactoryOp<T>(Type cls, Type[] paramTypes ) where T: Delegate
         {
             var ctor = cls.GetConstructor(paramTypes);
-            RuntimeCheck.Assert.True(ctor != null, "no matching constructor found");
+            Assert.True(ctor != null, "no matching constructor found");
 
             List<ParameterExpression> arguments = new List<ParameterExpression>
                 (paramTypes.Select<Type, ParameterExpression>((x) =>

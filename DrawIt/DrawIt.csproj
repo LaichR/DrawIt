@@ -90,7 +90,6 @@
       <HintPath>packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -175,10 +174,6 @@
     <ProjectReference Include="..\Sketch\Sketch.csproj">
       <Project>{3dd1df94-717c-49c4-b6d6-6278a514ec8a}</Project>
       <Name>Sketch</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\UI.Utilities\UI.Utilities.csproj">
-      <Project>{6871c89d-fd52-4627-a44d-0949659dcaa6}</Project>
-      <Name>UI.Utilities</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -10,9 +10,9 @@ using System.Windows.Shapes;
 using System.Windows.Media;
 using System.Windows.Controls;
 using System.Windows.Documents;
-using UI.Utilities;
-using UI.Utilities.Interfaces;
 using Sketch.Helper;
+using Sketch.Helper.Binding;
+using Sketch.View.CustomControls;
 using Sketch.Models;
 using Sketch.Interface;
 
@@ -373,7 +373,7 @@ namespace Sketch.View
             foreach( var cd in commands)
             {
                 _myTools.Children.Add(
-                    new UI.Utilities.Controls.ToolbarButton
+                    new ToolbarButton
                     {
                         ImageBitmap = cd.Bitmap,
                         Command = cd.Command,
@@ -541,7 +541,7 @@ namespace Sketch.View
 
         void InitContextMenu(ConnectableBase model)
         {
-            RuntimeCheck.Contract.Requires<ArgumentNullException>(model != null, "InitContextMenu() requires valide model");
+            Sketch.Helper.RuntimeCheck.Contract.Requires<ArgumentNullException>(model != null, "InitContextMenu() requires valide model");
             var commands = model.Commands;
             if (commands != null && commands.Count > 0)
             {

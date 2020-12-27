@@ -10,7 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Documents;
 using System.Windows.Controls;
-using UI.Utilities.Interfaces;
+using Sketch.Helper.Binding;
 using Sketch.Models;
 using Sketch.Interface;
 using Sketch.Helper;

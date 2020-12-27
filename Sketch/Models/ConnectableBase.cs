@@ -5,14 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
-using UI.Utilities.Interfaces;
+
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using UI.Utilities;
 using Sketch.Interface;
 using System.Drawing.Text;
 using System.CodeDom;
 using Sketch.Helper;
+using Sketch.Helper.Binding;
+using Sketch.Helper.UiUtilities;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 
@@ -483,7 +484,7 @@ namespace Sketch.Models
             {
                 Commands = new List<ICommandDescriptor>()
                 {
-                    new UI.Utilities.Behaviors.CommandDescriptor
+                    new CommandDescriptor
                         {
                             Name = "Select Color",
                             Command = _cmdSelectColor

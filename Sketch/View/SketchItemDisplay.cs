@@ -9,11 +9,10 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Documents;
 using System.Windows.Controls;
-using System.Windows.Shapes;
-using UI.Utilities.Interfaces;
 using Sketch.Models;
 using Sketch.Interface;
 using Sketch.Helper;
+using Sketch.Helper.Binding;
 using System.IO;
 
 namespace Sketch.View

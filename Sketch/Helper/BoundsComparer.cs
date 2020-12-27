@@ -8,7 +8,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
-using RuntimeCheck;
+using Sketch.Helper.RuntimeCheck;
 using Sketch.Interface;
 
 namespace Sketch.Helper

@@ -10,6 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Sketch.Helper.RuntimeCheck;
 
 namespace Sketch.View
 {
@@ -26,8 +27,8 @@ namespace Sketch.View
 
         public SketchItemDisplayLabel( ISketchItemContainer container, Canvas canvas )
         {
-            RuntimeCheck.Contract.Requires<ArgumentNullException>(container != null, "Container must not be null");
-            RuntimeCheck.Contract.Requires<ArgumentNullException>(canvas != null, "Canvas must not be null");
+            Contract.Requires<ArgumentNullException>(container != null, "Container must not be null");
+            Contract.Requires<ArgumentNullException>(canvas != null, "Canvas must not be null");
 
             DataContext = container;
             SetBinding(TagProperty, "Label");

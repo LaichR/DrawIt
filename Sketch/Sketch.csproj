@@ -72,7 +72,20 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helper\Binding\BindableModel.cs" />
+    <Compile Include="Helper\Binding\CommandDescriptor.cs" />
+    <Compile Include="Helper\Binding\DelegateCommand.cs" />
+    <Compile Include="Helper\Binding\ICommandDescriptor.cs" />
     <Compile Include="Helper\PlacementHelper.cs" />
+    <Compile Include="Helper\RuntimeCheck\Assert.cs" />
+    <Compile Include="Helper\RuntimeCheck\Contract.cs" />
+    <Compile Include="Helper\RuntimeCheck\ViolatedAssertionException.cs" />
+    <Compile Include="Helper\RuntimeCheck\ViolatedContractException.cs" />
+    <Compile Include="Helper\UiUtilities\BitmapOperations.cs" />
+    <Compile Include="Helper\UiUtilities\BitmapToBitmapImageConverter.cs" />
+    <Compile Include="Helper\UiUtilities\BitmapToBitmapSource.cs" />
+    <Compile Include="Helper\UiUtilities\BitmapToCursor.cs" />
+    <Compile Include="Helper\UiUtilities\SerializableColor.cs" />
     <Compile Include="View\ColorPicker\ColorPalette.xaml.cs">
       <DependentUpon>ColorPalette.xaml</DependentUpon>
     </Compile>
@@ -85,6 +98,8 @@
     <Compile Include="View\ConnectorAdorner.cs" />
     <Compile Include="View\ConnectorUI.cs" />
     <Compile Include="View\ConnectablePairSelector.cs" />
+    <Compile Include="Helper\UiUtilities\BitmapImage.cs" />
+    <Compile Include="View\CustomControls\ToolbarButton.cs" />
     <Compile Include="View\DecoratorAdorner.cs" />
     <Compile Include="View\IntersectionFinder.cs" />
     <Compile Include="View\GeometryBorder.cs" />
@@ -108,21 +123,21 @@
     <Compile Include="Models\ToWaypointAdapter.cs" />
     <Compile Include="Models\Waypoint.cs" />
     <Compile Include="Models\WaypointWrapper.cs" />
-    <Compile Include="PropertyEditor\ColorConverter.cs" />
-    <Compile Include="PropertyEditor\DoubleConverter.cs" />
-    <Compile Include="PropertyEditor\IntegerConverter.cs" />
-    <Compile Include="PropertyEditor\PropertyDisplayTemplateSelector.cs" />
-    <Compile Include="PropertyEditor\RectangleWrapper.cs" />
-    <Compile Include="PropertyEditor\RectConverter.cs" />
-    <Compile Include="PropertyEditor\PropertyEditTemplateSelector.cs" />
-    <Compile Include="PropertyEditor\ITemplateProvider.cs" />
-    <Compile Include="PropertyEditor\PropertyEditor.xaml.cs">
+    <Compile Include="View\PropertyEditor\ColorConverter.cs" />
+    <Compile Include="View\PropertyEditor\DoubleConverter.cs" />
+    <Compile Include="View\PropertyEditor\IntegerConverter.cs" />
+    <Compile Include="View\PropertyEditor\PropertyDisplayTemplateSelector.cs" />
+    <Compile Include="View\PropertyEditor\RectangleWrapper.cs" />
+    <Compile Include="View\PropertyEditor\RectConverter.cs" />
+    <Compile Include="View\PropertyEditor\PropertyEditTemplateSelector.cs" />
+    <Compile Include="View\PropertyEditor\ITemplateProvider.cs" />
+    <Compile Include="View\PropertyEditor\PropertyEditor.xaml.cs">
       <DependentUpon>PropertyEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Interface\IBoundsProvider.cs" />
-    <Compile Include="PropertyEditor\PropertyEditorModel.cs" />
-    <Compile Include="PropertyEditor\PropertyValueModel.cs" />
-    <Compile Include="PropertyEditor\RectViewer.xaml.cs">
+    <Compile Include="View\PropertyEditor\PropertyEditorModel.cs" />
+    <Compile Include="View\PropertyEditor\PropertyValueModel.cs" />
+    <Compile Include="View\PropertyEditor\RectViewer.xaml.cs">
       <DependentUpon>RectViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="Helper\BoundsComparer.cs" />
@@ -201,16 +216,6 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\source\repos\RuntimeCheck\RuntimeCheck.csproj">
-      <Project>{7188d9d1-c458-4c0f-acb8-36c4279afa41}</Project>
-      <Name>RuntimeCheck</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\UI.Utilities\UI.Utilities.csproj">
-      <Project>{6871c89d-fd52-4627-a44d-0949659dcaa6}</Project>
-      <Name>UI.Utilities</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -245,11 +250,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="PropertyEditor\PropertyEditor.xaml">
+    <Page Include="View\PropertyEditor\PropertyEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="PropertyEditor\RectViewer.xaml">
+    <Page Include="View\PropertyEditor\RectViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -5,8 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media;
-using UI.Utilities.Interfaces;
-using UI.Utilities.Controls;
+using Sketch.Helper.Binding;
+using Sketch.Helper.UiUtilities;
+using Sketch.View.CustomControls;
 
 namespace Sketch.View
 {
@@ -22,7 +23,7 @@ namespace Sketch.View
                     Header = c.Name,
                     Command = c.Command,
                     Icon = c.Bitmap != null ?
-                            new BitmapImage { Source = UI.Utilities.ToBitmapSource.Bitmap2BitmapSource(c.Bitmap) } :
+                            new BitmapImage { Source = ToBitmapSource.Bitmap2BitmapSource(c.Bitmap) } :
                             null
                 };
                 contextMenu.Items.Add(m);

@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Sketch.Models;
 using System.Windows;
 using System.Windows.Media;
-using UI.Utilities.Interfaces;
 using Sketch.Interface;
 using System.Runtime.Serialization;
 using System.ComponentModel;
