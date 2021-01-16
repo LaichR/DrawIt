@@ -37,6 +37,8 @@ namespace Sketch.Models
 
         static readonly List<FieldInfo> _persistenFields = new List<FieldInfo>();
 
+        static readonly RotateTransform _rotation = new RotateTransform();
+
         public Waypoint(Point p)
         {
             _bounds.X = p.X + Bounds.Width/2;
@@ -57,6 +59,8 @@ namespace Sketch.Models
         {
             PersistencyHelper.BackupPersistentFields(this, info, PersistentFields);
         }
+
+        public RotateTransform Rotation => _rotation;
 
         public ConnectorDocking IncomingDocking 
         { get => _incomingDocking; set => _incomingDocking = value; }

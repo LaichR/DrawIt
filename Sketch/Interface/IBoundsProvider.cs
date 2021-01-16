@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 
 namespace Sketch.Interface
 {
@@ -13,6 +14,11 @@ namespace Sketch.Interface
     public interface IBoundsProvider
     {
         Rect Bounds
+        {
+            get;
+        }
+
+        RotateTransform Rotation
         {
             get;
         }

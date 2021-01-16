@@ -10,12 +10,12 @@ namespace Sketch.Helper.Binding
     public class DelegateCommand : ICommand
     {
 
-        readonly Action _exectueDelegate;
+        readonly Action _executeDelegate;
         readonly Func<bool> _canExecute;
 
         public DelegateCommand(Action delegate_, Func<bool> canExecute_=null)
         {
-            _exectueDelegate = delegate_;
+            _executeDelegate = delegate_;
             _canExecute = canExecute_;
         }
 
@@ -29,7 +29,7 @@ namespace Sketch.Helper.Binding
 
         public void Execute(object _1)
         {
-            _exectueDelegate();
+            _executeDelegate();
         }
 
         public void RaiseCanExecuteChanged()

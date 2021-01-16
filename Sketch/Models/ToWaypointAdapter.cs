@@ -14,6 +14,7 @@ namespace Sketch.Models
     {
         readonly ConnectorModel _connector;
         readonly IConnectable _connectable;
+        
         public ToWaypointAdapter(ConnectorModel model, IConnectable connectable)
         {
             _connector = model;
@@ -79,5 +80,7 @@ namespace Sketch.Models
         {
             ShapeChanged?.Invoke(sender, args);
         }
+
+        public RotateTransform Rotation => _connectable.Rotation;
     }
 }

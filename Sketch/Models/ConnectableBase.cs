@@ -38,7 +38,7 @@ namespace Sketch.Models
         [PersistentField((int)ModelVersion.V_0_1, "AllowSizeChange")]
         bool _allowSizeChange;
         double _rotationAngle = 0.0;
-        RotateTransform _rotateTransform = null;
+        RotateTransform _rotateTransform = new RotateTransform();
 
         [PersistentField((int)ModelVersion.V_0_1, "Fill", true)]
         readonly SerializableColor _fillColor = new SerializableColor() { Color = Colors.Snow };
@@ -64,8 +64,16 @@ namespace Sketch.Models
             FillColor = color;
             LabelArea = ComputeLabelArea(DisplayedLabel());
             _bounds = ComputeBounds(pos, size, LabelArea);
-            
+            _rotateTransform.CenterX = Bounds.Width / 2;
+            _rotateTransform.CenterY = Bounds.Height / 2;
+            _rotateTransform.Changed += RotateTransform_Changed;
             Initialize();
+        }
+
+        private void RotateTransform_Changed(object sender, EventArgs e)
+        {
+            Rect newRect = _rotateTransform.TransformBounds(_bounds);
+            NotifyShapeChanged(ref _bounds, ref newRect);
         }
 
         public Brush Stroke
