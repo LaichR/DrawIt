@@ -13,7 +13,7 @@ using Sketch.Models;
 using Sketch.Interface;
 using System.Runtime.Serialization;
 
-namespace DrawIt.Shapes
+namespace Sketch.Models.BasicItems
 {
     [Serializable]
     public class PictureModel: ConnectableBase
@@ -26,13 +26,11 @@ namespace DrawIt.Shapes
         BitmapImage _myImage;
         Brush _fill;
 
-        public PictureModel( System.Windows.Point p, ISketchItemContainer container, string fileName)
+        public PictureModel( System.Windows.Point p, ISketchItemContainer container)
             :base(p, container, new Size(PictureModel.DefaultWidth, PictureModel.DefaultHeight),
-                 fileName, Colors.Snow)
+                 "new image" , Colors.Snow)
         {
-            Label = fileName;
             CanChangeSize = true;
-            RotationAngle = 0.0;
             UpdateGeometry();
         }
 
@@ -59,8 +57,35 @@ namespace DrawIt.Shapes
         protected override void Initialize()
         {
             base.Initialize();
-            _myImage = new BitmapImage(new Uri(Label));
-            _fill = new ImageBrush(_myImage) { Stretch = Stretch.Fill };
+            if (System.IO.File.Exists(Label))
+            {
+                _myImage = new BitmapImage(new Uri(Label));
+
+                _fill = new ImageBrush(_myImage) { Stretch = Stretch.Fill };
+            }
+            else
+            {
+                OpenImage();
+            }
+        }
+
+        void OpenImage()
+        {
+            var dlg = new Microsoft.Win32.OpenFileDialog()
+            {
+                Filter = "(*.bmp, *.jpg)|*.bmp;*.jpg",
+                Title = "Select image"
+            };
+
+            if( dlg.ShowDialog() == true )
+            {
+                Label = dlg.FileName;
+                _myImage = new BitmapImage(new Uri(Label));
+                _myImage.Rotation = System.Windows.Media.Imaging.Rotation.Rotate90;
+                _fill = new ImageBrush(_myImage) { Stretch = Stretch.Fill };
+                
+            }
+
         }
 
     }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace Sketch.PropertyEditor
+namespace Sketch.View.PropertyEditor
 {
     public class ColorConverter : IValueConverter
     {

@@ -9,7 +9,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Sketch.Helper.Binding;
-namespace Sketch.PropertyEditor
+
+
+namespace Sketch.View.PropertyEditor
 {
     public class RectangleWrapper:BindableModel
     {

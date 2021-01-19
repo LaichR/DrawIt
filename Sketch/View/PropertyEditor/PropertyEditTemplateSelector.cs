@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Sketch.PropertyEditor
+namespace Sketch.View.PropertyEditor
 {
     public class PropertyEditTemplateSelector: DataTemplateSelector
     {
@@ -39,6 +39,10 @@ namespace Sketch.PropertyEditor
             FrameworkElement element = container as FrameworkElement;
             if (item != null && item is PropertyValueModel model)
             {
+                if (model.IsEditingTemplateSpecified)
+                {
+                    return element.FindResource(model.EditingTemplateName) as DataTemplate;
+                }
                 if (_typeToTemplateMapping.TryGetValue(model.PropertyType, out string key))
                 {
                     return element.FindResource(key) as DataTemplate;

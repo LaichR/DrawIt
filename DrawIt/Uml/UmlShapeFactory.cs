@@ -53,7 +53,9 @@ namespace DrawIt.Uml
 
             category = "Miscellaneous";
             RegisterSketchItemInCategory(category, typeof(FreeTextModel), "Free text element", "Add a text element to the diagram", Sketch.Properties.Resources.free_text);
-            SetInitialSelection(  typeof(UmlInitialStateModel) );
+            RegisterSketchItemInCategory(category, typeof(PictureModel), "Picture element", "Add a picture to the diagram", Sketch.Properties.Resources.SaveAsPicture);
+
+            SetInitialSelection(  typeof(UmlClassModel) );
         }
 
 

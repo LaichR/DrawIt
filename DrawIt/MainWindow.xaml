@@ -8,8 +8,8 @@
         xmlns:model ="clr-namespace:Sketch.Models;assembly=Sketch" 
         xmlns:si ="clr-namespace:Sketch.Interface;assembly=Sketch"
         xmlns:colorpicker ="clr-namespace:Sketch.View.ColorPicker;assembly=Sketch" 
-        xmlns:pe="clr-namespace:Sketch.PropertyEditor;assembly=Sketch"
-        Title="Drawing " Height="350" Width="952.463" SizeToContent="WidthAndHeight">
+        xmlns:pe="clr-namespace:Sketch.View.PropertyEditor;assembly=Sketch"
+        Title="Draw-It " Height="350" Width="952.463" SizeToContent="WidthAndHeight">
     <Window.Resources>
         <uiu:BitmapToBitmapImageConverter x:Key="BmpConverter"/>
       

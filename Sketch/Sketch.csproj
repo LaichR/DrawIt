@@ -56,11 +56,9 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\DrawIt\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
-    </Reference>
     <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Presentation" />
     <Reference Include="System.Xaml" />
@@ -86,6 +84,7 @@
     <Compile Include="Helper\UiUtilities\BitmapToBitmapSource.cs" />
     <Compile Include="Helper\UiUtilities\BitmapToCursor.cs" />
     <Compile Include="Helper\UiUtilities\SerializableColor.cs" />
+    <Compile Include="Models\BasicItems\PictureModel.cs" />
     <Compile Include="View\ColorPicker\ColorPalette.xaml.cs">
       <DependentUpon>ColorPalette.xaml</DependentUpon>
     </Compile>
@@ -124,7 +123,9 @@
     <Compile Include="Models\Waypoint.cs" />
     <Compile Include="Models\WaypointWrapper.cs" />
     <Compile Include="View\PropertyEditor\ColorConverter.cs" />
+    <Compile Include="Models\DataTemplateAttribute.cs" />
     <Compile Include="View\PropertyEditor\DoubleConverter.cs" />
+    <Compile Include="View\PropertyEditor\FontFamilyEnumerator.cs" />
     <Compile Include="View\PropertyEditor\IntegerConverter.cs" />
     <Compile Include="View\PropertyEditor\PropertyDisplayTemplateSelector.cs" />
     <Compile Include="View\PropertyEditor\RectangleWrapper.cs" />

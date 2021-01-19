@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Sketch.PropertyEditor
+namespace Sketch.View.PropertyEditor
 {
     /// <summary>
     /// Interaction logic for PropertyEditor.xaml

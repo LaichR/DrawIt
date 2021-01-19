@@ -13,10 +13,14 @@ using Sketch.Interface;
 using System.ComponentModel;
 using System.Collections;
 using System.Windows.Navigation;
-using Sketch.PropertyEditor;
+using Sketch.View.PropertyEditor;
 
 namespace Sketch.Models
 {
+    /// <summary>
+    /// The class ConnectorModel is the view model of any connection between two sketch items
+    /// 
+    /// </summary>
     public class ConnectorModel: ModelBase, IConnectorItemModel, IEnumerator<IWaypoint>
     {
         static readonly double HotSpotSize = 8;
@@ -49,8 +53,10 @@ namespace Sketch.Models
 
         [PersistentField((int)ModelVersion.V_0_1, "ConnectionType")]
         readonly ConnectionType _connectionType;
+
         [PersistentField((int)ModelVersion.V_0_1, "StartPointDocking")]
         ConnectorDocking _startpointDocking;
+        
         [PersistentField((int)ModelVersion.V_0_1, "EndPointDocking")]
         ConnectorDocking _endpointDocking;
 

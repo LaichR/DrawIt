@@ -5,8 +5,9 @@ using System.Linq;
 using System.Text;
 using ComponentModel=System.ComponentModel;
 using System.Windows.Data;
+using System.ComponentModel.DataAnnotations;
 
-namespace Sketch.PropertyEditor
+namespace Sketch.View.PropertyEditor
 {
     public class DoubleConverter : IValueConverter
     {
@@ -20,7 +21,15 @@ namespace Sketch.PropertyEditor
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return converter.ConvertFrom(value);
+            if (string.IsNullOrEmpty(value.ToString())) return 0;
+            try
+            {
+                return converter.ConvertFrom(value);
+            }
+            catch
+            {
+                return value;
+            }
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace Sketch.PropertyEditor
+namespace Sketch.View.PropertyEditor
 {
     public class IntegerConverter : IValueConverter
     {

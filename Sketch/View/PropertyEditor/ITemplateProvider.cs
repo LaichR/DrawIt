@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Sketch.PropertyEditor
+namespace Sketch.View.PropertyEditor
 {
     public interface ITemplateProvider
     {

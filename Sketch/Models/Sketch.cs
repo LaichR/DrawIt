@@ -14,6 +14,12 @@ using Sketch.Helper.RuntimeCheck;
 
 namespace Sketch.Models
 {
+    /// <summary>
+    /// A Sketch is a collection of sketch-items that can visually be arranged on a canvas. 
+    /// The class Sketch provides access to this collection and the basic commands of the graphical 
+    /// edior such as aligning, deleting, saving exporting to PNG file etc..
+    /// By providing a custom Sketch-Item factory arbitry sketch items may be constructed and added to a sketch.
+    /// </summary>
     public class Sketch : ISketchItemContainer, ISketchPadControl, IColorSelectionTarget, INotifyPropertyChanged
     {
         readonly ObservableCollection<ISketchItemModel> _sketchItems = new ObservableCollection<ISketchItemModel>();
@@ -28,6 +34,7 @@ namespace Sketch.Models
         public event EventHandler SketchLoaded;
 
         public ObservableCollection<ISketchItemModel> SketchItems => _sketchItems;
+
 
         public string Label 
         { 

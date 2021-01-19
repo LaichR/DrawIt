@@ -28,8 +28,8 @@ namespace DrawIt.Uml
         static UmlClassModel()
         {
             
-            Sketch.PropertyEditor.PropertyEditTemplateSelector.RegisterDataTemplate(typeof(ObservableCollection<UmlMemberDescription>), "ClassMembersTemplate");
-            Sketch.PropertyEditor.PropertyDisplayTemplateSelector.RegisterDataTemplate(typeof(ObservableCollection<UmlMemberDescription>), "ClassMembersTemplate");
+            Sketch.View.PropertyEditor.PropertyEditTemplateSelector.RegisterDataTemplate(typeof(ObservableCollection<UmlMemberDescription>), "ClassMembersTemplate");
+            Sketch.View.PropertyEditor.PropertyDisplayTemplateSelector.RegisterDataTemplate(typeof(ObservableCollection<UmlMemberDescription>), "ClassMembersTemplate");
         }
 
         public UmlClassModel(Point p, ISketchItemContainer container)

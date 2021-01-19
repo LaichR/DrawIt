@@ -9,9 +9,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using Sketch.Models;
 using Sketch.Helper.Binding;
 
-namespace Sketch.PropertyEditor
+namespace Sketch.View.PropertyEditor
 {
     public class PropertyValueModel:BindableModel
     {
@@ -22,14 +23,17 @@ namespace Sketch.PropertyEditor
         string _displayName;
         
         bool _getValue = false;
+        readonly DataTemplateAttribute _dataTemplateAttribute;
         readonly RectangleWrapper _rectangleWrapper;
-        public PropertyValueModel(ITemplateProvider templateProvider, object parent, PropertyInfo propertyInfo)
+        public PropertyValueModel(ITemplateProvider templateProvider, object parent, PropertyInfo propertyInfo, DataTemplateAttribute datatemplate=null)
         {
+            
             _parent = parent;
             _templateProvider = templateProvider;
             _propertyInfo = propertyInfo;
             _displayName = propertyInfo.Name;
-            if( parent is  INotifyPropertyChanged bindable)
+            _dataTemplateAttribute = _propertyInfo.GetCustomAttribute<DataTemplateAttribute>(true);
+            if ( parent is  INotifyPropertyChanged bindable)
             {
                 bindable.PropertyChanged += Bindable_PropertyChanged;
             }
@@ -148,6 +152,20 @@ namespace Sketch.PropertyEditor
         {
             get => _templateProvider.CellEditingTemplateSelector;
         }
+
+        public bool IsCellTemplateSpecified
+        {
+            get => _dataTemplateAttribute != null && !String.IsNullOrEmpty(_dataTemplateAttribute.DisplayTemplate);
+        }
+
+        public bool IsEditingTemplateSpecified
+        {
+            get => _dataTemplateAttribute != null && !String.IsNullOrEmpty(_dataTemplateAttribute.EditingTemplate);
+        }
+
+        public string EditingTemplateName => _dataTemplateAttribute?.EditingTemplate;
+
+        public string CellTemplateName => _dataTemplateAttribute?.DisplayTemplate;
 
         public void ReleaseBinding()
         {

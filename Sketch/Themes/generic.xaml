@@ -28,7 +28,15 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    
+
+    <DataTemplate DataType="{x:Type BasicItems:PictureModel}">
+        <Border Background="{Binding Fill}" 
+                BorderThickness="{Binding BorderThickness}" 
+                BorderBrush="{Binding BorderBrush}" >
+            <!--<Image Source="{Binding Label}"--> 
+        </Border>
+
+    </DataTemplate>
     <DataTemplate DataType="{x:Type BasicItems:FreeTextModel}">
         <Border Background="{Binding Fill}" 
                 BorderThickness="{Binding BorderThickness}" 
@@ -42,7 +50,6 @@
                      Foreground="{Binding TextBrush}"
                      FontWeight="{Binding FontWeight, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                      FontStyle="{Binding ShownFontStyle, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
-                     
                      Margin="2,5,1,5">
 
             </TextBox>
@@ -590,143 +597,6 @@
                     </Slider>
                   </Border>
                 </Grid>
-<!--
-                <Grid Margin="2,2,7,2" Grid.Column="0" Grid.Row="1">
-
-                  <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                  </Grid.ColumnDefinitions>
-                  <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                  </Grid.RowDefinitions>
-                  <Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
-                     FontFamily="{TemplateBinding FontFamily}"
-                     FontSize="{TemplateBinding FontSize}"
-                     Foreground="{TemplateBinding Foreground}">
-                    <Bold>ScRGB</Bold>
-                  </Label>
-                  <Label Grid.Column="0" Grid.Row="1"
-                     FontFamily="{TemplateBinding FontFamily}"
-                     FontSize="{TemplateBinding FontSize}"
-                     Foreground="{TemplateBinding Foreground}">ScA</Label>
-                  <TextBox
-                     Grid.Column="1" Grid.Row="1"
-                     MaxLength="10"
-                     FontFamily="{TemplateBinding FontFamily}"
-                     FontSize="{TemplateBinding FontSize}"
-                     Foreground="{TemplateBinding Foreground}"
-                     Text="{Binding ScA, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" 
-                     MinWidth="75"
-                       />
-                  <Label Grid.Column="0" Grid.Row="2"
-                     FontFamily="{TemplateBinding FontFamily}"
-                     FontSize="{TemplateBinding FontSize}"
-                     Foreground="{TemplateBinding Foreground}">ScR</Label>
-                  <TextBox 
-                     Grid.Column="1" Grid.Row="2"
-                     MaxLength="10"
-                     FontFamily="{TemplateBinding FontFamily}"
-                     FontSize="{TemplateBinding FontSize}"
-                     Foreground="{TemplateBinding Foreground}"                         
-                     Text="{Binding ScR, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
-                     MinWidth="75" />
-                  <Label Grid.Column="0" Grid.Row="3"
-                     FontFamily="{TemplateBinding FontFamily}"
-                     FontSize="{TemplateBinding FontSize}"
-                     Foreground="{TemplateBinding Foreground}">ScG</Label>
-                  <TextBox 
-                     Grid.Column="1" Grid.Row="3"
-                     MaxLength="10"
-                     FontFamily="{TemplateBinding FontFamily}"
-                     FontSize="{TemplateBinding FontSize}"
-                     Foreground="{TemplateBinding Foreground}"                         
-                     Text="{Binding ScG, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
-                     MinWidth="75" />
-                  <Label Grid.Column="0" Grid.Row="4"
-                     FontFamily="{TemplateBinding FontFamily}"
-                     FontSize="{TemplateBinding FontSize}"
-                     Foreground="{TemplateBinding Foreground}">ScB</Label>
-                  <TextBox 
-                     Grid.Column="1" Grid.Row="4"
-                     MaxLength="10"
-                     FontFamily="{TemplateBinding FontFamily}"
-                     FontSize="{TemplateBinding FontSize}"
-                     Foreground="{TemplateBinding Foreground}"                         
-                     Text="{Binding ScB, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" 
-                     MinWidth="75" />
-
-                </Grid>
-
-                <Grid Grid.Column="2" Grid.Row="1" Margin="2">
-
-                  <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                  </Grid.ColumnDefinitions>
-                  <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                  </Grid.RowDefinitions>
-                  <Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
-                     FontFamily="{TemplateBinding FontFamily}"
-                     FontSize="{TemplateBinding FontSize}"
-                     Foreground="{TemplateBinding Foreground}">
-                    <Bold>sRGB</Bold>
-                  </Label>
-                  <Label Grid.Column="0" Grid.Row="1"
-                     FontFamily="{TemplateBinding FontFamily}"
-                     FontSize="{TemplateBinding FontSize}"
-                     Foreground="{TemplateBinding Foreground}">A</Label>
-                  <TextBox
-                     MaxLength="3"
-                     FontFamily="{TemplateBinding FontFamily}"
-                     FontSize="{TemplateBinding FontSize}"
-                     Foreground="{TemplateBinding Foreground}"                      
-                     Grid.Column="1" Grid.Row="1"
-                     Text="{Binding A, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
-                  <Label Grid.Column="0" Grid.Row="2"
-                     FontFamily="{TemplateBinding FontFamily}"
-                     FontSize="{TemplateBinding FontSize}"
-                     Foreground="{TemplateBinding Foreground}">R</Label>
-                  <TextBox 
-                     Grid.Column="1" Grid.Row="2"
-                     MaxLength="3"
-                     FontFamily="{TemplateBinding FontFamily}"
-                     FontSize="{TemplateBinding FontSize}"
-                     Foreground="{TemplateBinding Foreground}"                         
-                     Text="{Binding R, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
-                  <Label Grid.Column="0" Grid.Row="3"
-                     FontFamily="{TemplateBinding FontFamily}"
-                     FontSize="{TemplateBinding FontSize}"
-                     Foreground="{TemplateBinding Foreground}">G</Label>
-                  <TextBox 
-                     Grid.Column="1" Grid.Row="3"
-                     MaxLength="3"
-                     FontFamily="{TemplateBinding FontFamily}"
-                     FontSize="{TemplateBinding FontSize}"
-                     Foreground="{TemplateBinding Foreground}"                         
-                     Text="{Binding G, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
-                  <Label Grid.Column="0" Grid.Row="4"
-                     FontFamily="{TemplateBinding FontFamily}"
-                     FontSize="{TemplateBinding FontSize}"
-                     Foreground="{TemplateBinding Foreground}">B</Label>
-                  <TextBox 
-                     Grid.Column="1" Grid.Row="4"
-                     MaxLength="3"
-                     FontFamily="{TemplateBinding FontFamily}"
-                     FontSize="{TemplateBinding FontSize}"
-                     Foreground="{TemplateBinding Foreground}"                         
-                     Text="{Binding B, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
-                </Grid>
--->
                 <Grid Margin="2,7,0,0"
                   Grid.Column="0" Grid.Row="1">
                   <Grid.ColumnDefinitions>

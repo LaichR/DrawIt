@@ -12,7 +12,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Sketch.Helper.Binding;
 
-namespace Sketch.PropertyEditor
+namespace Sketch.View.PropertyEditor
 {
     public class PropertyEditorModel: BindableModel, ITemplateProvider
     {
@@ -41,6 +41,7 @@ namespace Sketch.PropertyEditor
                 ObjectTypeName = _object.GetType().Name;
                 foreach (var pi in obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
                 {
+                    
                     var attrs = pi.GetCustomAttributes<BrowsableAttribute>(true);
                     if (attrs.Any())
                     {
@@ -51,6 +52,7 @@ namespace Sketch.PropertyEditor
                             elements.Add(pvModel);
                         }
                     }
+
                 }
             }
             else

@@ -20,6 +20,9 @@ using System.Collections.ObjectModel;
 namespace Sketch.Models
 {
 
+    /// <summary>
+    /// The class ConnectableBase is the base for all sketch items, that might be connected through a connector to another connectable sketch item.
+    /// </summary>
     public abstract class ConnectableBase: ModelBase, IBoundedSketchItemModel
     {
 
@@ -210,7 +213,7 @@ namespace Sketch.Models
             {
                 if (_rotateTransform == null )
                 {
-                    _rotateTransform =  new RotateTransform(_rotationAngle, (_bounds.Left + _bounds.Right) / 2, (_bounds.Top + _bounds.Bottom) / 2);
+                    _rotateTransform =  new RotateTransform(_rotationAngle, (_bounds.Right) / 2, (_bounds.Bottom) / 2);
                 }
                 return _rotateTransform;
             }

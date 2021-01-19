@@ -101,7 +101,7 @@ namespace Sketch.Models.BasicItems
         }
 
         [Browsable(true)]
-        
+        [DataTemplate("FontFamilySelectorTemplate", TemplateTarget.DisplayAndEditingTemplate)]
         public string FontFamily
         {
             get => _fontFamily;

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Sketch.PropertyEditor
+namespace Sketch.View.PropertyEditor
 {
     public class PropertyDisplayTemplateSelector : DataTemplateSelector
     {
@@ -29,8 +29,7 @@ namespace Sketch.PropertyEditor
         {
             if (_typeToTemplateMapping.TryGetValue(dataType, out string _1))
             {
-                throw new ApplicationException(
-                    string.Format("Template for type <{0}> already defined", dataType));
+                throw new ApplicationException( $"Template for type <{dataType}> already defined" );
             }
             _typeToTemplateMapping.Add(dataType, newTemplateName);
         }
@@ -40,6 +39,10 @@ namespace Sketch.PropertyEditor
             FrameworkElement element = container as FrameworkElement;
             if (item != null && item is PropertyValueModel model)
             {
+                if ( model.IsCellTemplateSpecified )
+                {
+                    return element.FindResource(model.CellTemplateName) as DataTemplate;
+                }
                 if (_typeToTemplateMapping.TryGetValue(model.PropertyType, out string key))
                 {
                     var template =  element.FindResource(key) as DataTemplate;

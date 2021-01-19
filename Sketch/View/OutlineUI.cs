@@ -119,6 +119,7 @@ namespace Sketch.View
 
                 InitContextMenu(model);
                 
+                
             }
             else
             {

@@ -4,7 +4,6 @@ using Sketch.Helper;
 using System.Windows.Input;
 using Sketch.Helper.Binding;
 using DrawIt.Uml;
-using DrawIt.Shapes;
 using Sketch.Interface;
 using System.Windows.Controls;
 using Sketch.View.CustomControls;
@@ -94,7 +93,7 @@ namespace DrawIt
             _registeredCursors.Add(typeof(UmlNoteModel), BitmapToCursor.CreateCursor(_insertNote, 1, 1));
             _registeredCursors.Add(typeof(UmlPackageModel), BitmapToCursor.CreateCursor(_insertPackage, 1, 1));
             _registeredCursors.Add(typeof(UmlChoiceModel), BitmapToCursor.CreateCursor(_insertChoice, 1, 1));
-            _registeredCursors.Add(typeof(PictureModel), BitmapToCursor.CreateCursor(_insertPicture, 1, 1));
+
 
 
             _deleteEntry = new DelegateCommand(DoDeleteEntries);
