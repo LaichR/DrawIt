@@ -6,4 +6,3 @@ __pycache__/
 packages/
 *.user
 DrawIt/DrawIt_TemporaryKey.pfx
-DrawIt/publish

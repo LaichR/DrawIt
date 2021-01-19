@@ -600,7 +600,17 @@ namespace Sketch.View
             maxZ = int.MinValue;
             foreach (var sibling in this._parent.Canvas.Children.OfType<ISketchItemUI>())
             {
-                if (this.Bounds.IntersectsWith(sibling.Model.Geometry.Bounds))
+                var r1 = this.Bounds;
+                var r2 = Rect.Empty;
+                if (sibling.Model is IBoundsProvider boundsProvider )
+                {
+                    r2 = boundsProvider.Bounds;
+                }
+                else
+                {
+                    r2 = VisualTreeHelper.GetContentBounds(sibling.Shape);
+                }
+                if (r1.IntersectsWith(r2))
                 {
                     var otherZ = Canvas.GetZIndex(sibling.Shape);
                     if (otherZ > maxZ) maxZ = otherZ;
