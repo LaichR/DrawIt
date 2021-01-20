@@ -223,7 +223,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="Resources\DefaultConnector.bmp" />
   </ItemGroup>
   <ItemGroup>
