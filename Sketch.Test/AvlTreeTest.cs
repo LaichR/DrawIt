@@ -14,7 +14,7 @@ namespace Sketch.Test
     public class AvlTreeTest
     {
         [Test]
-        public void TestBoundedItemInserAndFind()
+        public void TestBoundedItemInsertAndFind()
         {
             List<Rect> rectangles = new List<Rect>();
             LinkedAvlTree<BoundsComparer> tree = new LinkedAvlTree<BoundsComparer>();
@@ -37,10 +37,16 @@ namespace Sketch.Test
 
             var left = -1.0;
             var lowerBound = tree.LowerBound(rectangles.First());
+            var previous = lowerBound;
             while( lowerBound != null)
             {
-                Assert.True(left <= lowerBound.Data.Left);
+                if(left > lowerBound.Data.Left)
+                {
+                    Assert.True(left <= lowerBound.Data.Left);
+                }
+                
                 left = lowerBound.Data.Left;
+                previous = lowerBound;
                 lowerBound = lowerBound.Next;
             }
         }
@@ -53,8 +59,8 @@ namespace Sketch.Test
             {
                 var x = rand.NextDouble() * 2048;
                 var y = rand.NextDouble() * 1600;
-                var w = rand.NextDouble() + 150;
-                var h = rand.NextDouble() * 50;
+                var w = 150;
+                var h = 50;
                 var p = new Point(x, y);
                 var s = new Size(w, h);
                 var r = new Rect(p, s);

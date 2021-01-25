@@ -12,6 +12,7 @@ using Sketch.Interface;
 using Sketch.Models;
 using System.Windows.Controls;
 using Sketch.View;
+using Sketch.Helper.RuntimeCheck;
 
 
 namespace Sketch.Utilities
@@ -92,7 +93,7 @@ namespace Sketch.Utilities
 
         public static void AlignLeft(IEnumerable<ISketchItemModel> outlines)
         {
-            RuntimeCheck.Contract.Requires(outlines != null, "list of shapes to align must not be null");
+            Contract.Requires(outlines != null, "list of shapes to align must not be null");
             var orderedUis = outlines.Where((x) => x is ConnectableBase && x.IsMarked).OrderBy((x) => x.Geometry.Bounds.Top);
             if (orderedUis.Count() > 1)
             {
@@ -109,7 +110,7 @@ namespace Sketch.Utilities
 
         public static void AlignTop(IEnumerable<ISketchItemModel> outlines)
         {
-            RuntimeCheck.Contract.Requires(outlines != null, "list of shapes to align must not be null");
+            Contract.Requires(outlines != null, "list of shapes to align must not be null");
             var orderedUis = outlines.Where((x) => x is ConnectableBase && x.IsMarked).OrderBy((x) => x.Geometry.Bounds.Left);
             if (orderedUis.Count() > 1)
             {
@@ -126,7 +127,7 @@ namespace Sketch.Utilities
 
         public static void AlignCenter(IEnumerable<ISketchItemModel> outlines)
         {
-            RuntimeCheck.Contract.Requires(outlines != null, "list of shapes to align must not be null");
+            Contract.Requires(outlines != null, "list of shapes to align must not be null");
             var orderedUis = outlines.Where((x) => x is ConnectableBase && x.IsMarked).OrderBy((x) => x.Geometry.Bounds.Top);
             if (orderedUis.Count() > 1)
             {

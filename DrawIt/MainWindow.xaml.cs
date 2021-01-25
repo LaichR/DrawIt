@@ -87,7 +87,7 @@ namespace DrawIt
 
         private void SketchPad_SelectedItemChanged(object sender, RoutedEventArgs e)
         {
-            var selected = SketchPad.SelectedItem;
+            var selected = this.SketchPad.SelectedItem;
             _model.SelectedItem = selected;
             PropertyEditor.InspectedObject = selected;
         }

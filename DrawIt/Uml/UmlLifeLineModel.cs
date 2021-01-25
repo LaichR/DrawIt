@@ -1,95 +1,129 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Media;
-using Bluebottle.Base.Interfaces;
-using Sketch.Types;
 using Sketch.Models;
 using System.Runtime.Serialization;
+using Sketch.Interface;
 
-namespace Drawing.Uml
+namespace DrawIt.Uml
 {
     [Serializable]
+    [AllowableConnector(typeof(UmlMessageModel))]
     public class UmlLifeLineModel : ConnectableBase
     {
-        IList<Bluebottle.Base.Interfaces.ICommandDescriptor> _tools = new List<Bluebottle.Base.Interfaces.ICommandDescriptor>();
-        OutlineToolFactory _toolFactory;
-        double _height;
-        double _activityStart = 0.05;
-        public UmlLifeLineModel(Size parentSize, Point p, OutlineToolFactory toolFactory)
-        {
-            var pos = p;
-            pos.Y = 10;
-            IsSelected = true;
-            AllowSizeChange = true;
-            Name = "a Object";
-            RotationAngle = 0.0;
-            FillColor = Colors.White;
-            _toolFactory = toolFactory;
+        
+        new public static readonly double DefaultHeight = 350;
+        new public static readonly double DefaultWidth = 36;
 
-            FormattedText t = new FormattedText(Name, System.Globalization.CultureInfo.CurrentCulture,
-                     System.Windows.FlowDirection.LeftToRight, new Typeface("Arial"), 12, Brushes.Blue);
-            _height = parentSize.Height;
+        static readonly Pen _lifeLinePen = new Pen(Brushes.Black, 1)
+        { DashStyle = new DashStyle(new double[] { 5, 5 }, 0), DashCap = PenLineCap.Square };
             
-            LabelArea = new Rect(pos, new Size(t.Width, t.Height));
-            pos.X = (LabelArea.Left + LabelArea.Right) / 2;
-            pos.Y = LabelArea.Bottom;
-            Bounds = new Rect( pos, new Size(1, parentSize.Height));
-            AllowSizeChange = false;
-            _tools = _toolFactory.GetTools();
+        LineGeometry _lifeLine;
+
+
+        public UmlLifeLineModel(Point p, ISketchItemContainer container )
+            :base(p, container, new Size(UmlLifeLineModel.DefaultWidth,
+                UmlLifeLineModel.DefaultHeight),
+                 "Object Life Line", Colors.Snow)
+        {
+            FillColor = new Color() { A = 0, R = 0xFF, G = 0xFF, B = 0xFF };
+
+            CanChangeSize = true;
+            UpdateGeometry();
         }
 
-        internal double GetNextInteractionPosition()
+        
+
+        protected UmlLifeLineModel(SerializationInfo info, StreamingContext context)
+            :base(info, context) 
         {
-            var ret = _activityStart;
-            _activityStart += 0.05;
-            return ret;
+            UpdateGeometry();
         }
 
-        public override RectangleGeometry Outline
+
+        
+
+        public override void UpdateGeometry()
         {
-            get
+            var g = Geometry as GeometryGroup;
+            g.Children.Clear();
+            var r = new Rect(new Point(0,0), 
+                new Point(Bounds.Width, LabelArea.Height + 10));
+            var rg = new RectangleGeometry(r);
+            _lifeLine = new LineGeometry(
+                new Point(Bounds.Width / 2, LabelArea.Height + 10),
+                new Point(Bounds.Width / 2, Bounds.Height- LabelArea.Height + 10)
+                );
+            
+            g.Children.Add(rg);
+            //g.Children.Add(_lifeLine);
+        }
+
+        public override void RenderAdornments(DrawingContext drawingContext)
+        {
+            drawingContext.DrawGeometry(_lifeLinePen.Brush, _lifeLinePen , _lifeLine);   
+        }
+
+        protected override Point GetConnectorPositionInfo(Point hint, out double relativePos, out ConnectorDocking docking, out ulong port)
+        {
+            port = 0;
+            var lifeLineX = Bounds.X + Bounds.Width / 2;
+            Point p = new Point(lifeLineX, hint.Y);
+            docking = ConnectorDocking.Right;
+            relativePos = (p.Y -Bounds.Y) / Bounds.Height;
+            if (hint.X < lifeLineX)
             {
-                return new RectangleGeometry(Bounds);
+                docking = ConnectorDocking.Left;
+            }
+            return p;
+        }
+
+        public override Point GetPreferredToolsLocation(Point curMouse, out ConnectorDocking docking)
+        {
+            Point p = Bounds.TopRight;
+            double middle = Bounds.X + Bounds.Width / 2;
+            //p.X = middle + 10;
+            docking = ConnectorDocking.Right;
+            if( curMouse.X < middle)
+            {
+                docking = ConnectorDocking.Left;
+                p = Bounds.TopLeft;
+            }
+            p.Y = curMouse.Y-10;
+            return p;
+        }
+
+        public override Point GetConnectorPoint(ConnectorDocking docking, double relativePosition, ulong connectorPort)
+        {
+            double y = Bounds.Height * relativePosition + Bounds.Top;
+            return new Point(Bounds.Left + Bounds.Width / 2, y);
+        }
+
+        public double LifeLineX
+        {
+            get => Bounds.Width / 2;
+        }
+
+        public override string Label 
+        { 
+            get => base.Label;
+            set
+            {
+                base.Label = value;
+                AdjustBounds();
             }
         }
 
-        public override IList<ICommandDescriptor> Tools
+        void AdjustBounds()
         {
-            get
+            if (Bounds.Left != 0) // the bounds where not yet initialized
             {
-                return _tools;
+                LabelArea = ComputeLabelArea(DisplayedLabel());
+                var w = Math.Max(DefaultWidth, LabelArea.Width + 20);
+                var h = Math.Max(Bounds.Height, LabelArea.Height + 20);
+                Bounds = ComputeBounds(Bounds.TopLeft, new Size(w, h), LabelArea);
             }
         }
 
-
-        public override Geometry Geometry
-        {
-            get
-            {
-                var myGeometry = new GeometryGroup();
-
-                FormattedText t = new FormattedText(Name, System.Globalization.CultureInfo.CurrentCulture,
-                    System.Windows.FlowDirection.LeftToRight, new Typeface("Arial"), 12, Brushes.Blue);
-                //var textGeometry = t.BuildGeometry();
-                var labelRect = new RectangleGeometry(
-                    new Rect(new Point(LabelArea.Left + 7, LabelArea.Top + 2),
-                             new Point(LabelArea.Right + 7, LabelArea.Bottom + 2)));
-
-                myGeometry.Children.Add(labelRect);
-
-                List<Point> points = new List<Point>
-                {
-                    new Point( (LabelArea.Left + LabelArea.Right)/2-1, LabelArea.Bottom  ),
-                    new Point( (LabelArea.Left + LabelArea.Right)/2 + 1, _height)
-                };
-
-                LineGeometry line = new LineGeometry(points[0], points[1]);
-
-                myGeometry.Children.Add(line);
-                return myGeometry;
-            }
-        }
     }
 }

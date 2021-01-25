@@ -83,7 +83,7 @@
         <Expander x:Name="Expander" Grid.Row="2" Grid.Column="0" 
                   ExpandDirection="Right" FlowDirection="LeftToRight" HorizontalContentAlignment="Stretch"
                   Expanded="Expander_Expanded"
-                  Collapsed="Expander_Collapsed">
+                  Collapsed="Expander_Collapsed" IsExpanded="True">
             <Grid Grid.Column="0" Grid.Row="2">
 
             <Grid.RowDefinitions>
@@ -95,12 +95,12 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                <TextBlock Text="Sketch Title:" Margin="5,0,5,0" VerticalAlignment="Center"
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                    <TextBlock Text="Sketch Title:" Margin="5,0,5,0" VerticalAlignment="Center"
                            FontStyle="Oblique" FontWeight="Bold"/>
-                <TextBox Text="{Binding Label}" Margin="5,0,5,0" VerticalAlignment="Center" HorizontalAlignment="Stretch" MinWidth="250" BorderThickness="0.3,0.3,1,1"/>
-            </StackPanel>
-            <TreeView Grid.Row="1" ItemsSource="{Binding SupportedDiagrams }" Margin="5,0,5,0"
+                    <TextBox Text="{Binding Label}" Margin="5,0,5,0" VerticalAlignment="Center" HorizontalAlignment="Stretch" MinWidth="250" BorderThickness="0.3,0.3,1,1"/>
+                </StackPanel>
+                <TreeView Grid.Row="1" ItemsSource="{Binding SupportedDiagrams }" Margin="5,0,5,0"
                       LostFocus="TreeView_LostFocus"
                       GotFocus="TreeView_GotFocus"
                       >
