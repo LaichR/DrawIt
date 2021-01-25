@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Windows;
 using Sketch.Interface;
-using Sketch.Types;
+using Sketch.Helper;
 
 namespace Sketch.Utilities
 {

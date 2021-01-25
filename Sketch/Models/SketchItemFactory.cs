@@ -11,7 +11,6 @@ using System.Windows;
 using Sketch.Helper.Binding;
 using System.Linq.Expressions;
 using LinqExp = System.Linq.Expressions.Expression;
-using System.Runtime.Hosting;
 using System.Security.Cryptography;
 using Sketch.Models;
 using Bitmap = System.Drawing.Bitmap;
