@@ -10,6 +10,10 @@
     <UseWPF>true</UseWPF>
     
     <AssemblyName>DrawIt</AssemblyName>
+    
+    <SignAssembly>false</SignAssembly>
+    
+    <ApplicationIcon>DrawIt.ico</ApplicationIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

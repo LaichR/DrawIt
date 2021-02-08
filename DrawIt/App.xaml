@@ -13,7 +13,8 @@
             <Setter Property="FontWeight" Value="Bold"/>
         </Style>
         <Style x:Key="LabelEditorStyle" TargetType="TextBox">
-            <Setter Property="Background" Value="{Binding Parent.Background}"/>
+            <Setter Property="Background" Value="{Binding Parent.Background, Mode=OneWay, RelativeSource={RelativeSource Mode=FindAncestor,
+            AncestorType={x:Type SketchCtrl:OutlineUI}}}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Focusable" Value="{Binding Path=IsSelected}"/>
             <Setter Property="Text" Value="{Binding Path=Label, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>

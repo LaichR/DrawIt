@@ -15,7 +15,7 @@
         <Setter Property="FontWeight" Value="Bold"/>
     </Style>
     <Style x:Key="LabelEditorStyle" TargetType="TextBox">
-        <Setter Property="Background" Value="{Binding DataContext.Fill, RelativeSource={RelativeSource Mode=FindAncestor,
+        <Setter Property="Background" Value="{Binding Background, RelativeSource={RelativeSource Mode=FindAncestor,
             AncestorType={x:Type Ctrl:OutlineUI}}}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Focusable" Value="{Binding Path=IsSelected}"/>
